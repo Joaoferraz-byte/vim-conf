@@ -14,7 +14,7 @@ require("dashboard").setup({
       { icon = "  ", desc = "Novo Arquivo", action = "enew", key = "n" },
       { icon = "  ", desc = "Arquivos Recentes", action = "Telescope oldfiles", key = "r" },
       { icon = "  ", desc = "Explorar Arquivos", action = "NvimTreeToggle", key = "e" },
-      { icon = "  ", desc = "Configuração", action = "e ~/.config/nvim/init.lua", key = "c" },
+      { icon = "  ", desc = "Configuração", action = "e ~/Projects/lua-conf/init.lua", key = "c" },
       { icon = "  ", desc = "Sair do Neovim", action = "qa", key = "q" },
     },
   },
