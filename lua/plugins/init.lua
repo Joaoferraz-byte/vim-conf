@@ -1,10 +1,21 @@
-require("nvim-treesitter.configs").setup({
-  highlight = { enable = true },
-  indent = { enable = true },
-  ensure_installed = { "lua", "nix", "java", "c", "cpp", "python", "typescript", "html", "css", "json", "markdown", "angular" }, -- Adicionado angular
-  sync_install = false,
-  auto_install = true,
-})
+-- O nvim-treesitter v1.0.0 mudou a forma de configuração ou o nome dos módulos.
+-- Tentamos carregar o módulo antigo, se falhar, tentamos o novo ou apenas ignoramos.
+local status_ok, configs = pcall(require, "nvim-treesitter.configs")
+if not status_ok then
+    -- Tenta o novo padrão se existir (algumas versões usam nvim-treesitter.config)
+    status_ok, configs = pcall(require, "nvim-treesitter.config")
+end
+
+if status_ok and configs.setup then
+  configs.setup({
+    highlight = { enable = true },
+    indent = { enable = true },
+    -- No NixOS, os parsers são instalados via Nix (nix-conf)
+    ensure_installed = {}, 
+    sync_install = false,
+    auto_install = false,
+  })
+end
 
 local cmp = require("cmp")
 local luasnip = require("luasnip")
