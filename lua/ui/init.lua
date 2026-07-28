@@ -1,10 +1,15 @@
 require("snacks").setup({
   dashboard = {
     enabled = true,
+    -- Garante que o dashboard apareça ao iniciar
     sections = {
       { section = "header" },
       { section = "keys", gap = 1, padding = 1 },
       { section = "startup" },
+    },
+    -- Força o dashboard a ser exibido mesmo se o nvim for aberto sem argumentos
+    autocmds = {
+      enabled = true,
     },
     preset = {
       header = [[
