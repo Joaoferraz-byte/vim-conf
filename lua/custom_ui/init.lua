@@ -16,6 +16,7 @@ require("snacks").setup({
                         LIVARA
       Neovim declarativo — C/C++ · Java · Kotlin · Angular · Manim
       ]],
+      header_hl = "Keyword",
       keys = {
         { icon = " ", key = "f", desc = "Procurar Arquivo", action = ":Telescope find_files" },
         { icon = " ", key = "n", desc = "Novo Arquivo", action = ":enew" },
