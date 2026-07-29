@@ -40,7 +40,7 @@
               key = "f";
             }
             {
-              desc = "  New File (Advanced)";
+              desc = "  New File";
               group = "@variable";
               action = "lua _G.advanced_new_file()";
               key = "n";
@@ -60,7 +60,7 @@
             {
               desc = "  Config";
               group = "@variable";
-              action = "Telescope find_files cwd=~/.config/nvim";
+              action = "Telescope find_files cwd=/home/livara/.config/";
               key = "c";
             }
             {
