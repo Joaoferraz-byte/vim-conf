@@ -4,6 +4,7 @@
   globals.maplocalleader = " ";
 
   keymaps = [
+    # ─── Geral ───
     {
       key = "<Esc>";
       action = "<cmd>nohlsearch<CR>";
@@ -29,37 +30,185 @@
       options = { silent = true; desc = "Fechar buffer"; };
     }
 
+    # ─── Dashboard ───
+    {
+      key = "<leader>d";
+      action = ":lua Snacks.dashboard()";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Abrir dashboard"; };
+    }
+
+    # ─── Navegação / Busca ───
     {
       key = "<leader>e";
-      action = "<cmd>NvimTreeToggle<CR>";
+      action = ":lua Snacks.explorer()";
       mode = [ "n" ];
-      options = { silent = true; desc = "Alternar explorador"; };
+      options = { silent = true; desc = "Alternar explorador de arquivos"; };
     }
     {
       key = "<leader>ff";
-      action = "<cmd>Telescope find_files<CR>";
+      action = ":lua Snacks.picker.files()";
       mode = [ "n" ];
       options = { silent = true; desc = "Buscar arquivos"; };
     }
     {
       key = "<leader>fg";
-      action = "<cmd>Telescope live_grep<CR>";
+      action = ":lua Snacks.picker.grep()";
       mode = [ "n" ];
       options = { silent = true; desc = "Buscar conteúdo"; };
     }
     {
       key = "<leader>fb";
-      action = "<cmd>Telescope buffers<CR>";
+      action = ":lua Snacks.picker.buffers()";
       mode = [ "n" ];
       options = { silent = true; desc = "Buffers"; };
     }
     {
       key = "<leader>fd";
-      action = "<cmd>Telescope diagnostics<CR>";
+      action = ":lua Snacks.picker.diagnostics()";
       mode = [ "n" ];
       options = { silent = true; desc = "Diagnósticos"; };
     }
+    {
+      key = "<leader>fr";
+      action = ":lua Snacks.picker.recent()";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Arquivos recentes"; };
+    }
+    {
+      key = "<leader>fp";
+      action = ":lua Snacks.picker.projects()";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Projetos"; };
+    }
+    {
+      key = "<leader>f:";
+      action = ":lua Snacks.picker.command_history()";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Histórico de comandos"; };
+    }
 
+    # ─── Telescope (fallback compatibilidade) ───
+    {
+      key = "<leader>tf";
+      action = "<cmd>Telescope find_files<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Telescope: buscar arquivos"; };
+    }
+    {
+      key = "<leader>tg";
+      action = "<cmd>Telescope live_grep<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Telescope: buscar conteúdo"; };
+    }
+    {
+      key = "<leader>tb";
+      action = "<cmd>Telescope buffers<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Telescope: buffers"; };
+    }
+
+    # ─── Aerial (outline) ───
+    {
+      key = "<leader>o";
+      action = "<cmd>AerialToggle<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Alternar outline"; };
+    }
+    {
+      key = "<leader>on";
+      action = "<cmd>AerialNavToggle<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Alternar navegação outline"; };
+    }
+
+    # ─── Harpoon ───
+    {
+      key = "<leader>ha";
+      action.__raw = "function() require('harpoon'):list():add() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Harpoon: marcar arquivo"; };
+    }
+    {
+      key = "<leader>ht";
+      action.__raw = "function() require('harpoon').ui:toggle_quick_menu(require('harpoon'):list()) end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Harpoon: lista rápida"; };
+    }
+    {
+      key = "<leader>h1";
+      action.__raw = "function() require('harpoon'):list():select(1) end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Harpoon: ir para 1"; };
+    }
+    {
+      key = "<leader>h2";
+      action.__raw = "function() require('harpoon'):list():select(2) end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Harpoon: ir para 2"; };
+    }
+    {
+      key = "<leader>h3";
+      action.__raw = "function() require('harpoon'):list():select(3) end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Harpoon: ir para 3"; };
+    }
+    {
+      key = "<leader>h4";
+      action.__raw = "function() require('harpoon'):list():select(4) end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Harpoon: ir para 4"; };
+    }
+
+    # ─── Flash ───
+    {
+      key = "s";
+      action.__raw = "function() require('flash').jump() end";
+      mode = [ "n" "x" "o" ];
+      options = { silent = true; desc = "Flash: navegar"; };
+    }
+    {
+      key = "S";
+      action.__raw = "function() require('flash').treesitter() end";
+      mode = [ "n" "x" "o" ];
+      options = { silent = true; desc = "Flash: treesitter"; };
+    }
+
+    # ─── Zen Mode ───
+    {
+      key = "<leader>z";
+      action = "<cmd>ZenMode<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Zen mode"; };
+    }
+
+    # ─── Smart Splits ───
+    {
+      key = "<C-h>";
+      action.__raw = "function() require('smart-splits').move_cursor_left() end";
+      mode = [ "n" "t" ];
+      options = { silent = true; desc = "Smart splits: mover cursor esquerda"; };
+    }
+    {
+      key = "<C-j>";
+      action.__raw = "function() require('smart-splits').move_cursor_down() end";
+      mode = [ "n" "t" ];
+      options = { silent = true; desc = "Smart splits: mover cursor baixo"; };
+    }
+    {
+      key = "<C-k>";
+      action.__raw = "function() require('smart-splits').move_cursor_up() end";
+      mode = [ "n" "t" ];
+      options = { silent = true; desc = "Smart splits: mover cursor cima"; };
+    }
+    {
+      key = "<C-l>";
+      action.__raw = "function() require('smart-splits').move_cursor_right() end";
+      mode = [ "n" "t" ];
+      options = { silent = true; desc = "Smart splits: mover cursor direita"; };
+    }
+
+    # ─── LSP ───
     {
       key = "gd";
       action = "<cmd>lua vim.lsp.buf.definition()<CR>";
@@ -115,6 +264,7 @@
       options = { silent = true; desc = "Lista de diagnósticos"; };
     }
 
+    # ─── Terminal ───
     {
       key = "<C-\\>";
       action = "<cmd>ToggleTerm direction=float<CR>";
@@ -122,6 +272,7 @@
       options = { silent = true; desc = "Terminal flutuante"; };
     }
 
+    # ─── DAP ───
     {
       key = "<leader>db";
       action = "<cmd>lua require('dap').toggle_breakpoint()<CR>";
@@ -159,6 +310,7 @@
       options = { silent = true; desc = "Alternar interface DAP"; };
     }
 
+    # ─── Java ───
     {
       key = "<leader>jo";
       action = "<cmd>JdtOrganizeImports<CR>";

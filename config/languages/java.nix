@@ -1,13 +1,26 @@
 { pkgs, ... }:
 {
-  # JDTLS é iniciado pelo nvim-jdtls abaixo para que cada projeto receba
-  # seu workspace, raízes Maven/Gradle e suporte de depuração corretamente.
-  plugins.lsp.servers.jdtls.enable = false;
+  # ─── JDTLS nativo do Nixvim ───
+  plugins.jdtls = {
+    enable = true;
+    autoLoad = true;
+    jdtLanguageServerPackage = pkgs.jdt-language-server;
+  };
 
-  extraPlugins = with pkgs.vimPlugins; [
-    nvim-jdtls
-    spring-boot-nvim
-  ];
+  # ─── Spring Boot nativo do Nixvim ───
+  plugins.spring-boot = {
+    enable = true;
+    autoLoad = true;
+    settings = {
+      autocmd = true;
+      java_cmd = "${pkgs.jdk21}/bin/java";
+      server = {
+        root_dir = {
+          __raw = ''vim.fs.root(0, { '.git', 'mvnw', 'gradlew' })'';
+        };
+      };
+    };
+  };
 
   extraPackages = with pkgs; [
     jdk21
@@ -17,76 +30,124 @@
     gradle
   ];
 
+  # Configurações avançadas do JDTLS via extraConfigLua
   extraConfigLua = ''
-    local function start_jdtls()
-      local ok, jdtls = pcall(require, "jdtls")
-      if not ok then
-        return
-      end
+    -- Configurações avançadas do JDTLS (settings, root_markers, dap integration)
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "java",
+      callback = function()
+        -- Configurar inlay hints para nomes de parâmetros
+        local ok, jdtls = pcall(require, "jdtls")
+        if not ok then
+          return
+        end
 
-      local root_markers = {
-        ".git",
-        "mvnw",
-        "gradlew",
-        "pom.xml",
-        "build.gradle",
-        "build.gradle.kts",
-        "settings.gradle",
-        "settings.gradle.kts",
-      }
-      local root_dir = require("jdtls.setup").find_root(root_markers)
-      if root_dir == nil then
-        return
-      end
+        -- Override settings do JDTLS para comportamento avançado
+        local function on_attach(_, _)
+          -- Habilitar DAP para Java com hot code replace
+          pcall(jdtls.setup_dap, {
+            hotcodereplace = "auto",
+            config_overrides = {},
+          })
 
-      local project_name = vim.fn.fnamemodify(root_dir, ":p:h:t")
-      local workspace_dir = vim.fn.stdpath("cache") .. "/jdtls/" .. project_name
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
+          -- Organizar imports ao salvar
+          vim.api.nvim_create_autocmd("BufWritePost", {
+            buffer = vim.api.nvim_get_current_buf(),
+            callback = function()
+              pcall(vim.cmd, "JdtOrganizeImports")
+            end,
+            once = true,
+          })
+        end
 
-      local config = {
-        cmd = {
-          "${pkgs.jdt-language-server}/bin/jdtls",
-          "--jvm-arg=-javaagent:${pkgs.lombok}/share/java/lombok.jar",
-          "-data",
-          workspace_dir,
-        },
-        root_dir = root_dir,
-        capabilities = capabilities,
-        settings = {
-          java = {
-            eclipse = { downloadSources = true },
-            maven = { downloadSources = true },
-            implementationsCodeLens = { enabled = true },
-            referencesCodeLens = { enabled = true },
-            references = { includeDecompiledSources = true },
-            format = { enabled = true },
-            saveActions = { organizeImports = true },
-            configuration = {
-              runtimes = {
-                {
-                  name = "JavaSE-21",
-                  path = "${pkgs.jdk21}",
-                  default = true,
+        -- Encontrar root do projeto
+        local root_markers = {
+          ".git",
+          "mvnw",
+          "gradlew",
+          "pom.xml",
+          "build.gradle",
+          "build.gradle.kts",
+          "settings.gradle",
+          "settings.gradle.kts",
+        }
+
+        local root_dir = require("jdtls.setup").find_root(root_markers)
+        if root_dir == nil then
+          return
+        end
+
+        -- Configurar workspace por projeto
+        local project_name = vim.fn.fnamemodify(root_dir, ":p:h:t")
+        local workspace_dir = vim.fn.stdpath("cache") .. "/jdtls/" .. project_name
+        local config_dir = workspace_dir .. "/config"
+
+        -- Iniciar/reattach JDTLS com configuração completa
+        local config = {
+          cmd = {
+            "${pkgs.jdt-language-server}/bin/jdtls",
+            "--jvm-arg=-javaagent:${pkgs.lombok}/share/java/lombok.jar",
+            "-configuration",
+            config_dir,
+            "-data",
+            workspace_dir,
+          },
+          root_dir = root_dir,
+          settings = {
+            java = {
+              eclipse = { downloadSources = true },
+              maven = { downloadSources = true },
+              implementationsCodeLens = { enabled = true },
+              referencesCodeLens = { enabled = true },
+              references = { includeDecompiledSources = true },
+              format = { enabled = true },
+              saveActions = { organizeImports = true },
+              completion = {
+                favoriteStaticMembers = {
+                  "org.junit.jupiter.api.Assertions.*",
+                  "org.junit.jupiter.api.Assumptions.*",
+                  "org.junit.jupiter.api.DynamicContainer.*",
+                  "org.junit.jupiter.api.DynamicTest.*",
+                  "org.mockito.Mockito.*",
+                  "org.mockito.ArgumentMatchers.*",
+                  "org.mockito.Answers.*",
                 },
+                filteredTypes = {
+                  "com.sun.*",
+                  "io.micrometer.shaded.*",
+                  "java.awt.*",
+                  "jdk.*",
+                  "sun.*",
+                },
+              },
+              inlayHints = {
+                parameterNames = { enabled = "all" },
+              },
+              configuration = {
+                runtimes = {
+                  {
+                    name = "JavaSE-21",
+                    path = "${pkgs.jdk21}",
+                    default = true,
+                  },
+                },
+              },
+              codeGeneration = {
+                toString = {
+                  template = "${"$"}{object.className}{${"$"}{member.name()}=${"$"}{member.value}, ${"$"}{otherMembers}}",
+                },
+                useBlocks = true,
               },
             },
           },
-        },
-        on_attach = function(_, _)
-          pcall(jdtls.setup_dap, { hotcodereplace = "auto" })
-        end,
-      }
+          on_attach = on_attach,
+          init_options = {
+            bundles = {},
+          },
+        }
 
-      jdtls.start_or_attach(config)
-    end
-
-    vim.api.nvim_create_autocmd("FileType", {
-      pattern = "java",
-      callback = start_jdtls,
+        jdtls.start_or_attach(config)
+      end,
     })
-
-    pcall(function()
-      require("spring_boot").setup()
-    end)
   '';
 }
