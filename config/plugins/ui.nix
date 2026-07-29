@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
   plugins = {
-    # ─── Snacks.nvim (utilitários modernos) ───
+    # ─── Snacks.nvim ───
     snacks = {
       enable = true;
       settings = {
@@ -17,13 +17,17 @@
       };
     };
 
-    # ─── Dashboard-nvim (Start Screen robusto e nativo) ───
+    # ─── Dashboard-nvim (Centralizado Verticalmente) ───
     dashboard = {
       enable = true;
       settings = {
         theme = "doom";
         config = {
           header = [
+            ""
+            ""
+            ""
+            ""
             "██╗     ██╗██╗   ██╗ █████╗ ██████╗  █████╗ "
             "██║     ██║██║   ██║██╔══██╗██╔══██╗██╔══██╗"
             "██║     ██║██║   ██║███████║██████╔╝███████║"
@@ -44,6 +48,12 @@
               desc = "New File (Advanced)";
               action = "lua _G.advanced_new_file()";
               key = "n";
+            }
+            {
+              icon = "  ";
+              desc = "Spring Boot Wizard";
+              action = "lua _G.spring_boot_wizard()";
+              key = "s";
             }
             {
               icon = "  ";
@@ -75,61 +85,52 @@
       };
     };
 
-    # ─── Nvim-Tree (Explorador estável) ───
+    # ─── Which-Key (UI de Keymaps Organizada) ───
+    which-key = {
+      enable = true;
+      settings = {
+        spec = [
+          {
+            __unkeyed-1 = "<leader>f";
+            group = " Arquivos";
+            icon = " ";
+          }
+          {
+            __unkeyed-1 = "<leader>c";
+            group = " Configuração";
+            icon = " ";
+          }
+          {
+            __unkeyed-1 = "<leader>l";
+            group = "󰘦 LSP/Linguagens";
+            icon = "󰘦 ";
+          }
+          {
+            __unkeyed-1 = "<leader>n";
+            group = " Novo";
+            icon = " ";
+          }
+          {
+            __unkeyed-1 = "<leader>h";
+            group = "󰛢 Harpoon";
+            icon = "󰛢 ";
+          }
+        ];
+      };
+    };
+
+    # ─── Nvim-Tree ───
     nvim-tree = {
       enable = true;
       openOnSetup = false;
       filters.dotfiles = false;
     };
 
-    # ─── Noice.nvim (UI moderna) ───
-    noice = {
-      enable = true;
-    };
-
-    # ─── Barbecue (breadcrumbs) ───
-    barbecue = {
-      enable = true;
-      settings = {
-        attach_navic = true;
-        create_autocmd = true;
-        winbar.enabled = true;
-      };
-    };
-
-    # ─── Treesitter Context ───
-    treesitter-context = {
-      enable = true;
-      settings = {
-        max_lines = 3;
-        separator = "-";
-      };
-    };
-
-    # ─── Indent Blankline ───
-    indent-blankline = {
-      enable = true;
-      settings = {
-        indent.char = "│";
-        scope.enabled = true;
-        exclude = {
-          filetypes = [
-            "dashboard"
-            "alpha"
-            "nixvim"
-            "NvimTree"
-            "Trouble"
-            "toggleterm"
-            "help"
-          ];
-        };
-      };
-    };
-
-    # ─── Fidget ───
+    # ─── Outros Plugins de UI ───
+    noice.enable = true;
+    barbecue.enable = true;
+    treesitter-context.enable = true;
     fidget.enable = true;
-
-    # ─── Outros ───
     bufferline.enable = true;
     lualine = {
       enable = true;
@@ -138,19 +139,18 @@
         globalstatus = true;
       };
     };
-    toggleterm = {
+    indent-blankline = {
       enable = true;
       settings = {
-        direction = "float";
-        open_mapping = "[[<c-\\>]]";
-        float_opts.border = "curved";
+        indent.char = "│";
+        exclude.filetypes = [ "dashboard" "alpha" "NvimTree" "toggleterm" "help" ];
       };
     };
   };
 
-  # Configurações extras de UI e funções customizadas
+  # Funções Customizadas e Autocmds
   extraConfigLua = ''
-    -- Função avançada para criar novos arquivos com seleção de pasta
+    -- Função avançada para criar novos arquivos
     _G.advanced_new_file = function()
       local telescope = require("telescope")
       local actions = require("telescope.actions")
@@ -168,19 +168,11 @@
         attach_mappings = function(prompt_bufnr, map)
           local create_file = function()
             local selection = action_state.get_selected_entry()
-            local current_picker = action_state.get_current_picker(prompt_bufnr)
-            local dir = current_picker.cwd
-
+            local dir = action_state.get_current_picker(prompt_bufnr).cwd
             if selection then
-              if selection.is_dir then
-                dir = selection.path
-              else
-                dir = vim.fn.fnamemodify(selection.path, ":h")
-              end
+              dir = selection.is_dir and selection.path or vim.fn.fnamemodify(selection.path, ":h")
             end
-
             actions.close(prompt_bufnr)
-
             vim.ui.input({ prompt = "Nome do novo arquivo: " }, function(input)
               if input and input ~= "" then
                 local path = dir .. "/" .. input
@@ -189,16 +181,73 @@
               end
             end)
           end
-
           map("n", "<CR>", create_file)
           map("i", "<CR>", create_file)
           return true
         end,
       })
     end
+
+    -- Spring Boot Project Wizard
+    _G.spring_boot_wizard = function()
+      local java_versions = { "17", "21" }
+      local boot_versions = { "3.2.0", "3.3.0" }
+
+      vim.ui.select(java_versions, { prompt = "Versão do Java:" }, function(java_v)
+        if not java_v then return end
+        vim.ui.select(boot_versions, { prompt = "Versão do Spring Boot:" }, function(boot_v)
+          if not boot_v then return end
+          vim.ui.input({ prompt = "Group ID (ex: com.example): ", default = "com.example" }, function(group)
+            if not group then return end
+            vim.ui.input({ prompt = "Artifact ID (ex: demo): ", default = "demo" }, function(artifact)
+              if not artifact then return end
+              
+              -- Selecionar diretório via Telescope File Browser
+              local telescope = require("telescope")
+              local fb = telescope.extensions.file_browser
+              fb.file_browser({
+                prompt_title = "Selecionar Pasta Raiz do Projeto",
+                cwd = vim.fn.getcwd(),
+                attach_mappings = function(prompt_bufnr, map)
+                  local select_dir = function()
+                    local selection = require("telescope.actions.state").get_selected_entry()
+                    local root_dir = selection and (selection.is_dir and selection.path or vim.fn.fnamemodify(selection.path, ":h")) or vim.fn.getcwd()
+                    require("telescope.actions").close(prompt_bufnr)
+                    
+                    local project_path = root_dir .. "/" .. artifact
+                    vim.fn.mkdir(project_path, "p")
+                    
+                    local curl_cmd = string.format(
+                      "curl https://start.spring.io/starter.tgz " ..
+                      "-d type=maven-project " ..
+                      "-d language=java " ..
+                      "-d bootVersion=%s " ..
+                      "-d baseDir=%s " ..
+                      "-d groupId=%s " ..
+                      "-d artifactId=%s " ..
+                      "-d javaVersion=%s " ..
+                      "| tar -xzvf - -C %s",
+                      boot_v, artifact, group, artifact, java_v, root_dir
+                    )
+                    
+                    vim.fn.jobstart(curl_cmd, {
+                      on_exit = function()
+                        vim.notify("Projeto Spring Boot criado em: " .. project_path)
+                        vim.cmd("NvimTreeOpen " .. project_path)
+                      end
+                    })
+                  end
+                  map("n", "<CR>", select_dir)
+                  return true
+                end
+              })
+            end)
+          end)
+        end)
+      end)
+    end
   '';
 
-  # Desabilitar guias de indentação do Snacks no Dashboard via Autocmd
   autoCmd = [
     {
       event = "FileType";

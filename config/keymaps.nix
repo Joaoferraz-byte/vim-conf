@@ -29,12 +29,22 @@
       mode = [ "n" ];
       options = { silent = true; desc = "Abrir Dashboard"; };
     }
+
+    # ─── Categoria Novo (<leader>n) ───
     {
       key = "<leader>nf";
       action = "<cmd>lua _G.advanced_new_file()<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Criar novo arquivo (Avançado)"; };
+      options = { silent = true; desc = "Novo Arquivo (Avançado)"; };
     }
+    {
+      key = "<leader>ns";
+      action = "<cmd>lua _G.spring_boot_wizard()<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Novo Projeto Spring Boot"; };
+    }
+
+    # ─── Oil ───
     {
       key = "-";
       action = "<cmd>Oil<CR>";
@@ -42,30 +52,44 @@
       options = { silent = true; desc = "Abrir Oil (File Explorer)"; };
     }
 
-    # ─── Telescope ───
+    # ─── Categoria Buscar (<leader>f) ───
     {
       key = "<leader>ff";
       action = "<cmd>Telescope find_files<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Buscar arquivos"; };
+      options = { silent = true; desc = "Buscar Arquivos"; };
     }
     {
       key = "<leader>fg";
       action = "<cmd>Telescope live_grep<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Buscar texto"; };
+      options = { silent = true; desc = "Buscar Texto"; };
     }
     {
       key = "<leader>fb";
       action = "<cmd>Telescope buffers<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Buffers"; };
+      options = { silent = true; desc = "Listar Buffers"; };
     }
     {
       key = "<leader>fp";
       action = "<cmd>Telescope projects<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Projetos"; };
+      options = { silent = true; desc = "Listar Projetos"; };
+    }
+
+    # ─── Categoria Configuração (<leader>c) ───
+    {
+      key = "<leader>cn";
+      action = "<cmd>NvimTreeOpen ~/.config/nvim<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Configuração do Neovim"; };
+    }
+    {
+      key = "<leader>cs";
+      action = "<cmd>NvimTreeOpen /etc/nixos<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Configuração do Sistema"; };
     }
 
     # ─── Flash ───
@@ -98,26 +122,36 @@
       mode = [ "n" "t" ];
     }
 
-    # ─── LSP ───
+    # ─── Categoria LSP/Linguagens (<leader>l) ───
     {
       key = "gd";
       action = "<cmd>lua vim.lsp.buf.definition()<CR>";
       mode = [ "n" ];
+      options = { desc = "Ir para Definição"; };
     }
     {
       key = "K";
       action = "<cmd>lua vim.lsp.buf.hover()<CR>";
       mode = [ "n" ];
+      options = { desc = "Hover Info"; };
     }
     {
-      key = "<leader>ca";
+      key = "<leader>la";
       action = "<cmd>lua vim.lsp.buf.code_action()<CR>";
       mode = [ "n" "v" ];
+      options = { desc = "Code Action"; };
     }
     {
       key = "<leader>lf";
       action = "<cmd>ConformFormat<CR>";
       mode = [ "n" ];
+      options = { desc = "Formatar Buffer"; };
+    }
+    {
+      key = "<leader>lr";
+      action = "<cmd>lua vim.lsp.buf.rename()<CR>";
+      mode = [ "n" ];
+      options = { desc = "Renomear Símbolo"; };
     }
   ];
 }
