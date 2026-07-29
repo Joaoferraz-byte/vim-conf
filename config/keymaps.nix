@@ -29,6 +29,18 @@
       mode = [ "n" ];
       options = { silent = true; desc = "Abrir Dashboard"; };
     }
+    {
+      key = "<leader>nf";
+      action = "<cmd>lua _G.advanced_new_file()<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Criar novo arquivo (Avançado)"; };
+    }
+    {
+      key = "-";
+      action = "<cmd>Oil<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Abrir Oil (File Explorer)"; };
+    }
 
     # ─── Telescope ───
     {

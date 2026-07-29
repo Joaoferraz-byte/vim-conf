@@ -47,6 +47,9 @@
     # ─── Smart Splits ───
     smart-splits.enable = true;
 
+    # ─── Oil (File explorer moderno) ───
+    oil.enable = true;
+
     # ─── Treesitter ───
     treesitter = {
       enable = true;
@@ -61,6 +64,7 @@
     telescope = {
       enable = true;
       extensions.fzf-native.enable = true;
+      extensions.file-browser.enable = true;
     };
   };
 
