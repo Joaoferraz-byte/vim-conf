@@ -1,69 +1,71 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 {
-  plugins = {
-    dap = {
-      enable = true;
-      extensions = {
-        dap-ui.enable = true;
-        dap-virtual-text.enable = true;
-      };
-      adapters = {
-        executables = {
-          # Corrigindo o erro do vscode-codelldb usando o binário direto do pacote
-          lldb = {
-            command = "${pkgs.lldb}/bin/lldb-dap";
-          };
-          gdb = {
-            command = "gdb";
-            args = [ "-i" "dap" ];
-          };
-        };
-      };
-      configurations = {
-        cpp = [
-          {
-            name = "Launch (LLDB)";
-            type = "lldb";
-            request = "launch";
-            program = ''
-              function()
-                return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
-              end
-            '';
-            cwd = "\${workspaceFolder}";
-            stopOnEntry = false;
-          }
-        ];
-        c = [
-          {
-            name = "Launch (GDB)";
-            type = "gdb";
-            request = "launch";
-            program = ''
-              function()
-                return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
-              end
-            '';
-            cwd = "\${workspaceFolder}";
-          }
-        ];
-        java = [
-          {
-            type = "java";
-            request = "launch";
-            name = "Debug (Attach) - Remote";
-            hostName = "127.0.0.1";
-            port = 5005;
-          }
-        ];
-      };
+  plugins.dap = {
+    enable = true;
+
+    adapters.executables.lldb = {
+      command = "${pkgs.lldb}/bin/lldb-dap";
+    };
+
+    configurations = {
+      c = [
+        {
+          name = "Launch executable (LLDB)";
+          type = "lldb";
+          request = "launch";
+          program.__raw = ''
+            function()
+              return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+            end
+          '';
+          cwd = "\${workspaceFolder}";
+          stopOnEntry = false;
+        }
+      ];
+      cpp = [
+        {
+          name = "Launch executable (LLDB)";
+          type = "lldb";
+          request = "launch";
+          program.__raw = ''
+            function()
+              return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+            end
+          '';
+          cwd = "\${workspaceFolder}";
+          stopOnEntry = false;
+        }
+      ];
+      java = [
+        {
+          type = "java";
+          request = "attach";
+          name = "Attach Spring Boot (porta 5005)";
+          hostName = "127.0.0.1";
+          port = 5005;
+        }
+      ];
     };
   };
 
-  # Garantir que os debuggers estejam instalados
+  plugins.dap-ui.enable = true;
+  plugins.dap-virtual-text.enable = true;
+
+  extraConfigLua = ''
+    local dap, dapui = require("dap"), require("dapui")
+    dap.listeners.after.event_initialized["nixvim_dapui"] = function()
+      dapui.open()
+    end
+    dap.listeners.before.event_terminated["nixvim_dapui"] = function()
+      dapui.close()
+    end
+    dap.listeners.before.event_exited["nixvim_dapui"] = function()
+      dapui.close()
+    end
+  '';
+
   extraPackages = with pkgs; [
     lldb
     gdb
-    vscode-extensions.vadimcn.vscode-lldb
   ];
 }

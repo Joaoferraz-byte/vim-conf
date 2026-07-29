@@ -4,5 +4,6 @@
     ./options.nix
     ./keymaps.nix
     ./plugins
+    ./languages
   ];
 }

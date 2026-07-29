@@ -1,46 +1,58 @@
 { ... }:
 {
-  # ── Vim Options ─────────────────────────────────────────────────────────────
   opts = {
     number = true;
     relativenumber = true;
+    cursorline = true;
+    signcolumn = "yes";
+    termguicolors = true;
+
+    expandtab = true;
     shiftwidth = 2;
     tabstop = 2;
-    expandtab = true;
+    softtabstop = 2;
     smartindent = true;
+    breakindent = true;
+
+    ignorecase = true;
+    smartcase = true;
+    inccommand = "split";
+    incsearch = true;
+    hlsearch = false;
+    completeopt = [ "menu" "menuone" "noselect" ];
+
+    splitbelow = true;
+    splitright = true;
+    scrolloff = 8;
+    sidescrolloff = 8;
     wrap = false;
+    mouse = "a";
+    updatetime = 200;
+    timeoutlen = 400;
+
     swapfile = false;
     backup = false;
     undofile = true;
-    hlsearch = false;
-    incsearch = true;
-    termguicolors = true;
-    scrolloff = 8;
-    signcolumn = "yes";
-    updatetime = 50;
-    cursorline = true;
-    mouse = "a";
-    splitbelow = true;
-    splitright = true;
+    undolevels = 10000;
   };
 
-  # ── Theme: GitHub Dark ─────────────────────────────────────────────────────
+  # O módulo oficial cuida do carregamento do plugin antes da seleção do tema.
   colorschemes.github-theme = {
     enable = true;
     settings = {
       options = {
-        transparent = true;
+        transparent = false;
+        terminal_colors = true;
+        dim_inactive = false;
         styles = {
           comments = "italic";
           keywords = "italic";
-          functions = "italic";
         };
       };
     };
   };
   colorscheme = "github_dark_default";
 
-  # ── Performance ─────────────────────────────────────────────────────────────
   performance = {
     byteCompileLua = {
       enable = true;

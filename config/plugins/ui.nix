@@ -4,74 +4,46 @@
     nvim-tree = {
       enable = true;
       settings = {
-        view = { width = 35; side = "left"; };
+        view = {
+          width = 36;
+          side = "left";
+        };
         renderer = {
-          icons = {
-            show = { file = true; folder = true; git = true; };
-            glyphs = {
-              git = {
-                unstaged = "✗";
-                staged = "✓";
-                unmerged = "";
-                renamed = "➜";
-                untracked = "★";
-                deleted = "⊘";
-                ignored = "◌";
-              };
-            };
-          };
+          group_empty = true;
+          highlight_git = true;
         };
         filters = {
           dotfiles = false;
           git_ignored = false;
-          custom = [ ".git" "node_modules" ".direnv" ".result" ];
+          custom = [
+            ".direnv"
+            ".git"
+            ".result"
+          ];
         };
-        git = { enable = true; };
-        diagnostics = {
-          enable = true;
-          icons = { hint = "󰠠 "; info = " "; warning = " "; error = " "; };
-        };
+        git.enable = true;
+        diagnostics.enable = true;
       };
     };
+
+    bufferline.enable = true;
 
     lualine = {
       enable = true;
       settings = {
-        options.theme = "github_dark";
+        options = {
+          theme = "auto";
+          globalstatus = true;
+          component_separators = "";
+          section_separators = "";
+        };
         sections = {
-          lualine_a = [
-            { __raw = ''{ 'mode', fmt = function(str) return '▊ ' .. str end }''; }
-          ];
-          lualine_b = [ "branch" "diff" ];
-          lualine_c = [
-            { __raw = ''{ 'diagnostics', sources = { 'nvim_lsp', 'nvim_diagnostic' }, symbols = { error = ' ', warn = ' ', info = ' ', hint = '󰠠 ' } }''; }
-            { __raw = ''{ 'filename', path = 1, symbols = { modified = '  ', readonly = '  ' } }''; }
-          ];
-          lualine_x = [
-            { __raw = ''{ 'encoding', fmt = string.lower }''; }
-            { __raw = ''{ 'fileformat', icons_enabled = true }''; }
-          ];
+          lualine_a = [ "mode" ];
+          lualine_b = [ "branch" "diff" "diagnostics" ];
+          lualine_c = [ "filename" ];
+          lualine_x = [ "encoding" "fileformat" "filetype" ];
           lualine_y = [ "progress" ];
           lualine_z = [ "location" ];
-        };
-      };
-    };
-
-    dashboard = {
-      enable = true;
-      settings = {
-        theme = "doom";
-        config = {
-          header = [
-            "  "
-            "██╗  ██╗██╗██╗      ██████╗ ██╗  ██╗███████╗██████╗ "
-            "██║  ██║██║██║     ██╔═══██╗██║ ██╔╝██╔════╝██╔══██╗"
-            "███████║██║██║     ██║   ██║█████╔╝ █████╗  ██████╔╝"
-            "██╔══██║██║██║     ██║   ██║██╔═██╗ ██╔══╝  ██╔══██╗"
-            "██║  ██║██║███████╗╚██████╔╝██║  ██╗███████╗██║  ██║"
-            "╚═╝  ╚═╝╚═╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝"
-            "  "
-          ];
         };
       };
     };
@@ -79,27 +51,16 @@
     toggleterm = {
       enable = true;
       settings = {
-        size = 20;
+        direction = "float";
         open_mapping = "[[<c-\\>]]";
-        hide_numbers = true;
         shade_terminals = true;
         start_in_insert = true;
-        terminal_mappings = true;
         persist_size = true;
-        direction = "float";
         close_on_exit = true;
-        shell = "zsh";
         float_opts = {
           border = "curved";
-          winblend = 3;
+          winblend = 0;
         };
-      };
-    };
-
-    telescope = {
-      enable = true;
-      extensions = {
-        fzf-native.enable = true;
       };
     };
   };

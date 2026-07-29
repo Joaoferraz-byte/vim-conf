@@ -1,10 +1,10 @@
 {
-  description = "A highly optimized NixVim configuration for Enterprise Development (Java, C/C++)";
+  description = "NixVim IDE para Java, Spring Boot, Angular e desenvolvimento web";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # Sem `follows`: NixVim testa sua própria revisão compatível de nixpkgs.
     nixvim.url = "github:nix-community/nixvim";
-    nixvim.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -22,27 +22,35 @@
         "aarch64-darwin"
       ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
+      nixvimModule = import ./config;
     in
     {
+      lib = {
+        nixvimModule = nixvimModule;
+        nixvimModules.default = nixvimModule;
+      };
+
       packages = forAllSystems (
         system:
         let
-          pkgs = import nixpkgs { inherit system; config.allowUnfree = true; };
-          nixvimModule = {
-            inherit pkgs;
-            module = import ./config;
-            extraSpecialArgs = {
-              inherit self;
-            };
+          pkgs = import nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
           };
-          nvim = nixvim.legacyPackages.${system}.makeNixvimWithModule nixvimModule;
         in
         {
-          default = nvim;
+          default = nixvim.legacyPackages.${system}.makeNixvimWithModule {
+            inherit pkgs;
+            module = nixvimModule;
+            extraSpecialArgs = { inherit self; };
+          };
         }
       );
 
-      # Permite usar como um módulo do Home Manager ou NixOS
-      nixvimModule = import ./config;
+      checks = forAllSystems (system: {
+        nixvim = self.packages.${system}.default;
+      });
+
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
     };
 }

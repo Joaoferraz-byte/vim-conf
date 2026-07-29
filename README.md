@@ -1,0 +1,108 @@
+# NixVim para Java Web e Angular
+
+Esta configuração fornece um **Neovim declarativo**, reproduzível e pronto para desenvolvimento Java web. Ela combina JDTLS por projeto, suporte a Spring Boot, Angular Language Server, TypeScript, ESLint, formatação por Conform, depuração DAP e um ambiente visual baseado em **GitHub Dark**. A configuração não utiliza Mason: servidores, formatadores e dependências de editor são fornecidos pelo Nix.
+
+> O NixVim deve ser mantido compatível com a revisão de Nixpkgs usada por ele. Por isso, este flake mantém sua entrada `nixvim` independente e não força `nixpkgs.follows`. [1]
+
+| Área | Componentes incluídos |
+|---|---|
+| Java e Spring Boot | `nvim-jdtls`, JDTLS, JDK 21, Lombok, Maven, Gradle, `spring-boot.nvim` e configuração por workspace Maven/Gradle. |
+| Angular e web | AngularLS, TypeScript LSP, ESLint, HTML, CSS, JSON, YAML, Emmet e Tailwind CSS. |
+| Qualidade | Conform com Prettier/Prettierd, Google Java Format, Nixfmt, Stylua e Shfmt. |
+| Depuração | `nvim-dap`, DAP UI, DAP virtual text, LLDB/GDB e perfil para anexar a Spring Boot na porta `5005`. |
+| Interface | `github_dark_default`, Telescope, NvimTree, Bufferline, Lualine, Gitsigns, Treesitter, Trouble e terminal flutuante. |
+
+## Executar como pacote
+
+Após publicar o flake, a execução direta é:
+
+```bash
+nix run github:Joaoferraz-byte/vim-conf
+```
+
+O pacote padrão é construído via `nixvim.legacyPackages.<system>.makeNixvimWithModule`, o caminho oficialmente suportado para expor uma configuração NixVim como derivação. [1]
+
+## Integrar com NixOS e Home Manager
+
+Adicione o flake como entrada e mantenha o módulo oficial do NixVim no Home Manager. O módulo de configuração deste repositório deve ser importado dentro de `programs.nixvim.imports`, conforme a interface documentada pelo NixVim. [1]
+
+```nix
+{
+  inputs = {
+    vim-conf.url = "github:Joaoferraz-byte/vim-conf";
+    nixvim.url = "github:nix-community/nixvim";
+  };
+
+  # No módulo NixOS que configura o Home Manager:
+  home-manager.sharedModules = [
+    inputs.nixvim.homeModules.nixvim
+  ];
+
+  # No home.nix do usuário:
+  programs.nixvim = {
+    enable = true;
+    imports = [ inputs.vim-conf.lib.nixvimModule ];
+  };
+}
+```
+
+## Fluxos de trabalho
+
+### Java e Spring Boot
+
+Ao abrir um arquivo Java dentro de um projeto com `pom.xml`, `build.gradle`, `build.gradle.kts`, `mvnw`, `gradlew` ou `.git`, o `nvim-jdtls` cria ou reutiliza um workspace isolado. As configurações ativam download de fontes, code lenses, organização de imports e JDK 21. O JDTLS é o servidor oficialmente exposto pelo NixVim para Java. [2]
+
+Para depurar uma aplicação Spring Boot, inicie-a com depuração remota na porta `5005`, por exemplo:
+
+```bash
+./mvnw spring-boot:run \
+  -Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005'
+```
+
+Em seguida, use `<leader>dc` e escolha **Attach Spring Boot (porta 5005)**. O perfil usa a interface oficial de configurações DAP indexadas por filetype. [3]
+
+### Angular
+
+AngularLS e TypeScript LSP são instalados pelo módulo NixVim, enquanto `nodejs` fica disponível no ambiente do editor. O Angular CLI deve continuar preferencialmente no `devDependencies` de cada aplicação, por exemplo com `npm install --save-dev @angular/cli`; isso preserva a versão exigida por cada workspace Angular. O módulo `angularls` é suportado diretamente pelo NixVim. [4]
+
+### Formatação
+
+A formatação é executada ao salvar, com timeout de 2,5 segundos e fallback para LSP quando não existir um formatador dedicado. Use `<leader>lf` para formatar manualmente. As opções `formatters_by_ft` e `format_on_save` seguem a interface do módulo Conform do NixVim. [5]
+
+| Atalho | Ação |
+|---|---|
+| `<leader>ff` / `<leader>fg` | Procurar arquivos / conteúdo com Telescope. |
+| `<leader>e` | Alternar explorador de arquivos. |
+| `gd`, `gD`, `gi`, `gr`, `K` | Navegação e documentação LSP. |
+| `<leader>rn`, `<leader>ca`, `<leader>lf` | Renomear, ação de código e formatar. |
+| `<C-\\>` | Abrir ou fechar terminal flutuante. |
+| `<leader>db`, `<leader>dc`, `<leader>dn` | Breakpoint, continuar e step over no DAP. |
+| `<leader>jo`, `<leader>ju` | Organizar imports e atualizar configuração JDTLS. |
+
+## Tema GitHub Dark
+
+O tema é configurado pelo módulo oficial `colorschemes.github-theme`, e só então `colorscheme = "github_dark_default"` é selecionado. A Lualine usa `theme = "auto"`, de modo que herda o esquema carregado e não disputa a aplicação do tema. [6]
+
+## Validação
+
+O repositório declara um pacote padrão e uma checagem NixVim:
+
+```bash
+nix flake check --no-build
+nix build .#default
+```
+
+A integração no NixOS deve ser avaliada com:
+
+```bash
+nix eval .#nixosConfigurations.myMachine.config.system.build.toplevel.drvPath
+```
+
+## Referências
+
+[1]: https://nix-community.github.io/nixvim/user-guide/install.html "NixVim — Installation"
+[2]: https://nix-community.github.io/nixvim/plugins/lsp/servers/jdtls/index.html "NixVim — JDTLS"
+[3]: https://nix-community.github.io/nixvim/plugins/dap/index.html "NixVim — DAP"
+[4]: https://nix-community.github.io/nixvim/plugins/lsp/servers/angularls/index.html "NixVim — AngularLS"
+[5]: https://github.com/nix-community/nixvim/blob/main/plugins/by-name/conform-nvim/default.nix "NixVim — Conform module"
+[6]: https://nix-community.github.io/nixvim/colorschemes/github-theme/index.html "NixVim — GitHub Theme"
