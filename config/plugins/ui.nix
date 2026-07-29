@@ -1,267 +1,150 @@
-{ ... }:
+{ pkgs, ... }:
 {
   plugins = {
-    # ─── Snacks.nvim (substitui nvim-tree, adiciona dashboard, statuscolumn, picker) ───
+    # ─── Snacks.nvim (utilitários modernos) ───
     snacks = {
       enable = true;
       settings = {
-        bigfile = {
-          enabled = true;
-          notify = true;
-        };
+        bigfile.enabled = true;
+        notifier.enabled = true;
+        quickfile.enabled = true;
+        statuscolumn.enabled = true;
+        words.enabled = true;
+        indent.enabled = true;
+        input.enabled = true;
+        scope.enabled = true;
+        scroll.enabled = true;
+      };
+    };
 
-        dashboard = {
-          enabled = true;
-          width = 60;
-          pane_gap = 4;
-          preset = {
-            header = ''
-              ⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣤⠶⢶⡶⠶⣤⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀
-              ⠀⠀⠀⠀⢀⣤⣾⣿⣿⣿⣿⠀⡸⢇⠀⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀
-              ⠀⠀⠀⣴⢏⡉⠻⢿⣿⣿⣿⠤⠧⠼⠤⣿⣿⣿⣿⠟⢩⠿⣦⠀⠀⠀
-              ⠀⢀⣾⣅⠘⢡⠆⡴⠛⢉⣠⣤⣶⠀⠀⠀⠉⠛⢯⣠⠔⠠⠚⣷⡀⠀
-              ⠀⣾⣿⣿⣷⣦⡞⢀⣴⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⢻⣤⣶⣿⣿⣷⠀
-              ⢠⣿⣿⣿⣿⡟⠀⣾⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⢻⣿⣿⣿⣿⡄
-              ⢸⣿⣿⣿⣿⡇⠘⠛⠛⠛⠛⠛⠛⣤⣤⣤⣤⣤⣤⡄⢸⣿⣿⣿⣿⡇
-              ⠘⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⡿⠀⣼⣿⣿⣿⣿⠃
-              ⠀⢿⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⠟⠁⣼⣿⣿⣿⣿⡿⠀
-              ⠀⠈⢿⣿⣿⣿⣿⣷⣤⣀⠀⠀⠀⠿⠛⠋⣁⣤⣾⣿⣿⣿⣿⡿⠁⠀
-              ⠀⠀⠀⠻⣿⣿⣿⣿⣿⣿⣿⣶⣶⣶⣶⣿⣿⣿⣿⣿⣿⣿⠟⠀⠀⠀
-              ⠀⠀⠀⠀⠈⠛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠛⠁⠀⠀⠀⠀
-              ⠀⠀⠀⠀⠀⠀⠈⠙⠛⠛⠿⠿⠿⠿⠛⠛⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀'';
-            keys = [
-              {
-                icon = " ";
-                key = "f";
-                desc = "Find File";
-                action = ":lua Snacks.dashboard.pick('files')";
-              }
-              {
-                icon = " ";
-                key = "n";
-                desc = "New File";
-                action = ":ene | startinsert";
-              }
-              {
-                icon = " ";
-                key = "g";
-                desc = "Find Text";
-                action = ":lua Snacks.dashboard.pick('live_grep')";
-              }
-              {
-                icon = " ";
-                key = "r";
-                desc = "Recent Files";
-                action = ":lua Snacks.dashboard.pick('oldfiles')";
-              }
-              {
-                icon = " ";
-                key = "c";
-                desc = "Config";
-                action = ":lua Snacks.dashboard.pick('files', {cwd = vim.fn.stdpath('config')})";
-              }
-              {
-                icon = " ";
-                key = "s";
-                desc = "Restore Session";
-                section = "session";
-              }
-              {
-                icon = "󰒲 ";
-                key = "L";
-                desc = "Lazy";
-                action = ":Lazy";
-              }
-              {
-                icon = " ";
-                key = "q";
-                desc = "Quit";
-                action = ":qa";
-              }
-            ];
-          };
-          sections = [
-            { section = "header"; }
-            { section = "keys"; gap = 1; padding = 1; }
-            {
-              pane = 2;
-              icon = " ";
-              desc = "Browse Repo";
-              padding = 1;
-              key = "b";
-              action.__raw = "function() Snacks.gitbrowse() end";
-            }
-            {
-              pane = 2;
-              icon = " ";
-              title = "Projects";
-              section = "projects";
-              indent = 2;
-              padding = 2;
-            }
-            {
-              pane = 2;
-              icon = " ";
-              title = "Recent Files";
-              section = "recent_files";
-              indent = 2;
-              padding = 1;
-            }
-            {
-              pane = 2;
-              icon = " ";
-              title = "Git Status";
-              section = "terminal";
-              enabled.__raw = "function() return Snacks.git.get_root() ~= nil end";
-              cmd = "git --no-pager diff --stat -B -M -C";
-              height = 10;
-              padding = 1;
-              ttl = "5 * 60";
-              indent = 3;
-            }
-            { section = "startup"; }
+    # ─── Dashboard-nvim (Start Screen robusto e nativo) ───
+    dashboard = {
+      enable = true;
+      settings = {
+        theme = "hyper";
+        config = {
+          header = [
+            "⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣤⠶⢶⡶⠶⣤⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀"
+            "⠀⠀⠀⠀⢀⣤⣾⣿⣿⣿⣿⠀⡸⢇⠀⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀"
+            "⠀⠀⠀⣴⢏⡉⠻⢿⣿⣿⣿⠤⠧⠼⠤⣿⣿⣿⣿⠟⢩⠿⣦⠀⠀⠀"
+            "⠀⢀⣾⣅⠘⢡⠆⡴⠛⢉⣠⣤⣶⠀⠀⠀⠉⠛⢯⣠⠔⠠⠚⣷⡀⠀"
+            "⠀⣾⣿⣿⣷⣦⡞⢀⣴⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⢻⣤⣶⣿⣿⣷⠀"
+            "⢠⣿⣿⣿⣿⡟⠀⣾⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⢻⣿⣿⣿⣿⡄"
+            "⢸⣿⣿⣿⣿⡇⠘⠛⠛⠛⠛⠛⠛⣤⣤⣤⣤⣤⣤⡄⢸⣿⣿⣿⣿⡇"
+            "⠘⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⡿⠀⣼⣿⣿⣿⣿⠃"
+            "⠀⢿⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⠟⠁⣼⣿⣿⣿⣿⡿⠀"
+            "⠀⠈⢿⣿⣿⣿⣿⣷⣤⣀⠀⠀⠀⠿⠛⠋⣁⣤⣾⣿⣿⣿⣿⡿⠁⠀"
+            "⠀⠀⠀⠻⣿⣿⣿⣿⣿⣿⣿⣶⣶⣶⣶⣿⣿⣿⣿⣿⣿⣿⠟⠀⠀⠀"
+            "⠀⠀⠀⠀⠈⠛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠛⠁⠀⠀⠀⠀"
+            "⠀⠀⠀⠀⠀⠀⠈⠙⠛⠛⠿⠿⠿⠿⠛⠛⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀"
           ];
-        };
-
-        explorer = {
-          enabled = true;
-          replace = {
-            netrw = true;
+          shortcut = [
+            {
+              desc = "  Find File";
+              group = "@variable";
+              action = "Telescope find_files";
+              key = "f";
+            }
+            {
+              desc = "  New File";
+              group = "@variable";
+              action = "ene | startinsert";
+              key = "n";
+            }
+            {
+              desc = "  Find Text";
+              group = "@variable";
+              action = "Telescope live_grep";
+              key = "g";
+            }
+            {
+              desc = "  Recent Files";
+              group = "@variable";
+              action = "Telescope oldfiles";
+              key = "r";
+            }
+            {
+              desc = "  Config";
+              group = "@variable";
+              action = "Telescope find_files cwd=~/.config/nvim";
+              key = "c";
+            }
+            {
+              desc = "  Quit";
+              group = "@variable";
+              action = "qa";
+              key = "q";
+            }
+          ];
+          project = {
+            enable = true;
+            action = "Telescope projects";
           };
-        };
-
-        indent = {
-          enabled = true;
-        };
-
-        input = {
-          enabled = true;
-        };
-
-        picker = {
-          enabled = true;
-        };
-
-        quickfile = {
-          enabled = true;
-        };
-
-        scope = {
-          enabled = true;
-        };
-
-        statuscolumn = {
-          enabled = true;
-        };
-
-        words = {
-          enabled = true;
-          debounce = 100;
+          mru = {
+            limit = 10;
+          };
         };
       };
     };
 
-    # ─── Noice.nvim (UI moderna para comandos, cmdline, etc.) ───
+    # ─── Nvim-Tree (Explorador estável) ───
+    nvim-tree = {
+      enable = true;
+      openOnSetup = false;
+      filters.dotfiles = false;
+    };
+
+    # ─── Noice.nvim (UI moderna) ───
     noice = {
       enable = true;
     };
 
-    # ─── Barbecue (breadcrumbs / path navigation) ───
+    # ─── Barbecue (breadcrumbs) ───
     barbecue = {
       enable = true;
       settings = {
         attach_navic = true;
         create_autocmd = true;
-        dim_dirname = true;
-        dirname_padding = 1;
-        winbar = { enabled = true; };
+        winbar.enabled = true;
       };
     };
 
-    # ─── Treesitter Context (mostra contexto do código no topo) ───
+    # ─── Treesitter Context ───
     treesitter-context = {
       enable = true;
       settings = {
-        enable = true;
         max_lines = 3;
-        min_window_height = 0;
-        line_numbers = true;
-        multiline_threshold = 20;
-        trim_scope = "outer";
-        mode = "cursor";
         separator = "-";
       };
     };
 
-    # ─── Indent Blankline (guias de indentação visuais) ───
+    # ─── Indent Blankline ───
     indent-blankline = {
       enable = true;
       settings = {
-        indent = {
-          char = "│";
-        };
-        scope = {
-          enabled = false; # snacks indent cuida disso
-        };
+        indent.char = "│";
+        scope.enabled = true;
       };
     };
 
-    # ─── Fidget (indicador de progresso LSP) ───
-    fidget = {
-      enable = true;
-      settings = {
-        notification = {
-          window = {
-            winblend = 0;
-            border = "rounded";
-          };
-        };
-        progress = {
-          display = {
-            render_limit = 5;
-          };
-        };
-      };
-    };
+    # ─── Fidget ───
+    fidget.enable = true;
 
-    # ─── Bufferline (continua como está) ───
+    # ─── Outros ───
     bufferline.enable = true;
-
-    # ─── Lualine (statusline moderna) ───
     lualine = {
       enable = true;
-      settings = {
-        options = {
-          theme = "auto";
-          globalstatus = true;
-          component_separators = "";
-          section_separators = "";
-        };
-        sections = {
-          lualine_a = [ "mode" ];
-          lualine_b = [ "branch" "diff" "diagnostics" ];
-          lualine_c = [ "filename" ];
-          lualine_x = [ "encoding" "fileformat" "filetype" ];
-          lualine_y = [ "progress" ];
-          lualine_z = [ "location" ];
-        };
+      settings.options = {
+        theme = "auto";
+        globalstatus = true;
       };
     };
-
-    # ─── Toggleterm (terminal flutuante) ───
     toggleterm = {
       enable = true;
       settings = {
         direction = "float";
         open_mapping = "[[<c-\\>]]";
-        shade_terminals = true;
-        start_in_insert = true;
-        persist_size = true;
-        close_on_exit = true;
-        float_opts = {
-          border = "curved";
-          winblend = 0;
-        };
+        float_opts.border = "curved";
       };
     };
   };
