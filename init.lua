@@ -1,6 +1,0 @@
-require("custom_core.options")
-require("custom_core.keymaps")
-require("custom_plugins.init")
-require("custom_dap.init")
-require("custom_lsp.init")
-require("custom_ui.init")
