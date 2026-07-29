@@ -52,15 +52,15 @@
               key = "g";
             }
             {
-              desc = "  Recent Files";
+              desc = "  Projects";
               group = "@variable";
-              action = "Telescope oldfiles";
-              key = "r";
+              action = "Telescope projects";
+              key = "p";
             }
             {
               desc = "  Config";
               group = "@variable";
-              action = "Telescope find_files cwd=/home/livara/.config/";
+              action = "NvimTreeOpen ~/.config/nvim";
               key = "c";
             }
             {
@@ -71,11 +71,10 @@
             }
           ];
           project = {
-            enable = true;
-            action = "Telescope projects";
+            enable = false;
           };
           mru = {
-            limit = 10;
+            limit = 0;
           };
         };
       };
