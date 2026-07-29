@@ -21,7 +21,7 @@
     dashboard = {
       enable = true;
       settings = {
-        theme = "hyper";
+        theme = "doom";
         config = {
           header = [
             "██╗     ██╗██╗   ██╗ █████╗ ██████╗  █████╗ "
@@ -32,50 +32,45 @@
             "╚══════╝╚═╝  ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝"
             "                                            "
           ];
-          shortcut = [
+          center = [
             {
-              desc = "  Find File";
-              group = "@variable";
+              icon = "  ";
+              desc = "Find File";
               action = "Telescope find_files";
               key = "f";
             }
             {
-              desc = "  New File";
-              group = "@variable";
+              icon = "  ";
+              desc = "New File (Advanced)";
               action = "lua _G.advanced_new_file()";
               key = "n";
             }
             {
-              desc = "  Find Text";
-              group = "@variable";
+              icon = "  ";
+              desc = "Find Text";
               action = "Telescope live_grep";
               key = "g";
             }
             {
-              desc = "  Projects";
-              group = "@variable";
+              icon = "  ";
+              desc = "Projects";
               action = "Telescope projects";
               key = "p";
             }
             {
-              desc = "  Config";
-              group = "@variable";
+              icon = "  ";
+              desc = "Config";
               action = "NvimTreeOpen ~/.config/nvim";
               key = "c";
             }
             {
-              desc = "  Quit";
-              group = "@variable";
+              icon = "  ";
+              desc = "Quit";
               action = "qa";
               key = "q";
             }
           ];
-          project = {
-            enable = false;
-          };
-          mru = {
-            limit = 0;
-          };
+          footer = [ "" ];
         };
       };
     };
