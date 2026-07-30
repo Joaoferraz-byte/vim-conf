@@ -34,7 +34,8 @@
             "██║     ██║╚██╗ ██╔╝██╔══██║██╔══██╗██╔══██║"
             "███████╗██║ ╚████╔╝ ██║  ██║██║  ██║██║  ██║"
             "╚══════╝╚═╝  ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝"
-            "                                            "
+            ""
+            ""
           ];
           center = [
             {
@@ -74,6 +75,12 @@
               key = "c";
             }
             {
+              icon = "󰌌  ";
+              desc = "Browse Keymaps";
+              action = "Telescope keymaps";
+              key = "?";
+            }
+            {
               icon = "  ";
               desc = "Quit";
               action = "qa";
@@ -85,37 +92,80 @@
       };
     };
 
-    # ─── Which-Key (UI de Keymaps Organizada) ───
+    # ─── Which-Key (Modern keymap discovery) ───
     which-key = {
       enable = true;
       settings = {
+        delay = 250;
+        preset = "modern";
+        show_help = true;
+        show_keys = true;
+        layout = {
+          spacing = 6;
+          align = "center";
+        };
+        win = {
+          border = "rounded";
+          title = true;
+          title_pos = "center";
+          padding = [ 1 2 ];
+        };
         spec = [
           {
             __unkeyed-1 = "<leader>f";
-            group = " Arquivos";
-            icon = " ";
+            group = "Files";
+            icon = "󰈞";
           }
           {
             __unkeyed-1 = "<leader>c";
-            group = " Configuração";
-            icon = " ";
+            group = "Configuration";
+            icon = "󰒓";
           }
           {
             __unkeyed-1 = "<leader>l";
-            group = "󰘦 LSP/Linguagens";
-            icon = "󰘦 ";
+            group = "Language";
+            icon = "󰘦";
           }
           {
             __unkeyed-1 = "<leader>n";
-            group = " Novo";
-            icon = " ";
+            group = "New";
+            icon = "󰐕";
           }
           {
             __unkeyed-1 = "<leader>h";
-            group = "󰛢 Harpoon";
-            icon = "󰛢 ";
+            group = "Harpoon";
+            icon = "󰛢";
+          }
+          {
+            __unkeyed-1 = "<leader>g";
+            group = "Git";
+            icon = "";
+          }
+          {
+            __unkeyed-1 = "<leader>d";
+            desc = "Open Dashboard";
+            icon = "󰋜";
+          }
+          {
+            __unkeyed-1 = "<leader>x";
+            group = "Debug";
+            icon = "󰃤";
           }
         ];
+      };
+    };
+
+    # ─── Subtle window animations ───
+    mini = {
+      enable = true;
+      modules = {
+        animate = {
+          cursor.enable = false;
+          scroll.enable = false;
+          resize.enable = true;
+          open.enable = true;
+          close.enable = true;
+        };
       };
     };
 
@@ -123,11 +173,19 @@
     nvim-tree = {
       enable = true;
       openOnSetup = false;
-      filters.dotfiles = false;
+      settings.filters.dotfiles = false;
     };
 
     # ─── Outros Plugins de UI ───
-    noice.enable = true;
+    noice = {
+      enable = true;
+      settings.presets = {
+        bottom_search = true;
+        command_palette = true;
+        long_message_to_split = true;
+        lsp_doc_border = true;
+      };
+    };
     barbecue.enable = true;
     treesitter-context.enable = true;
     fidget.enable = true;

@@ -3,6 +3,8 @@
   plugins = {
     web-devicons.enable = true;
     gitsigns.enable = true;
+    neogit.enable = true;
+    diffview.enable = true;
     comment.enable = true;
     todo-comments.enable = true;
     undotree.enable = true;

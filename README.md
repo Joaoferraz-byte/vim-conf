@@ -1,6 +1,6 @@
 # NixVim IDE Moderno
 
-Esta configuração fornece um **Neovim declarativo**, reproduzível e pronto para desenvolvimento Java, Spring Boot, Angular e web. Ela combina JDTLS por projeto, suporte a Spring Boot, Angular Language Server, TypeScript, ESLint, formatação por Conform, depuração DAP, uma interface visual baseada em **GitHub Dark** e uma **página inicial moderna com Snacks.nvim Dashboard**. A configuração não utiliza Mason: servidores, formatadores e dependências de editor são fornecidos pelo Nix.
+Esta configuração fornece um **Neovim declarativo**, reproduzível e pronto para desenvolvimento Java, Spring Boot, Angular, web, C/C++, embarcados e programação competitiva. Ela combina JDTLS por projeto, suporte a Spring Boot, Angular Language Server, TypeScript, ESLint, formatação por Conform, depuração DAP, uma interface visual baseada em **GitHub Dark** e uma **página inicial moderna com dashboard-nvim**. A configuração não utiliza Mason: servidores, formatadores e dependências de editor são fornecidos pelo Nix.
 
 > O NixVim deve ser mantido compatível com a revisão de Nixpkgs usada por ele. Por isso, este flake mantém sua entrada `nixvim` independente e não força `nixpkgs.follows`. [1]
 
@@ -8,10 +8,13 @@ Esta configuração fornece um **Neovim declarativo**, reproduzível e pronto pa
 |---|---|
 | Java e Spring Boot | JDTLS (plugin nativo NixVim), JDK 21, Lombok, Maven, Gradle, `spring-boot.nvim` (plugin nativo), inlay hints, DAP com hot code replace, organização automática de imports e workspace isolado por projeto. |
 | Angular e web | AngularLS, TypeScript LSP, ESLint, HTML, CSS, JSON, YAML, Emmet, Tailwind CSS e TS Autotag. |
-| Qualidade | Conform com Prettier/Prettierd, Google Java Format, Nixfmt, Stylua e Shfmt. |
+| Qualidade | Conform com Prettier/Prettierd, Google Java Format, Clang Format, Nixfmt, Stylua e Shfmt. |
+| C/C++ e embarcados | Clangd, CMake Tools, Clang Format, CMake, Ninja, GDB, OpenOCD e Cppcheck. |
+| Programação competitiva | Competitest, Clang, GCC e Clang Tools, todos fornecidos declarativamente. |
 | Depuração | `nvim-dap`, DAP UI, DAP virtual text, LLDB/GDB e perfil para anexar a Spring Boot na porta `5005`. |
-| Interface visual | Snacks.nvim (Dashboard, Explorer, Picker, Statuscolumn, Indent, Scope, Words), Noice, Barbecue (breadcrumbs), Treesitter Context, Indent Blankline, Fidget (LSP progress), Bufferline, Lualine, Gitsigns, Treesitter, Trouble, Smart Splits e terminal flutuante. |
-| Navegação | Flash, Leap, Harpoon, Aerial (outline), Project.nvim, Telescope e Which-Key. |
+| Interface visual | Dashboard-nvim, Snacks.nvim (Statuscolumn, Indent, Scope, Words e rolagem suave), Noice com paleta de comandos, Mini Animate, Barbecue (breadcrumbs), Treesitter Context, Indent Blankline, Fidget (LSP progress), Bufferline, Lualine, Gitsigns, Treesitter, Trouble, Smart Splits e terminal flutuante. |
+| Navegação | Flash, Leap, Harpoon, Aerial (outline), Project.nvim, Telescope e Which-Key com layout moderno. |
+| Git | Gitsigns, Neogit e Diffview para status, commits, branches, sync, diffs e histórico. |
 | Extras | Zen Mode, Todo Comments, Web Devicons e Illuminate. |
 
 ## Executar como pacote
@@ -73,15 +76,17 @@ A formatação é executada ao salvar, com timeout de 2,5 segundos e fallback pa
 
 ### Dashboard e Explorador de Arquivos
 
-Ao abrir o Neovim sem arquivos, o **Snacks.nvim Dashboard** é exibido automaticamente com atalhos para buscar arquivos, projetos recentes, configurações e informações do Git. Use `<leader>e` para alternar o explorador de arquivos lateral, `<leader>ff` para buscar arquivos e `<leader>d` para reabrir o dashboard a qualquer momento.
+Ao abrir o Neovim sem arquivos, o **dashboard-nvim** é exibido automaticamente com atalhos para buscar arquivos, projetos recentes, configurações, keymaps e informações do Git. Há duas linhas de separação entre o logotipo ASCII e as ações. Use `<leader>e` para alternar o explorador de arquivos lateral, `<leader>ff` para buscar arquivos, `<leader>?` para navegar por todos os keymaps e `<leader>d` para reabrir o dashboard a qualquer momento.
 
 ## Atalhos
 
 | Atalho | Ação |
 |---|---|
-| `<leader>e` | Alternar explorador de arquivos (Snacks Explorer). |
+| `<leader>e` | Alternar explorador de arquivos. |
 | `<leader>d` | Abrir dashboard. |
-| `<leader>ff` / `<leader>fg` | Procurar arquivos / conteúdo com Snacks Picker. |
+| `<leader>?` | Abrir lista pesquisável de todos os keymaps. |
+| `<leader><leader>` | Abrir menu de atalhos do líder. |
+| `<leader>ff` / `<leader>fg` | Procurar arquivos / conteúdo com Telescope. |
 | `<leader>fr` / `<leader>fp` | Arquivos recentes / projetos. |
 | `<leader>o` | Alternar outline (Aerial). |
 | `<leader>ha` | Marcar arquivo no Harpoon. |
@@ -90,12 +95,14 @@ Ao abrir o Neovim sem arquivos, o **Snacks.nvim Dashboard** é exibido automatic
 | `s` / `S` | Flash: navegar com rótulos / Treesitter. |
 | `<leader>z` | Zen Mode. |
 | `gd`, `gD`, `gi`, `gr`, `K` | Navegação e documentação LSP. |
-| `<leader>rn`, `<leader>ca`, `<leader>lf` | Renomear, ação de código e formatar. |
-| `<leader>ld` | Lista de diagnósticos (Trouble). |
-| `<C-\\>` | Abrir ou fechar terminal flutuante. |
+| `<leader>lr`, `<leader>la`, `<leader>lf` | Renomear símbolo, ação de código e formatar buffer. |
+| `<leader>ld` | Alternar diagnósticos com Trouble. |
 | `<C-h/j/k/l>` | Navegar entre splits (Smart Splits). |
-| `<leader>db`, `<leader>dc`, `<leader>dn` | Breakpoint, continuar e step over no DAP. |
-| `<leader>jo`, `<leader>ju` | Organizar imports e atualizar configuração JDTLS. |
+| `<leader>xb`, `<leader>xc`, `<leader>xn` | Breakpoint, continuar e step over no DAP. |
+| `<leader>xi`, `<leader>xo`, `<leader>xt` | Step into, step out e encerrar a sessão DAP. |
+| `<leader>gg` / `<leader>gc` | Abrir status Git / criar commit com Neogit. |
+| `<leader>gb`, `<leader>gl`, `<leader>gp`, `<leader>gr` | Branches, pull, push e rebase da branch atual. |
+| `<leader>gd`, `<leader>gh`, `<leader>gH`, `<leader>gB` | Diff, histórico do arquivo, histórico do repositório e blame da linha. |
 
 ## Tema GitHub Dark
 
@@ -124,3 +131,7 @@ nix eval .#nixosConfigurations.myMachine.config.system.build.toplevel.drvPath
 [4]: https://nix-community.github.io/nixvim/plugins/lsp/servers/angularls/index.html "NixVim — AngularLS"
 [5]: https://github.com/nix-community/nixvim/blob/main/plugins/by-name/conform-nvim/default.nix "NixVim — Conform module"
 [6]: https://nix-community.github.io/nixvim/colorschemes/github-theme/index.html "NixVim — GitHub Theme"
+[7]: https://nix-community.github.io/nixvim/plugins/neogit/index.html "NixVim — Neogit"
+[8]: https://nix-community.github.io/nixvim/plugins/diffview/index.html "NixVim — Diffview"
+[9]: https://nix-community.github.io/nixvim/plugins/competitest/index.html "NixVim — Competitest"
+[10]: https://nix-community.github.io/nixvim/plugins/cmake-tools/index.html "NixVim — CMake Tools"

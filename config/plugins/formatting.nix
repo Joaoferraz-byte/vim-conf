@@ -6,6 +6,8 @@
     settings = {
       formatters_by_ft = {
         java = [ "google-java-format" ];
+        c = [ "clang-format" ];
+        cpp = [ "clang-format" ];
         javascript = {
           __unkeyed-1 = "prettierd";
           __unkeyed-2 = "prettier";
@@ -47,6 +49,7 @@
 
   extraPackages = with pkgs; [
     google-java-format
+    clang-tools
     prettierd
     prettier
     nixfmt

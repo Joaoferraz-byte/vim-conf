@@ -1,95 +1,264 @@
-{ ... }:
 {
   globals.mapleader = " ";
   globals.maplocalleader = " ";
 
   keymaps = [
-    # ─── Geral ───
+    # ─── General ───
     {
       key = "<Esc>";
       action = "<cmd>nohlsearch<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Limpar destaque de busca"; };
+      options = { silent = true; desc = "Clear Search Highlight"; };
     }
     {
       key = "<C-s>";
       action = "<cmd>w<CR>";
       mode = [ "n" "i" ];
-      options = { silent = true; desc = "Salvar arquivo"; };
+      options = { silent = true; desc = "Save File"; };
     }
     {
       key = "<leader>e";
       action = "<cmd>NvimTreeToggle<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Alternar NvimTree"; };
+      options = { silent = true; desc = "Toggle File Explorer"; };
     }
     {
       key = "<leader>d";
       action = "<cmd>Dashboard<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Abrir Dashboard"; };
+      options = { silent = true; desc = "Open Dashboard"; };
+    }
+    {
+      key = "<leader>?";
+      action = "<cmd>Telescope keymaps<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Browse All Keymaps"; };
+    }
+    {
+      key = "<leader><leader>";
+      action = "<cmd>WhichKey<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Show Leader Keymaps"; };
     }
 
-    # ─── Categoria Novo (<leader>n) ───
+    # ─── New (<leader>n) ───
     {
       key = "<leader>nf";
       action = "<cmd>lua _G.advanced_new_file()<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Novo Arquivo (Avançado)"; };
+      options = { silent = true; desc = "New File (Advanced)"; };
     }
     {
       key = "<leader>ns";
       action = "<cmd>lua _G.spring_boot_wizard()<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Novo Projeto Spring Boot"; };
+      options = { silent = true; desc = "New Spring Boot Project"; };
     }
 
-    # ─── Oil ───
+    # ─── File Explorer ───
     {
       key = "-";
       action = "<cmd>Oil<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Abrir Oil (File Explorer)"; };
+      options = { silent = true; desc = "Open Oil File Explorer"; };
     }
 
-    # ─── Categoria Buscar (<leader>f) ───
+    # ─── Files (<leader>f) ───
     {
       key = "<leader>ff";
       action = "<cmd>Telescope find_files<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Buscar Arquivos"; };
+      options = { silent = true; desc = "Find Files"; };
     }
     {
       key = "<leader>fg";
       action = "<cmd>Telescope live_grep<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Buscar Texto"; };
+      options = { silent = true; desc = "Find Text"; };
     }
     {
       key = "<leader>fb";
       action = "<cmd>Telescope buffers<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Listar Buffers"; };
+      options = { silent = true; desc = "List Buffers"; };
+    }
+    {
+      key = "<leader>fr";
+      action = "<cmd>Telescope oldfiles<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "List Recent Files"; };
     }
     {
       key = "<leader>fp";
       action = "<cmd>Telescope projects<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Listar Projetos"; };
+      options = { silent = true; desc = "List Projects"; };
     }
 
-    # ─── Categoria Configuração (<leader>c) ───
+    # ─── Configuration (<leader>c) ───
     {
       key = "<leader>cn";
       action = "<cmd>NvimTreeOpen ~/.config/nvim<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Configuração do Neovim"; };
+      options = { silent = true; desc = "Open Neovim Configuration"; };
     }
     {
       key = "<leader>cs";
       action = "<cmd>NvimTreeOpen /etc/nixos<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Configuração do Sistema"; };
+      options = { silent = true; desc = "Open System Configuration"; };
+    }
+
+    # ─── Navigation ───
+    {
+      key = "<leader>o";
+      action = "<cmd>AerialToggle<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Toggle Symbol Outline"; };
+    }
+    {
+      key = "<leader>z";
+      action = "<cmd>ZenMode<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Toggle Zen Mode"; };
+    }
+
+    # ─── Harpoon (<leader>h) ───
+    {
+      key = "<leader>ha";
+      action.__raw = "function() require('harpoon'):list():add() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Add Current File"; };
+    }
+    {
+      key = "<leader>ht";
+      action.__raw = "function() local harpoon = require('harpoon'); harpoon.ui:toggle_quick_menu(harpoon:list()) end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Toggle Harpoon Menu"; };
+    }
+    {
+      key = "<leader>h1";
+      action.__raw = "function() require('harpoon'):list():select(1) end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Open Harpoon File 1"; };
+    }
+    {
+      key = "<leader>h2";
+      action.__raw = "function() require('harpoon'):list():select(2) end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Open Harpoon File 2"; };
+    }
+    {
+      key = "<leader>h3";
+      action.__raw = "function() require('harpoon'):list():select(3) end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Open Harpoon File 3"; };
+    }
+    {
+      key = "<leader>h4";
+      action.__raw = "function() require('harpoon'):list():select(4) end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Open Harpoon File 4"; };
+    }
+
+    # ─── Git (<leader>g) ───
+    {
+      key = "<leader>gg";
+      action = "<cmd>Neogit<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Open Git Status"; };
+    }
+    {
+      key = "<leader>gc";
+      action = "<cmd>Neogit commit<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Create Commit"; };
+    }
+    {
+      key = "<leader>gb";
+      action = "<cmd>Neogit branch<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Manage Branches"; };
+    }
+    {
+      key = "<leader>gl";
+      action = "<cmd>Neogit pull<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Pull Changes"; };
+    }
+    {
+      key = "<leader>gp";
+      action = "<cmd>Neogit push<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Push Changes"; };
+    }
+    {
+      key = "<leader>gr";
+      action = "<cmd>Neogit rebase<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Rebase Current Branch"; };
+    }
+    {
+      key = "<leader>gd";
+      action = "<cmd>DiffviewOpen<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Open Diff View"; };
+    }
+    {
+      key = "<leader>gh";
+      action = "<cmd>DiffviewFileHistory %<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Show File History"; };
+    }
+    {
+      key = "<leader>gH";
+      action = "<cmd>DiffviewFileHistory<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Show Repository History"; };
+    }
+    {
+      key = "<leader>gB";
+      action = "<cmd>Gitsigns blame_line<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Blame Current Line"; };
+    }
+
+    # ─── Debug (<leader>x) ───
+    {
+      key = "<leader>xb";
+      action.__raw = "function() require('dap').toggle_breakpoint() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Toggle Breakpoint"; };
+    }
+    {
+      key = "<leader>xc";
+      action.__raw = "function() require('dap').continue() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Start or Continue Debugging"; };
+    }
+    {
+      key = "<leader>xn";
+      action.__raw = "function() require('dap').step_over() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Step Over"; };
+    }
+    {
+      key = "<leader>xi";
+      action.__raw = "function() require('dap').step_into() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Step Into"; };
+    }
+    {
+      key = "<leader>xo";
+      action.__raw = "function() require('dap').step_out() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Step Out"; };
+    }
+    {
+      key = "<leader>xt";
+      action.__raw = "function() require('dap').terminate() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Terminate Debugging"; };
     }
 
     # ─── Flash ───
@@ -97,7 +266,13 @@
       key = "s";
       action.__raw = "function() require('flash').jump() end";
       mode = [ "n" "x" "o" ];
-      options = { silent = true; desc = "Flash: Jump"; };
+      options = { silent = true; desc = "Flash Jump"; };
+    }
+    {
+      key = "S";
+      action.__raw = "function() require('flash').treesitter() end";
+      mode = [ "n" "x" "o" ];
+      options = { silent = true; desc = "Flash Treesitter Selection"; };
     }
 
     # ─── Smart Splits ───
@@ -122,18 +297,36 @@
       mode = [ "n" "t" ];
     }
 
-    # ─── Categoria LSP/Linguagens (<leader>l) ───
+    # ─── Language (<leader>l) ───
     {
       key = "gd";
       action = "<cmd>lua vim.lsp.buf.definition()<CR>";
       mode = [ "n" ];
-      options = { desc = "Ir para Definição"; };
+      options = { desc = "Go to Definition"; };
+    }
+    {
+      key = "gD";
+      action = "<cmd>lua vim.lsp.buf.declaration()<CR>";
+      mode = [ "n" ];
+      options = { desc = "Go to Declaration"; };
+    }
+    {
+      key = "gi";
+      action = "<cmd>lua vim.lsp.buf.implementation()<CR>";
+      mode = [ "n" ];
+      options = { desc = "Go to Implementation"; };
+    }
+    {
+      key = "gr";
+      action = "<cmd>lua vim.lsp.buf.references()<CR>";
+      mode = [ "n" ];
+      options = { desc = "List References"; };
     }
     {
       key = "K";
       action = "<cmd>lua vim.lsp.buf.hover()<CR>";
       mode = [ "n" ];
-      options = { desc = "Hover Info"; };
+      options = { desc = "Show Documentation"; };
     }
     {
       key = "<leader>la";
@@ -145,13 +338,19 @@
       key = "<leader>lf";
       action = "<cmd>ConformFormat<CR>";
       mode = [ "n" ];
-      options = { desc = "Formatar Buffer"; };
+      options = { desc = "Format Buffer"; };
     }
     {
       key = "<leader>lr";
       action = "<cmd>lua vim.lsp.buf.rename()<CR>";
       mode = [ "n" ];
-      options = { desc = "Renomear Símbolo"; };
+      options = { desc = "Rename Symbol"; };
+    }
+    {
+      key = "<leader>ld";
+      action = "<cmd>Trouble diagnostics toggle<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Toggle Diagnostics"; };
     }
   ];
 }
