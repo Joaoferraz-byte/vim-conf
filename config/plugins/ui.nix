@@ -75,13 +75,13 @@
               key = "c";
             }
             {
-              icon = "󰌌  ";
-              desc = "Browse Keymaps";
-              action = "Telescope keymaps";
+              icon = "󰋗  ";
+              desc = "Browse All Keymaps";
+              action = "lua require('which-key').show({ global = true })";
               key = "?";
             }
             {
-              icon = "  ";
+              icon = "󰗼  ";
               desc = "Quit";
               action = "qa";
               key = "q";
@@ -150,6 +150,16 @@
             __unkeyed-1 = "<leader>x";
             group = "Debug";
             icon = "󰃤";
+          }
+          {
+            __unkeyed-1 = "<leader>?";
+            desc = "Browse All Keymaps";
+            icon = "󰘦";
+          }
+          {
+            __unkeyed-1 = "<leader><leader>";
+            desc = "Show Leader Keymaps";
+            icon = "󰋜";
           }
         ];
       };

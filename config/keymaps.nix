@@ -30,13 +30,13 @@
     }
     {
       key = "<leader>?";
-      action = "<cmd>Telescope keymaps<CR>";
+      action = "<cmd>lua require('which-key').show({ global = true })<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Browse All Keymaps"; };
     }
     {
       key = "<leader><leader>";
-      action = "<cmd>WhichKey<CR>";
+      action = "<cmd>lua require('which-key').show() <CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Show Leader Keymaps"; };
     }
@@ -299,31 +299,31 @@
 
     # ─── Language (<leader>l) ───
     {
-      key = "gd";
+      key = "<leader>ld";
       action = "<cmd>lua vim.lsp.buf.definition()<CR>";
       mode = [ "n" ];
       options = { desc = "Go to Definition"; };
     }
     {
-      key = "gD";
+      key = "<leader>lD";
       action = "<cmd>lua vim.lsp.buf.declaration()<CR>";
       mode = [ "n" ];
       options = { desc = "Go to Declaration"; };
     }
     {
-      key = "gi";
+      key = "<leader>li";
       action = "<cmd>lua vim.lsp.buf.implementation()<CR>";
       mode = [ "n" ];
       options = { desc = "Go to Implementation"; };
     }
     {
-      key = "gr";
+      key = "<leader>lr";
       action = "<cmd>lua vim.lsp.buf.references()<CR>";
       mode = [ "n" ];
       options = { desc = "List References"; };
     }
     {
-      key = "K";
+      key = "<leader>lh";
       action = "<cmd>lua vim.lsp.buf.hover()<CR>";
       mode = [ "n" ];
       options = { desc = "Show Documentation"; };
@@ -341,13 +341,13 @@
       options = { desc = "Format Buffer"; };
     }
     {
-      key = "<leader>lr";
+      key = "<leader>ln";
       action = "<cmd>lua vim.lsp.buf.rename()<CR>";
       mode = [ "n" ];
       options = { desc = "Rename Symbol"; };
     }
     {
-      key = "<leader>ld";
+      key = "<leader>lx";
       action = "<cmd>Trouble diagnostics toggle<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Toggle Diagnostics"; };
