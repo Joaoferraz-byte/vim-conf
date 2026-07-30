@@ -132,9 +132,9 @@
     }
     {
       key = "<leader>ht";
-      action.__raw = "function() local harpoon = require('harpoon'); harpoon.ui:toggle_quick_menu(harpoon:list()) end";
+      action = "<cmd>Telescope harpoon marks<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Toggle Harpoon Menu"; };
+      options = { silent = true; desc = "Open Harpoon Marks"; };
     }
     {
       key = "<leader>h1";
@@ -226,37 +226,37 @@
     # ─── Debug (<leader>x) ───
     {
       key = "<leader>xb";
-      action.__raw = "function() require('dap').toggle_breakpoint() end";
+      action = "<cmd>DapToggleBreakpoint<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Toggle Breakpoint"; };
     }
     {
       key = "<leader>xc";
-      action.__raw = "function() require('dap').continue() end";
+      action = "<cmd>DapContinue<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Start or Continue Debugging"; };
     }
     {
       key = "<leader>xn";
-      action.__raw = "function() require('dap').step_over() end";
+      action = "<cmd>DapStepOver<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Step Over"; };
     }
     {
       key = "<leader>xi";
-      action.__raw = "function() require('dap').step_into() end";
+      action = "<cmd>DapStepInto<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Step Into"; };
     }
     {
       key = "<leader>xo";
-      action.__raw = "function() require('dap').step_out() end";
+      action = "<cmd>DapStepOut<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Step Out"; };
     }
     {
       key = "<leader>xt";
-      action.__raw = "function() require('dap').terminate() end";
+      action = "<cmd>DapTerminate<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Terminate Debugging"; };
     }
