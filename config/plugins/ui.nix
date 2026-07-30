@@ -46,13 +46,13 @@
             }
             {
               icon = "  ";
-              desc = "New File (Advanced)";
+              desc = "New File";
               action = "lua _G.advanced_new_file()";
               key = "n";
             }
             {
               icon = "  ";
-              desc = "Spring Boot Wizard";
+              desc = "Spring Boot";
               action = "lua _G.spring_boot_wizard()";
               key = "s";
             }
@@ -108,7 +108,10 @@
           border = "rounded";
           title = true;
           title_pos = "center";
-          padding = [ 1 2 ];
+          padding = [
+            1
+            2
+          ];
         };
         spec = [
           {
@@ -211,7 +214,13 @@
       enable = true;
       settings = {
         indent.char = "│";
-        exclude.filetypes = [ "dashboard" "alpha" "NvimTree" "toggleterm" "help" ];
+        exclude.filetypes = [
+          "dashboard"
+          "alpha"
+          "NvimTree"
+          "toggleterm"
+          "help"
+        ];
       };
     };
   };
