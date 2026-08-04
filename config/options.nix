@@ -36,22 +36,25 @@
     undolevels = 10000;
   };
 
-  # O módulo oficial cuida do carregamento do plugin antes da seleção do tema.
-  colorschemes.github-theme = {
+  # Catppuccin theme for Neovim
+  colorschemes.catppuccin = {
     enable = true;
     settings = {
-      options = {
-        transparent = true;
-        terminal_colors = true;
-        dim_inactive = false;
-        styles = {
-          comments = "italic";
-          keywords = "italic";
-        };
+      flavour = "mocha"; # Mocha is the darkest flavor, matching DMS dark mode
+      transparent_background = true;
+      term_colors = true;
+      integrations = {
+        cmp = true;
+        gitsigns = true;
+        nvimtree = true;
+        treesitter = true;
+        notify = true;
+        mini.enabled = true;
+        indent_blankline.enabled = true;
       };
     };
   };
-  colorscheme = "github_dark_default";
+  colorscheme = "catppuccin-mocha";
 
   performance = {
     byteCompileLua = {
