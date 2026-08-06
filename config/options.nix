@@ -93,6 +93,8 @@
       for _, group in ipairs(transparent_groups) do
         vim.api.nvim_set_hl(0, group, { bg = "NONE", ctermbg = "NONE", force = true })
       end
+      -- Garante que fillchars eob seja respeitado mesmo após troca de tema
+      vim.opt.fillchars:append("eob: ")
 
       vim.api.nvim_set_hl(0, "PmenuSel", {
         bg = vim.g.dms_colors.primary or "#7aa2f7",

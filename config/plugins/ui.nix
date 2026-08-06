@@ -221,15 +221,9 @@
       settings.filters.dotfiles = false;
     };
 
-    # Noice
+    # Noice (Desativado para depurar press-any-key)
     noice = {
-      enable = true;
-      settings.presets = {
-        bottom_search = true;
-        command_palette = true;
-        long_message_to_split = true;
-        lsp_doc_border = true;
-      };
+      enable = false;
     };
 
     barbecue.enable = true;
@@ -375,26 +369,6 @@
           vim.wo.winhl = "Normal:NormalFloat,FloatBorder:FloatBorder"
         end
       '';
-    }
-    # Prevent "press enter" prompt on startup
-    {
-      event = "VimEnter";
-      command = ''lua
-        -- Silencia mensagens e erros durante o boot
-        local old_errorbell = vim.opt.errorbells:get()
-        local old_visualbell = vim.opt.visualbell:get()
-        vim.opt.errorbells = false
-        vim.opt.visualbell = false
-        
-        -- Garante que o dashboard não dispare mensagens
-        vim.defer_fn(function()
-          vim.cmd("silent! Dashboard")
-          vim.opt.errorbells = old_errorbell
-          vim.opt.visualbell = old_visualbell
-        end, 5)
-      '';
-      once = true;
-      nested = true;
     }
   ];
 }

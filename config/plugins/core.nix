@@ -100,9 +100,7 @@ in
   extraConfigLua = ''
     -- DMS base46 theme initialization
     pcall(function()
-      local base46 = require("base46")
-      -- Habilita transparência nativa do base46 se suportado
-      base46.load_theme("dms")
+      require("base46").load_theme("dms")
     end)
   '';
 }
