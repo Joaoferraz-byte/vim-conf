@@ -37,9 +37,9 @@
   };
 
   # ─── DMS Dynamic Theme ────────────────────────────────────────────────────
-  # Reads colors from the Matugen-generated theme (DMS).
-  # Neovim theme is set via lua in extraConfigLua.
-  colorscheme = "dms-dark";
+  # Uses the DMS base46 plugin (AvengeMedia/base46).
+  # DMS generates ~/.config/nvim/colors/dms.lua automatically.
+  colorscheme = "dms";
 
   performance = {
     byteCompileLua = {
@@ -64,26 +64,20 @@
       end
     end
 
-    -- Create custom highlight groups based on DMS colors
-    local bg = vim.g.dms_colors.bg or "#1a1b26"
-    local bg_alt = vim.g.dms_colors.bg_alt or "#24283b"
-    local fg = vim.g.dms_colors.fg or "#c0caf5"
-    local comment = vim.g.dms_colors.comment or "#565f89"
-    local primary = vim.g.dms_colors.primary or "#7aa2f7"
-
     -- Transparent background for floating windows
-    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE", fg = fg })
-    vim.api.nvim_set_hl(0, "FloatBorder", { bg = "NONE", fg = bg_alt })
+    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "FloatBorder", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "FloatTitle", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "FloatFooter", { bg = "NONE" })
     vim.api.nvim_set_hl(0, "NormalNC", { bg = "NONE" })
-    vim.api.nvim_set_hl(0, "CursorLine", { bg = bg_alt })
 
     -- Dashboard specific highlights (no noise)
-    vim.api.nvim_set_hl(0, "DashboardHeader", { fg = primary })
-    vim.api.nvim_set_hl(0, "DashboardFooter", { fg = comment })
-    vim.api.nvim_set_hl(0, "DashboardCenter", { fg = fg })
-    vim.api.nvim_set_hl(0, "DashboardKey", { fg = primary, bold = true })
-    vim.api.nvim_set_hl(0, "DashboardDesc", { fg = fg })
-    vim.api.nvim_set_hl(0, "DashboardIcon", { fg = primary })
-    vim.api.nvim_set_hl(0, "DashboardShortCut", { fg = comment })
+    vim.api.nvim_set_hl(0, "DashboardHeader", { fg = vim.g.dms_colors.primary or "#7aa2f7" })
+    vim.api.nvim_set_hl(0, "DashboardFooter", { fg = vim.g.dms_colors.comment or "#565f89" })
+    vim.api.nvim_set_hl(0, "DashboardCenter", { fg = vim.g.dms_colors.fg or "#c0caf5" })
+    vim.api.nvim_set_hl(0, "DashboardKey", { fg = vim.g.dms_colors.primary or "#7aa2f7", bold = true })
+    vim.api.nvim_set_hl(0, "DashboardDesc", { fg = vim.g.dms_colors.fg or "#c0caf5" })
+    vim.api.nvim_set_hl(0, "DashboardIcon", { fg = vim.g.dms_colors.primary or "#7aa2f7" })
+    vim.api.nvim_set_hl(0, "DashboardShortCut", { fg = vim.g.dms_colors.comment or "#565f89" })
   '';
 }

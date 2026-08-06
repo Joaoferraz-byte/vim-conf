@@ -52,6 +52,12 @@
       };
     };
 
+    # ─── DMS base46 (Dynamic theme plugin) ───
+    base46 = {
+      enable = true;
+      settings = {};
+    };
+
     # ─── TS Autotag ───
     ts-autotag.enable = true;
 
