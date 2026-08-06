@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  # C/C++ and embedded development tooling.
+  # C/C++ and Embedded
   plugins.cmake-tools.enable = true;
 
   extraPackages = with pkgs; [

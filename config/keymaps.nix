@@ -3,7 +3,7 @@
   globals.maplocalleader = " ";
 
   keymaps = [
-    # ─── General ───
+    # General
     {
       key = "<Esc>";
       action = "<cmd>nohlsearch<CR>";
@@ -41,7 +41,7 @@
       options = { silent = true; desc = "Show Leader Keymaps"; };
     }
 
-    # ─── New (<leader>n) ───
+    # New
     {
       key = "<leader>nf";
       action = "<cmd>lua _G.advanced_new_file()<CR>";
@@ -55,7 +55,7 @@
       options = { silent = true; desc = "New Spring Boot Project"; };
     }
 
-    # ─── File Explorer ───
+    # File Explorer
     {
       key = "-";
       action = "<cmd>Oil<CR>";
@@ -63,7 +63,7 @@
       options = { silent = true; desc = "Open Oil File Explorer"; };
     }
 
-    # ─── Files (<leader>f) ───
+    # Files
     {
       key = "<leader>ff";
       action = "<cmd>Telescope find_files<CR>";
@@ -95,7 +95,7 @@
       options = { silent = true; desc = "List Projects"; };
     }
 
-    # ─── Configuration (<leader>c) ───
+    # Configuration
     {
       key = "<leader>cn";
       action = "<cmd>NvimTreeOpen ~/.config/nvim<CR>";
@@ -109,7 +109,7 @@
       options = { silent = true; desc = "Open System Configuration"; };
     }
 
-    # ─── Navigation ───
+    # Navigation
     {
       key = "<leader>o";
       action = "<cmd>AerialToggle<CR>";
@@ -123,7 +123,7 @@
       options = { silent = true; desc = "Toggle Zen Mode"; };
     }
 
-    # ─── Harpoon (<leader>h) ───
+    # Harpoon
     {
       key = "<leader>ha";
       action.__raw = "function() require('harpoon'):list():add() end";
@@ -161,7 +161,7 @@
       options = { silent = true; desc = "Open Harpoon File 4"; };
     }
 
-    # ─── Git (<leader>g) ───
+    # Git
     {
       key = "<leader>gg";
       action = "<cmd>Neogit<CR>";
@@ -223,7 +223,7 @@
       options = { silent = true; desc = "Blame Current Line"; };
     }
 
-    # ─── Debug (<leader>x) ───
+    # Debug
     {
       key = "<leader>xb";
       action = "<cmd>DapToggleBreakpoint<CR>";
@@ -261,7 +261,7 @@
       options = { silent = true; desc = "Terminate Debugging"; };
     }
 
-    # ─── Tests (<leader>t) ───
+    # Tests
     {
       key = "<leader>tt";
       action.__raw = "function() require('neotest').run.run(vim.fn.expand('%')) end";
@@ -299,7 +299,7 @@
       options = { silent = true; desc = "Stop Running Test"; };
     }
 
-    # ─── Flash ───
+    # Flash
     {
       key = "s";
       action.__raw = "function() require('flash').jump() end";
@@ -313,7 +313,7 @@
       options = { silent = true; desc = "Flash Treesitter Selection"; };
     }
 
-    # ─── Smart Splits ───
+    # Smart Splits
     {
       key = "<C-h>";
       action.__raw = "function() require('smart-splits').move_cursor_left() end";
@@ -335,7 +335,7 @@
       mode = [ "n" "t" ];
     }
 
-    # ─── Language (<leader>l) ───
+    # Language
     {
       key = "<leader>ld";
       action = "<cmd>lua vim.lsp.buf.definition()<CR>";

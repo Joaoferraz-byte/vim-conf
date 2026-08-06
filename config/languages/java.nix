@@ -1,13 +1,13 @@
 { pkgs, ... }:
 {
-  # ─── JDTLS nativo do Nixvim ───
+  # JDTLS
   plugins.jdtls = {
     enable = true;
     autoLoad = true;
     jdtLanguageServerPackage = pkgs.jdt-language-server;
   };
 
-  # ─── Spring Boot nativo do Nixvim ───
+  # Spring Boot
   plugins.spring-boot = {
     enable = true;
     autoLoad = true;
@@ -22,7 +22,7 @@
     };
   };
 
-  # ─── Neotest + neotest-java (Test Runner Inline) ───
+  # Neotest
   plugins.neotest = {
     enable = true;
     settings = {
@@ -44,27 +44,21 @@
     gradle
   ];
 
-  # Configurações avançadas do JDTLS via extraConfigLua
   extraConfigLua = ''
-    -- Configurações avançadas do JDTLS (settings, root_markers, dap integration)
     vim.api.nvim_create_autocmd("FileType", {
       pattern = "java",
       callback = function()
-        -- Configurar inlay hints para nomes de parâmetros
         local ok, jdtls = pcall(require, "jdtls")
         if not ok then
           return
         end
 
-        -- Override settings do JDTLS para comportamento avançado
         local function on_attach(_, _)
-          -- Habilitar DAP para Java com hot code replace
           pcall(jdtls.setup_dap, {
             hotcodereplace = "auto",
             config_overrides = {},
           })
 
-          -- Organizar imports ao salvar
           vim.api.nvim_create_autocmd("BufWritePost", {
             buffer = vim.api.nvim_get_current_buf(),
             callback = function()
@@ -74,7 +68,6 @@
           })
         end
 
-        -- Encontrar root do projeto
         local root_markers = {
           ".git",
           "mvnw",
@@ -91,12 +84,10 @@
           return
         end
 
-        -- Configurar workspace por projeto
         local project_name = vim.fn.fnamemodify(root_dir, ":p:h:t")
         local workspace_dir = vim.fn.stdpath("cache") .. "/jdtls/" .. project_name
         local config_dir = workspace_dir .. "/config"
 
-        -- Iniciar/reattach JDTLS com configuração completa
         local config = {
           cmd = {
             "${pkgs.jdt-language-server}/bin/jdtls",

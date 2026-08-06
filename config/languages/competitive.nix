@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  # Competitive programming workflow for C/C++.
+  # Competitive Programming
   plugins.competitest.enable = true;
 
   extraPackages = with pkgs; [
