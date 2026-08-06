@@ -1,3 +1,5 @@
+# Changelog
+
 ## [Unreleased] - 2026-08-06
 
 ### Added
@@ -15,6 +17,25 @@
 - **Floating Window Transparency**: Telescope, leader menus, and popups now match terminal background
 - **project.nvim Corruption**: Added error handling for corrupted history.json
 - **Illuminate on Dashboard**: Disabled word highlights on dashboard, NvimTree, and help buffers
+
+### Added
+- **LazyDev**: Lua LSP performance plugin for lazy.nvim projects
+- **NeoTree**: Modern file explorer replacing NvimTree (sidebar, buffers, git-status views)
+- **Mini.nvim Suite**: mini.icons (icons everywhere), mini.surround (visual text objects), mini.ai (smarter text objects), mini.bracketed (buffer/diagnostic navigation), mini.files (filesystem explorer)
+- **Render Markdown**: Markdown rendering with checkbox, heading, and list improvements
+- **Dashboard Neotree Integration**: Dashboard now uses Neotree for directory navigation
+
+### Changed
+- **Options Refactored**: Replaced manual `dms.css` parsing with `base46.setup({ transparency = true })` and fillchars/WinEnter autocmds
+- **Lualine Theme**: Changed from `base46` to `dms` for accurate DMS color integration
+- **Keymaps**: All `NvimTree` references replaced with `Neotree`; added `mini.files` keymap (`<leader>e`)
+- **Core Plugins**: Removed duplicate `base46.load_theme("dms")` call (handled by DMS matugen generation)
+
+### Fixed
+- **DMS Theme Crash**: Fixed `apply_dms_theme()` which tried to read a non-existent `dms.css`; DMS matugen generates `~/.config/nvim/colors/dms.lua` internally via `base46.load("dms")`
+- **NvimTree Conflict**: Disabled `nvim-tree` in `ui.nix` (replaced by NeoTree)
+- **Mini.nvim Conflict**: Removed duplicate mini definition from `ui.nix` (consolidated in `core.nix`)
+- **Dashboard NvimTree Reference**: Updated dashboard config to use Neotree instead of NvimTree
 
 ## [2026-08-04]
 
