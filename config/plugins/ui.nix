@@ -18,7 +18,7 @@
       };
     };
 
-    # Dashboard-nvim
+    # Dashboard-nvim — Doom layout with Neo-tree integration
     dashboard = {
       enable = true;
       settings = {
@@ -81,7 +81,7 @@
             {
               icon = " ";
               desc = "Config";
-              action = "NvimTreeOpen ~/.config/nvim";
+              action = "Neotree ~/.config/nvim";
               key = "c";
               key_format = " %s";
             }
@@ -200,24 +200,11 @@
       };
     };
 
-    # Mini
-    mini = {
-      enable = true;
-      modules = {
-        animate = {
-          cursor.enable = false;
-          scroll.enable = false;
-          resize.enable = true;
-          open.enable = true;
-          close.enable = true;
-        };
-      };
-    };
+    # Mini.nvim modules are configured in core.nix.
 
-    # Nvim-Tree
+    # Nvim-Tree (kept for compatibility, but neo-tree is the primary explorer)
     nvim-tree = {
-      enable = true;
-      openOnSetup = false;
+      enable = false;
       settings.filters.dotfiles = false;
     };
 
@@ -234,10 +221,6 @@
           command_palette = true;
           long_message_to_split = true;
         };
-        # Routes are intentionally left empty: suppressing arbitrary
-        # messages masks real issues. The "press enter" prompt is disabled
-        # via opts.more = false in config/options.nix; any remaining prompt
-        # should be diagnosed at its source rather than filtered here.
       };
     };
 
@@ -249,7 +232,7 @@
     lualine = {
       enable = true;
       settings.options = {
-        theme = "auto";
+        theme = "dms";
         globalstatus = true;
       };
     };
@@ -261,10 +244,18 @@
         exclude.filetypes = [
           "dashboard"
           "alpha"
-          "NvimTree"
+          "Neotree"
           "toggleterm"
           "help"
         ];
+      };
+    };
+
+    # Render Markdown
+    render-markdown = {
+      enable = true;
+      settings = {
+        preset = "minimal";
       };
     };
   };
@@ -344,7 +335,7 @@
                     vim.fn.jobstart(curl_cmd, {
                       on_exit = function()
                         vim.notify("Projeto Spring Boot criado em: " .. project_path)
-                        vim.cmd("NvimTreeOpen " .. project_path)
+                        vim.cmd("Neotree " .. project_path)
                       end
                     })
                   end
@@ -395,14 +386,14 @@
         end)
       '';
     }
-    # Float windows: ensure transparency
+    # Neo-tree: ensure transparency for file explorer windows
     {
-      event = "WinEnter";
-      pattern = "*";
+      event = "FileType";
+      pattern = "neo-tree";
       command = ''lua
-        if vim.api.nvim_win_get_config(0).zindex then
-          vim.wo.winhl = "Normal:NormalFloat,FloatBorder:FloatBorder"
-        end
+        vim.opt_local.number = false
+        vim.opt_local.relativenumber = false
+        vim.opt_local.cursorline = false
       '';
     }
   ];

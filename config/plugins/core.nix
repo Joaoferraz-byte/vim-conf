@@ -26,10 +26,7 @@ in
     illuminate = {
       enable = true;
       settings = {
-        # Denylist prevents highlighting on dashboard, tree, help buffers
         filetypes_denylist = [ "dashboard" "alpha" "NvimTree" "help" ];
-        # Under_cursor highlights the word under cursor — disable to avoid
-        # visual noise on the dashboard when navigating options
         under_cursor = false;
       };
     };
@@ -93,6 +90,100 @@ in
       extensions.fzf-native.enable = true;
       extensions.file-browser.enable = true;
     };
+
+    # Lazydev — Lua LSP completion for Neovim config
+    lazydev = {
+      enable = true;
+      settings = {
+        library = [
+          {
+            path = "${pkgs.nixvim}/share/nixvim";
+            words = [ "nixvim" ];
+          }
+        ];
+        integrations = {
+          lspconfig = true;
+          cmp = true;
+        };
+      };
+    };
+
+    # Neo-tree — modern file explorer (replaces dashboard-nvim's NvimTree dependency)
+    neo-tree = {
+      enable = true;
+      settings = {
+        close_if_last_window = true;
+        filesystem = {
+          follow_current_file = {
+            enabled = true;
+            leave_dirs_open = true;
+          };
+          filtered_items = {
+            visible = true;
+            show_hidden = true;
+            always_show = [ ".git" ];
+          };
+        };
+        window = {
+          mappings = {
+            "s" = "open_split";
+            "S" = "open_vsplit";
+          };
+        };
+      };
+    };
+
+    # Mini.nvim modules — essential modern Neovim utilities
+    mini = {
+      enable = true;
+      modules = {
+        animate = {
+          cursor.enable = false;
+          scroll.enable = false;
+          resize.enable = true;
+          open.enable = true;
+          close.enable = true;
+        };
+        icons = {
+          mockDevIcons = true;
+        };
+        surround = {};
+        ai = {};
+        bracketed = {};
+        files = {
+          mappings = {
+            create = "c";
+            copy = "y";
+            copy_to_base = "Y";
+            delete = "d";
+            detail = ".";
+            find = "f";
+            go_in = "l";
+            go_in_plus = "L";
+            go_out = "h";
+            go_out_plus = "H";
+            hide_dotfiles = "gh";
+            hide_parent = "gp";
+            join = "j";
+            mark_goto = "'";
+            mark_toggle = "m";
+            open = "o";
+            open_cwd = "<C-g>c";
+            open_external = "x";
+            open_in_split = "s";
+            pick = "p";
+            pick_cwd = "<C-g>f";
+            rename = "r";
+            show_help = "g?";
+            sort_name = "<C-n>";
+            sort_mtime = "<C-m>";
+            sort_size = "<C-s>";
+            synchronize = "S";
+            trim_rslash = "T";
+          };
+        };
+      };
+    };
   };
 
   extraPlugins = [ base46-plugin ];
@@ -101,10 +192,66 @@ in
     git ripgrep fd gnumake nodejs jdk21 maven gradle chafa
   ];
 
+  # DMS base46 setup: enable transparency and register DMS integrations.
+  # The actual theme loading is handled by DMS matugen-generated dms.lua
+  # at ~/.config/nvim/colors/dms.lua, which calls base46.theme_harmonize()
+  # and base46.load("dms") dynamically.
   extraConfigLua = ''
-    -- DMS base46 theme initialization
     pcall(function()
-      require("base46").load_theme("dms")
+      local b46 = require("base46")
+      b46.setup({
+        transparency = true,
+        set_background = true,
+        term_colors = true,
+        integrations = {
+          blankline = true,
+          cmp = true,
+          defaults = true,
+          devicons = true,
+          git = true,
+          lsp = true,
+          mason = true,
+          neotest = true,
+          nvimtree = true,
+          statusline = true,
+          syntax = true,
+          treesitter = true,
+          tbline = true,
+          telescope = true,
+          whichkey = true,
+          alpha = true,
+          avante = true,
+          ["blink-pair"] = true,
+          bufferline = true,
+          codeactionmenu = true,
+          dap = true,
+          diffview = true,
+          edgy = true,
+          flash = true,
+          ["git-conflict"] = true,
+          gitsigns = true,
+          grug_far = true,
+          hop = true,
+          leap = true,
+          lspsaga = true,
+          markview = true,
+          ["mini-tabline"] = true,
+          ["mini-icons"] = true,
+          navic = true,
+          neogit = true,
+          notify = true,
+          nvshades = true,
+          orgmode = true,
+          rainbowdelimiters = true,
+          ["render-markdown"] = true,
+          semantic_tokens = true,
+          ["snacks-dashboard"] = true,
+          ["tiny-inline-diagnostic"] = true,
+          todo = true,
+          trouble = true,
+          ["vim-illuminate"] = true,
+        },
+      })
     end)
   '';
 }

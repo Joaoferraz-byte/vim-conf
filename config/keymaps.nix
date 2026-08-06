@@ -18,7 +18,7 @@
     }
     {
       key = "<leader>e";
-      action = "<cmd>NvimTreeToggle<CR>";
+      action = "<cmd>NeotreeToggle<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Toggle File Explorer"; };
     }
@@ -55,7 +55,7 @@
       options = { silent = true; desc = "New Spring Boot Project"; };
     }
 
-    # File Explorer
+    # File Explorer (Oil — buffer-level explorer)
     {
       key = "-";
       action = "<cmd>Oil<CR>";
@@ -98,13 +98,13 @@
     # Configuration
     {
       key = "<leader>cn";
-      action = "<cmd>NvimTreeOpen ~/.config/nvim<CR>";
+      action = "<cmd>Neotree ~/.config/nvim<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Open Neovim Configuration"; };
     }
     {
       key = "<leader>cs";
-      action = "<cmd>NvimTreeOpen /etc/nixos<CR>";
+      action = "<cmd>Neotree /etc/nixos<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Open System Configuration"; };
     }
@@ -389,6 +389,14 @@
       action = "<cmd>Trouble diagnostics toggle<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Toggle Diagnostics"; };
+    }
+
+    # Mini files (quick project file navigation)
+    {
+      key = "<leader>mf";
+      action.__raw = "function() require('mini.files').open() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Open Mini Files"; };
     }
   ];
 }
