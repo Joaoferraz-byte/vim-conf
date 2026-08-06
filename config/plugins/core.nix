@@ -246,6 +246,33 @@ in
           ["vim-illuminate"] = true,
         },
       })
+
+      -- DMS/base46 may reapply opaque highlight groups when the generated
+      -- colorscheme reloads. Reassert transparent backgrounds after every
+      -- colorscheme event so the terminal wallpaper remains visible.
+      local function apply_transparent_backgrounds()
+        local groups = {
+          "Normal", "NormalNC", "NormalFloat", "FloatBorder", "FloatTitle",
+          "SignColumn", "FoldColumn", "EndOfBuffer", "NonText", "LineNr",
+          "CursorLineNr", "StatusLine", "StatusLineNC", "TabLine", "TabLineFill",
+          "TabLineSel", "WinSeparator", "VertSplit", "MsgArea", "Pmenu",
+          "PmenuSel", "WildMenu", "TelescopeNormal", "TelescopeBorder",
+          "WhichKeyNormal", "NotifyBackground",
+        }
+        for _, group in ipairs(groups) do
+          local highlight = vim.api.nvim_get_hl(0, { name = group, link = false })
+          highlight.bg = nil
+          highlight.ctermbg = nil
+          vim.api.nvim_set_hl(0, group, highlight)
+        end
+      end
+
+      local transparency_group = vim.api.nvim_create_augroup("DmsTransparency", { clear = true })
+      vim.api.nvim_create_autocmd({ "ColorScheme", "VimEnter", "UIEnter" }, {
+        group = transparency_group,
+        callback = apply_transparent_backgrounds,
+      })
+      vim.schedule(apply_transparent_backgrounds)
     end)
   '';
 }

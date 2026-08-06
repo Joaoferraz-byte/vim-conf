@@ -107,7 +107,7 @@
               return {
                 "",
                 string.format(
-                  "nvim v%d.%d.%d  •  %d módulos Lua carregados  •  %s",
+                  "nvim v%d.%d.%d  •  %d loaded Lua modules  •  %s",
                   ver.major, ver.minor, ver.patch,
                   stats,
                   os.date("%d/%m/%Y")
@@ -221,6 +221,15 @@
           command_palette = true;
           long_message_to_split = true;
         };
+        routes = [
+          {
+            filter = {
+              event = "msg_show";
+              kind = "return_prompt";
+            };
+            opts.skip = true;
+          }
+        ];
       };
     };
 
@@ -273,7 +282,7 @@
         hidden = true,
         grouped = true,
         initial_mode = "normal",
-        prompt_title = "Selecionar Pasta (Enter para escolher)",
+        prompt_title = "Select directory (press Enter to choose)",
         attach_mappings = function(prompt_bufnr, map)
           local create_file = function()
             local selection = action_state.get_selected_entry()
@@ -282,7 +291,7 @@
               dir = selection.is_dir and selection.path or vim.fn.fnamemodify(selection.path, ":h")
             end
             actions.close(prompt_bufnr)
-            vim.ui.input({ prompt = "Nome do novo arquivo: " }, function(input)
+            vim.ui.input({ prompt = "New file name: " }, function(input)
               if input and input ~= "" then
                 local path = dir .. "/" .. input
                 vim.cmd("edit " .. path)
@@ -300,9 +309,9 @@
     _G.spring_boot_wizard = function()
       local java_versions = { "17", "21" }
       local boot_versions = { "3.2.0", "3.3.0" }
-      vim.ui.select(java_versions, { prompt = "Versão do Java:" }, function(java_v)
+      vim.ui.select(java_versions, { prompt = "Java version:" }, function(java_v)
         if not java_v then return end
-        vim.ui.select(boot_versions, { prompt = "Versão do Spring Boot:" }, function(boot_v)
+        vim.ui.select(boot_versions, { prompt = "Spring Boot version:" }, function(boot_v)
           if not boot_v then return end
           vim.ui.input({ prompt = "Group ID (ex: com.example): ", default = "com.example" }, function(group)
             if not group then return end
@@ -311,7 +320,7 @@
               local telescope = require("telescope")
               local fb = telescope.extensions.file_browser
               fb.file_browser({
-                prompt_title = "Selecionar Pasta Raiz do Projeto",
+                prompt_title = "Select project root directory",
                 cwd = vim.fn.getcwd(),
                 attach_mappings = function(prompt_bufnr, map)
                   local select_dir = function()
@@ -334,7 +343,7 @@
                     )
                     vim.fn.jobstart(curl_cmd, {
                       on_exit = function()
-                        vim.notify("Projeto Spring Boot criado em: " .. project_path)
+                        vim.notify("Spring Boot project created at: " .. project_path)
                         vim.cmd("Neotree " .. project_path)
                       end
                     })
