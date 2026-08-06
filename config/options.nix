@@ -37,7 +37,7 @@
 
     fillchars = "eob: ";
     shortmess = "atIcF"; # a: all, t: truncate, I: no intro, c: no completion messages, F: no file info
-    cmdheight = 1; # cmdheight=0 pode causar "press any key" em alguns casos de mensagens de erro
+    cmdheight = 1;
   };
 
   # DMS theme
@@ -87,9 +87,11 @@
         "Pmenu",
         "Folded",
         "FoldColumn",
+        "NvimTreeNormal",
+        "NvimTreeNormalNC",
       }
       for _, group in ipairs(transparent_groups) do
-        vim.api.nvim_set_hl(0, group, { bg = "NONE", ctermbg = "NONE" })
+        vim.api.nvim_set_hl(0, group, { bg = "NONE", ctermbg = "NONE", force = true })
       end
 
       vim.api.nvim_set_hl(0, "PmenuSel", {
@@ -114,13 +116,10 @@
       end,
     })
 
-    -- Força a aplicação inicial
-    vim.defer_fn(function()
-      _G.apply_dms_theme()
-    end, 10)
+    -- Aplicação imediata
+    _G.apply_dms_theme()
 
     -- Silenciamento total na inicialização
-    vim.opt.shortmess:append("s") -- Oculta "search hit BOTTOM"
-    -- vim.opt.lazyredraw = true  -- Desabilitado: pode causar artefatos visuais no dashboard
+    vim.opt.shortmess:append("s")
   '';
 }

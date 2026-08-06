@@ -14,6 +14,7 @@
         input.enabled = true;
         scope.enabled = true;
         scroll.enabled = true;
+        dashboard.enabled = false; # Desabilitado para não conflitar com dashboard-nvim
       };
     };
 
@@ -370,7 +371,6 @@
       event = "WinEnter";
       pattern = "*";
       command = ''lua
-        if vim.bo.filetype == "dashboard" then return end
         if vim.api.nvim_win_get_config(0).zindex then
           vim.wo.winhl = "Normal:NormalFloat,FloatBorder:FloatBorder"
         end
