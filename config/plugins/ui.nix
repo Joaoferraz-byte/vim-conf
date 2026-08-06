@@ -13,7 +13,7 @@
         notifier.enabled = true;
         quickfile.enabled = true;
         statuscolumn.enabled = true;
-        words.enabled = true;
+        words.enabled = false;  # Disable to prevent word highlights on dashboard
         indent.enabled = true;
         input.enabled = true;
         scope.enabled = true;
@@ -146,7 +146,7 @@
           {
             __unkeyed-1 = "<leader>g";
             group = "Git";
-            icon = "";
+            icon = "󰃂";
           }
           {
             __unkeyed-1 = "<leader>d";
@@ -325,13 +325,39 @@
         end)
       end)
     end
+
+    -- Floating window transparency for DMS theme consistency
+    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE", fg = nil })
+    vim.api.nvim_set_hl(0, "FloatBorder", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "FloatTitle", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "FloatFooter", { bg = "NONE" })
   '';
 
   autoCmd = [
+    # ─── Dashboard: disable all visual noise ───
     {
       event = "FileType";
       pattern = "dashboard";
-      command = "lua require('snacks').indent.disable()";
+      command = ''lua
+        vim.opt_local.number = false
+        vim.opt_local.relativenumber = false
+        vim.opt_local.cursorline = false
+        vim.opt_local.signcolumn = "no"
+        vim.opt_local.syntax = "off"
+        vim.cmd("nohlsearch")
+        require('snacks').indent.disable()
+      '';
+    }
+    # ─── Float windows: ensure transparency ───
+    {
+      event = "WinEnter";
+      pattern = "*";
+      command = ''lua
+        if vim.bo.filetype == "dashboard" then return end
+        if vim.api.nvim_win_get_config(0).zindex then
+          vim.wo.winhl = "Normal:NormalFloat,FloatBorder:FloatBorder"
+        end
+      '';
     }
   ];
 }
