@@ -1,6 +1,6 @@
 # NixVim IDE Moderno
 
-Esta configuração fornece um **Neovim declarativo**, reproduzível e pronto para desenvolvimento Java, Spring Boot, Angular, web, C/C++, embarcados e programação competitiva. Ela combina JDTLS por projeto, suporte a Spring Boot, Angular Language Server, TypeScript, ESLint, formatação por Conform, depuração DAP, uma interface visual baseada em **GitHub Dark** e uma **página inicial moderna com dashboard-nvim**. A configuração não utiliza Mason: servidores, formatadores e dependências de editor são fornecidos pelo Nix.
+Esta configuração fornece um **Neovim declarativo**, reproduzível e pronto para desenvolvimento Java, Spring Boot, Angular, web, C/C++, embarcados e programação competitiva. Ela combina JDTLS por projeto, suporte a Spring Boot, Angular Language Server, TypeScript, ESLint, formatação por Conform, depuração DAP, uma interface visual baseada no **tema dinâmico do DankMaterialShell (DMS)** e uma **página inicial limpa com dashboard-nvim**. A configuração não utiliza Mason: servidores, formatadores e dependências de editor são fornecidos pelo Nix.
 
 > O NixVim deve ser mantido compatível com a revisão de Nixpkgs usada por ele. Por isso, este flake mantém sua entrada `nixvim` independente e não força `nixpkgs.follows`. [1]
 
@@ -12,10 +12,10 @@ Esta configuração fornece um **Neovim declarativo**, reproduzível e pronto pa
 | C/C++ e embarcados | Clangd, CMake Tools, Clang Format, CMake, Ninja, GDB, OpenOCD e Cppcheck. |
 | Programação competitiva | Competitest, Clang, GCC e Clang Tools, todos fornecidos declarativamente. |
 | Depuração | `nvim-dap`, DAP UI, DAP virtual text, LLDB/GDB e perfil para anexar a Spring Boot na porta `5005`. |
-| Interface visual | Dashboard-nvim, Snacks.nvim (Statuscolumn, Indent, Scope, Words e rolagem suave), Noice com paleta de comandos, Mini Animate, Barbecue (breadcrumbs), Treesitter Context, Indent Blankline, Fidget (LSP progress), Bufferline, Lualine, Gitsigns, Treesitter, Trouble, Smart Splits e terminal flutuante. |
+| Interface visual | Dashboard-nvim, Snacks.nvim (Statuscolumn, Indent, Scope e rolagem suave), Noice com paleta de comandos, Mini Animate, Barbecue (breadcrumbs), Treesitter Context, Indent Blankline, Fidget (LSP progress), Bufferline, Lualine, Gitsigns, Treesitter, Trouble, Smart Splits e terminal flutuante. |
 | Navegação | Flash, Leap, Harpoon, Aerial (outline), Project.nvim, Telescope e Which-Key com layout moderno. |
 | Git | Gitsigns, Neogit e Diffview para status, commits, branches, sync, diffs e histórico. |
-| Extras | Zen Mode, Todo Comments, Web Devicons e Illuminate. |
+| Extras | Zen Mode, Todo Comments, Web Devicons e Oil (file explorer). |
 
 ## Executar como pacote
 
@@ -51,6 +51,10 @@ Adicione o flake como entrada e mantenha o módulo oficial do NixVim no Home Man
 }
 ```
 
+## Tema Dinâmico (DMS)
+
+O tema do Neovim segue o **DankMaterialShell (DMS)** dinamicamente. As cores são lidas do arquivo matugen gerado em `~/.config/DankMaterialShell/dms.css`, garantindo consistência visual entre o terminal, editor e shell. Os menus flutuantes (Telescope, Which-Key, popups) herdam transparência e cores do fundo do terminal.
+
 ## Fluxos de trabalho
 
 ### Java e Spring Boot
@@ -76,7 +80,7 @@ A formatação é executada ao salvar, com timeout de 2,5 segundos e fallback pa
 
 ### Dashboard e Explorador de Arquivos
 
-Ao abrir o Neovim sem arquivos, o **dashboard-nvim** é exibido automaticamente com atalhos para buscar arquivos, projetos recentes, configurações, keymaps e informações do Git. Há duas linhas de separação entre o logotipo ASCII e as ações. Use `<leader>e` para alternar o explorador de arquivos lateral, `<leader>ff` para buscar arquivos, `<leader>?` para navegar por todos os keymaps e `<leader>d` para reabrir o dashboard a qualquer momento.
+Ao abrir o Neovim sem arquivos, o **dashboard-nvim** é exibido automaticamente com atalhos para buscar arquivos, projetos recentes, configurações, keymaps e informações do Git. A página inicial é limpa: sem números de linha, sem highlights de palavras e com fundo transparente. Use `<leader>e` para alternar o explorador de arquivos lateral, `<leader>ff` para buscar arquivos, `<leader>?` para navegar por todos os keymaps e `<leader>d` para reabrir o dashboard a qualquer momento.
 
 ## Atalhos
 
@@ -104,10 +108,6 @@ Ao abrir o Neovim sem arquivos, o **dashboard-nvim** é exibido automaticamente 
 | `<leader>gb`, `<leader>gl`, `<leader>gp`, `<leader>gr` | Branches, pull, push e rebase da branch atual. |
 | `<leader>gd`, `<leader>gh`, `<leader>gH`, `<leader>gB` | Diff, histórico do arquivo, histórico do repositório e blame da linha. |
 
-## Tema GitHub Dark
-
-O tema é configurado pelo módulo oficial `colorschemes.github-theme`, e só então `colorscheme = "github_dark_default"` é selecionado. A Lualine usa `theme = "auto"`, de modo que herda o esquema carregado e não disputa a aplicação do tema. [6]
-
 ## Validação
 
 O repositório declara um pacote padrão e uma checagem NixVim:
@@ -130,8 +130,7 @@ nix eval .#nixosConfigurations.myMachine.config.system.build.toplevel.drvPath
 [3]: https://nix-community.github.io/nixvim/plugins/dap/index.html "NixVim — DAP"
 [4]: https://nix-community.github.io/nixvim/plugins/lsp/servers/angularls/index.html "NixVim — AngularLS"
 [5]: https://github.com/nix-community/nixvim/blob/main/plugins/by-name/conform-nvim/default.nix "NixVim — Conform module"
-[6]: https://nix-community.github.io/nixvim/colorschemes/github-theme/index.html "NixVim — GitHub Theme"
-[7]: https://nix-community.github.io/nixvim/plugins/neogit/index.html "NixVim — Neogit"
-[8]: https://nix-community.github.io/nixvim/plugins/diffview/index.html "NixVim — Diffview"
-[9]: https://nix-community.github.io/nixvim/plugins/competitest/index.html "NixVim — Competitest"
-[10]: https://nix-community.github.io/nixvim/plugins/cmake-tools/index.html "NixVim — CMake Tools"
+[6]: https://nix-community.github.io/nixvim/plugins/neogit/index.html "NixVim — Neogit"
+[7]: https://nix-community.github.io/nixvim/plugins/diffview/index.html "NixVim — Diffview"
+[8]: https://nix-community.github.io/nixvim/plugins/competitest/index.html "NixVim — Competitest"
+[9]: https://nix-community.github.io/nixvim/plugins/cmake-tools/index.html "NixVim — CMake Tools"
