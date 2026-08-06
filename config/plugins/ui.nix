@@ -13,7 +13,7 @@
         indent.enabled = true;
         input.enabled = true;
         scope.enabled = true;
-        scroll.enabled = true;
+        scroll.enabled = false; # Disable visual scrollbar to avoid | markers on the right edge
         dashboard.enabled = false; # Desabilitado para não conflitar com dashboard-nvim
       };
     };
@@ -25,6 +25,8 @@
         theme = "doom";
         hide = {
           statusline = true;
+          tabline = true;
+          # Ensure all UI chrome is hidden on the dashboard buffer
           tabline = true;
         };
         config = {
@@ -72,7 +74,7 @@
               key_format = " %s";
             }
             {
-              icon = "󰉋 "; # Substituído para evitar erro de glyph f60e
+              icon = "󰉋 ";
               desc = "Projects";
               action = "Telescope projects";
               key = "p";
@@ -360,7 +362,7 @@
   '';
 
   autoCmd = [
-    # Dashboard: disable all visual noise
+    # Dashboard: suppress all visual noise — numbers, signs, highlights, scrollbars
     {
       event = "FileType";
       pattern = "dashboard";
@@ -372,7 +374,27 @@
         vim.opt_local.syntax = "off"
         vim.opt_local.scrolloff = 0
         vim.cmd("nohlsearch")
+        -- Disable all plugins that could highlight on dashboard
         pcall(function() require('snacks').indent.disable() end)
+        pcall(function() require('snacks').scroll.disable() end)
+        pcall(function() require('illuminate').pause() end)
+        pcall(function() require('illuminate').toggle_buffer() end)
+        -- Clear all search highlights and plugin highlights on dashboard
+        pcall(function() vim.cmd("hi clear Search") end)
+        pcall(function() vim.cmd("hi clear IncSearch") end)
+      '';
+    }
+    # WinLeave: clear highlights when leaving dashboard (resume when returning)
+    {
+      event = "WinLeave";
+      pattern = "*";
+      command = ''lua
+        -- Resume illuminate when leaving the dashboard window
+        pcall(function()
+          if vim.bo.filetype ~= "dashboard" then
+            require('illuminate').resume()
+          end
+        end)
       '';
     }
     # Float windows: ensure transparency

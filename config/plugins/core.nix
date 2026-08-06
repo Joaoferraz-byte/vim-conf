@@ -26,7 +26,11 @@ in
     illuminate = {
       enable = true;
       settings = {
+        # Denylist prevents highlighting on dashboard, tree, help buffers
         filetypes_denylist = [ "dashboard" "alpha" "NvimTree" "help" ];
+        # Under_cursor highlights the word under cursor — disable to avoid
+        # visual noise on the dashboard when navigating options
+        under_cursor = false;
       };
     };
     trouble.enable = true;
