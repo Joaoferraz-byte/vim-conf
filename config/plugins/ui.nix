@@ -234,17 +234,10 @@
           command_palette = true;
           long_message_to_split = true;
         };
-        # Ignorar mensagens de inicialização que causam o prompt
-        routes = [
-          {
-            filter = {
-              event = "msg_show";
-              kind = "";
-              find = "written";
-            };
-            opts = { skip = true; };
-          }
-        ];
+        # Routes are intentionally left empty: suppressing arbitrary
+        # messages masks real issues. The "press enter" prompt is disabled
+        # via opts.more = false in config/options.nix; any remaining prompt
+        # should be diagnosed at its source rather than filtered here.
       };
     };
 
