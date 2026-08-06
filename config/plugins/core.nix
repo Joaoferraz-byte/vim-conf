@@ -95,12 +95,6 @@ in
     lazydev = {
       enable = true;
       settings = {
-        library = [
-          {
-            path = "${pkgs.nixvim}/share/nixvim";
-            words = [ "nixvim" ];
-          }
-        ];
         integrations = {
           lspconfig = true;
           cmp = true;
