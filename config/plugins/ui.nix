@@ -382,7 +382,8 @@
       command = ''lua
         vim.cmd("Dashboard")
       '';
-      options = { once = true; nested = true; };
+      once = true;
+      nested = true;
     }
   ];
 }
