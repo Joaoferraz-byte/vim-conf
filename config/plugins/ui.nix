@@ -1,11 +1,7 @@
-# ─── UI Plugins ───────────────────────────────────────────────────────────────
-# NOTE: Este módulo é importado no contexto do sistema de módulos do nixvim,
-# não no contexto do Home Manager. As opções devem estar no nível raiz do
-# módulo nixvim (plugins, opts, etc.) — NÃO dentro de programs.nixvim.
 { ... }:
 {
   plugins = {
-    # ─── Snacks.nvim ───
+    # Snacks.nvim
     snacks = {
       enable = true;
       settings = {
@@ -13,7 +9,7 @@
         notifier.enabled = true;
         quickfile.enabled = true;
         statuscolumn.enabled = true;
-        words.enabled = false;  # Disable to prevent word highlights on dashboard
+        words.enabled = false;
         indent.enabled = true;
         input.enabled = true;
         scope.enabled = true;
@@ -21,11 +17,15 @@
       };
     };
 
-    # ─── Dashboard-nvim (Centralizado Verticalmente) ───
+    # Dashboard-nvim
     dashboard = {
       enable = true;
       settings = {
         theme = "doom";
+        hide = {
+          statusline = true;
+          tabline = true;
+        };
         config = {
           header = [
             ""
@@ -43,52 +43,60 @@
           ];
           center = [
             {
-              icon = "  ";
+              icon = " ";
               desc = "Find File";
               action = "Telescope find_files";
               key = "f";
+              key_format = " %s";
             }
             {
-              icon = "  ";
+              icon = " ";
               desc = "New File";
               action = "lua _G.advanced_new_file()";
               key = "n";
+              key_format = " %s";
             }
             {
-              icon = "  ";
+              icon = " ";
               desc = "Spring Boot";
               action = "lua _G.spring_boot_wizard()";
               key = "s";
+              key_format = " %s";
             }
             {
-              icon = "  ";
+              icon = " ";
               desc = "Find Text";
               action = "Telescope live_grep";
               key = "g";
+              key_format = " %s";
             }
             {
-              icon = "  ";
+              icon = "󰌢 ";
               desc = "Projects";
               action = "Telescope projects";
               key = "p";
+              key_format = " %s";
             }
             {
-              icon = "  ";
+              icon = " ";
               desc = "Config";
               action = "NvimTreeOpen ~/.config/nvim";
               key = "c";
+              key_format = " %s";
             }
             {
-              icon = "  ";
+              icon = "󰋜 ";
               desc = "Browse All Keymaps";
               action = "lua require('which-key').show({ global = true })";
               key = "?";
+              key_format = " %s";
             }
             {
-              icon = "  ";
+              icon = " ";
               desc = "Quit";
               action = "qa";
               key = "q";
+              key_format = " %s";
             }
           ];
           footer.__raw = ''
@@ -110,7 +118,7 @@
       };
     };
 
-    # ─── Which-Key (Modern keymap discovery) ───
+    # Which-Key
     which-key = {
       enable = true;
       settings = {
@@ -135,63 +143,63 @@
           {
             __unkeyed-1 = "<leader>f";
             group = "Files";
-            icon = "󰈞";
+            icon = " ";
           }
           {
             __unkeyed-1 = "<leader>c";
             group = "Configuration";
-            icon = "󰒓";
+            icon = " ";
           }
           {
             __unkeyed-1 = "<leader>l";
             group = "Language";
-            icon = "󰘦";
+            icon = "󰘦 ";
           }
           {
             __unkeyed-1 = "<leader>n";
             group = "New";
-            icon = "󰐕";
+            icon = " ";
           }
           {
             __unkeyed-1 = "<leader>h";
             group = "Harpoon";
-            icon = "󰛢";
+            icon = " ";
           }
           {
             __unkeyed-1 = "<leader>g";
             group = "Git";
-            icon = "󰃂";
+            icon = " ";
           }
           {
             __unkeyed-1 = "<leader>d";
             desc = "Open Dashboard";
-            icon = "󰋜";
+            icon = "󰋜 ";
           }
           {
             __unkeyed-1 = "<leader>x";
             group = "Debug";
-            icon = "󰃤";
+            icon = " ";
           }
           {
             __unkeyed-1 = "<leader>t";
             group = "Test";
-            icon = "󰙨";
+            icon = " ";
           }
           {
             __unkeyed-1 = "<leader>?";
             desc = "Browse All Keymaps";
-            icon = "󰘦";
+            icon = "󰘦 ";
           }
           {
             __unkeyed-1 = "<leader><leader>";
             desc = "Show Leader Keymaps";
-            icon = "󰋜";
+            icon = "󰋜 ";
           }
         ];
       };
     };
 
-    # ─── Subtle window animations ───
+    # Mini
     mini = {
       enable = true;
       modules = {
@@ -205,14 +213,14 @@
       };
     };
 
-    # ─── Nvim-Tree ───
+    # Nvim-Tree
     nvim-tree = {
       enable = true;
       openOnSetup = false;
       settings.filters.dotfiles = false;
     };
 
-    # ─── Outros Plugins de UI ───
+    # Noice
     noice = {
       enable = true;
       settings.presets = {
@@ -222,10 +230,12 @@
         lsp_doc_border = true;
       };
     };
+
     barbecue.enable = true;
     treesitter-context.enable = true;
     fidget.enable = true;
     bufferline.enable = true;
+
     lualine = {
       enable = true;
       settings.options = {
@@ -233,6 +243,7 @@
         globalstatus = true;
       };
     };
+
     indent-blankline = {
       enable = true;
       settings = {
@@ -248,9 +259,7 @@
     };
   };
 
-  # Funções Customizadas e Autocmds
   extraConfigLua = ''
-    -- Função avançada para criar novos arquivos
     _G.advanced_new_file = function()
       local telescope = require("telescope")
       local actions = require("telescope.actions")
@@ -287,7 +296,6 @@
       })
     end
 
-    -- Spring Boot Project Wizard
     _G.spring_boot_wizard = function()
       local java_versions = { "17", "21" }
       local boot_versions = { "3.2.0", "3.3.0" }
@@ -299,8 +307,6 @@
             if not group then return end
             vim.ui.input({ prompt = "Artifact ID (ex: demo): ", default = "demo" }, function(artifact)
               if not artifact then return end
-
-              -- Selecionar diretório via Telescope File Browser
               local telescope = require("telescope")
               local fb = telescope.extensions.file_browser
               fb.file_browser({
@@ -311,10 +317,8 @@
                     local selection = require("telescope.actions.state").get_selected_entry()
                     local root_dir = selection and (selection.is_dir and selection.path or vim.fn.fnamemodify(selection.path, ":h")) or vim.fn.getcwd()
                     require("telescope.actions").close(prompt_bufnr)
-
                     local project_path = root_dir .. "/" .. artifact
                     vim.fn.mkdir(project_path, "p")
-
                     local curl_cmd = string.format(
                       "curl https://start.spring.io/starter.tgz " ..
                       "-d type=maven-project " ..
@@ -327,7 +331,6 @@
                       "| tar -xzvf - -C %s",
                       boot_v, artifact, group, artifact, java_v, root_dir
                     )
-
                     vim.fn.jobstart(curl_cmd, {
                       on_exit = function()
                         vim.notify("Projeto Spring Boot criado em: " .. project_path)
@@ -344,13 +347,10 @@
         end)
       end)
     end
-
-    -- (Transparência de fundo: ver _G.apply_dms_theme em config/options.nix,
-    -- reaplicada em todo ColorScheme para sobreviver a reloads do tema DMS)
   '';
 
   autoCmd = [
-    # ─── Dashboard: disable all visual noise ───
+    # Dashboard: disable all visual noise
     {
       event = "FileType";
       pattern = "dashboard";
@@ -360,11 +360,12 @@
         vim.opt_local.cursorline = false
         vim.opt_local.signcolumn = "no"
         vim.opt_local.syntax = "off"
+        vim.opt_local.scrolloff = 0
         vim.cmd("nohlsearch")
         require('snacks').indent.disable()
       '';
     }
-    # ─── Float windows: ensure transparency ───
+    # Float windows: ensure transparency
     {
       event = "WinEnter";
       pattern = "*";
@@ -374,6 +375,14 @@
           vim.wo.winhl = "Normal:NormalFloat,FloatBorder:FloatBorder"
         end
       '';
+    }
+    # Prevent "press enter" prompt on startup
+    {
+      event = "VimEnter";
+      command = ''lua
+        vim.cmd("Dashboard")
+      '';
+      options = { once = true; nested = true; };
     }
   ];
 }
