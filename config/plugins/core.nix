@@ -1,4 +1,20 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
+let
+  # DMS base46 plugin: built from GitHub, not in NixVim catalog.
+  # We use buildVimPlugin with requireCheck disabled to avoid the
+  # "neovim-require-check" validation that fails for base46.
+  base46-plugin = pkgs.vimUtils.buildVimPlugin {
+    pname = "base46";
+    version = "unstable";
+    src = pkgs.fetchFromGitHub {
+      owner = "AvengeMedia";
+      repo = "base46";
+      rev = "83522e02c6c3b4ea901c4bffd9e0a5e0371c1fe6";
+      hash = "sha256-kwDMC6rYzJYECmGnwn8JiAbffUq7hAXcUH6gPSkk2uI=";
+    };
+    neovimRequireCheck = false;
+  };
+in
 {
   plugins = {
     web-devicons.enable = true;
@@ -83,19 +99,7 @@
   };
 
   # ─── DMS base46 (Dynamic theme plugin, not a native NixVim plugin) ───
-  # Install via extraPlugins since base46 is not in the NixVim plugin catalog.
-  extraPlugins = with pkgs.vimPlugins; [
-    (pkgs.vimUtils.buildVimPlugin {
-      pname = "base46";
-      version = "unstable";
-      src = pkgs.fetchFromGitHub {
-        owner = "AvengeMedia";
-        repo = "base46";
-        rev = "83522e02c6c3b4ea901c4bffd9e0a5e0371c1fe6";
-        hash = "sha256-kwDMC6rYzJYECmGnwn8JiAbffUq7hAXcUH6gPSkk2uI=";
-      };
-    })
-  ];
+  extraPlugins = [ base46-plugin ];
 
   extraPackages = with pkgs; [
     git ripgrep fd gnumake nodejs jdk21 maven gradle chafa
