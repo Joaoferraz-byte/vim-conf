@@ -2,6 +2,13 @@
 
 ## [Unreleased] - 2026-08-06
 
+### Fixed — UI Polish
+- **Wallpaper Transparency**: Reapply transparent backgrounds for editor, floating windows, menus, statusline, tabline, separators, and dashboard-related surfaces after every DMS/base46 colorscheme reload
+- **Dashboard Return Prompt**: Hide Noice `return_prompt` messages so the dashboard no longer displays a distracting “Press any key to continue” prompt
+- **English UI**: Translate the dashboard footer and interactive file/project creation prompts to English
+
+## [Unreleased] - 2026-08-06
+
 ### Added
 - **Neotest + neotest-java**: Test runner inline para Java (run/debug arquivo ou teste mais próximo, summary, output panel) sob `<leader>t`, integrado ao DAP existente
 - **Dashboard Footer Dinâmico**: Mostra versão do nvim, módulos Lua carregados e data, mantendo header LIVARA e center intactos
