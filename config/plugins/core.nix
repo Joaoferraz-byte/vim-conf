@@ -10,7 +10,13 @@
     undotree.enable = true;
     which-key.enable = true;
     nvim-autopairs.enable = true;
-    illuminate.enable = true;
+    illuminate = {
+      enable = true;
+      settings = {
+        # Disable illuminate on dashboard to prevent word highlights on startup
+        filetypes_denylist = [ "dashboard" "alpha" "NvimTree" "help" ];
+      };
+    };
     trouble.enable = true;
 
     # ─── Flash (Navegação moderna) ───
@@ -38,6 +44,12 @@
     project-nvim = {
       enable = true;
       enableTelescope = true;
+      settings = {
+        # Enable manual mode to avoid automatic project detection on dashboard
+        manual_mode = true;
+        # Store history in a safe path
+        datapath = "$HOME/.local/share/nvim/project_nvim";
+      };
     };
 
     # ─── TS Autotag ───
@@ -73,4 +85,17 @@
   extraPackages = with pkgs; [
     git ripgrep fd gnumake nodejs jdk21 maven gradle chafa
   ];
+
+  # Fix project.nvim corrupted history.json on startup
+  extraConfigLua = ''
+    -- Handle corrupted project.nvim history.json
+    local history_path = vim.fn.stdpath("data") .. "/project_nvim/history.json"
+    if vim.fn.filereadable(history_path) == 1 then
+      local ok, data = pcall(vim.fn.json_decode, vim.fn.readfile(history_path))
+      if not ok or type(data) ~= "table" then
+        vim.fn.delete(history_path)
+        vim.notify("project.nvim: corrupted history cleared", vim.log.levels.WARN)
+      end
+    end
+  '';
 }
