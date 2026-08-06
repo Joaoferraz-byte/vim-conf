@@ -1,8 +1,5 @@
 { config, pkgs, lib, ... }:
 let
-  # DMS base46 plugin: built from GitHub, not in NixVim catalog.
-  # We use buildVimPlugin with requireCheck disabled to avoid the
-  # "neovim-require-check" validation that fails for base46.
   base46-plugin = pkgs.vimUtils.buildVimPlugin {
     pname = "base46";
     version = "unstable";
@@ -29,16 +26,15 @@ in
     illuminate = {
       enable = true;
       settings = {
-        # Disable illuminate on dashboard to prevent word highlights on startup
         filetypes_denylist = [ "dashboard" "alpha" "NvimTree" "help" ];
       };
     };
     trouble.enable = true;
 
-    # ─── Flash (Navegação moderna) ───
+    # Flash
     flash.enable = true;
 
-    # ─── Aerial (Outline) ───
+    # Aerial
     aerial = {
       enable = true;
       settings = {
@@ -47,7 +43,7 @@ in
       };
     };
 
-    # ─── Harpoon ───
+    # Harpoon
     harpoon = {
       enable = true;
       enableTelescope = true;
@@ -56,31 +52,28 @@ in
       };
     };
 
-    # ─── Project.nvim ───
+    # Project.nvim
     project-nvim = {
       enable = true;
       enableTelescope = true;
       settings = {
-        # Enable manual mode to avoid automatic project detection on dashboard
-        manual_mode = true;
-        # Store history in a safe path
-        datapath = "$HOME/.local/share/nvim/project_nvim";
+        datapath.__raw = ''vim.fn.stdpath("data") .. "/project_nvim"'';
       };
     };
 
-    # ─── TS Autotag ───
+    # TS Autotag
     ts-autotag.enable = true;
 
-    # ─── Zen Mode ───
+    # Zen Mode
     zen-mode.enable = true;
 
-    # ─── Smart Splits ───
+    # Smart Splits
     smart-splits.enable = true;
 
-    # ─── Oil (File explorer moderno) ───
+    # Oil
     oil.enable = true;
 
-    # ─── Treesitter ───
+    # Treesitter
     treesitter = {
       enable = true;
       nixGrammars = true;
@@ -90,7 +83,7 @@ in
       };
     };
 
-    # ─── Telescope ───
+    # Telescope
     telescope = {
       enable = true;
       extensions.fzf-native.enable = true;
@@ -98,7 +91,6 @@ in
     };
   };
 
-  # ─── DMS base46 (Dynamic theme plugin, not a native NixVim plugin) ───
   extraPlugins = [ base46-plugin ];
 
   extraPackages = with pkgs; [
@@ -106,18 +98,7 @@ in
   ];
 
   extraConfigLua = ''
-    -- Handle corrupted project.nvim history.json
-    local history_path = vim.fn.stdpath("data") .. "/project_nvim/history.json"
-    if vim.fn.filereadable(history_path) == 1 then
-      local ok, data = pcall(vim.fn.json_decode, vim.fn.readfile(history_path))
-      if not ok or type(data) ~= "table" then
-        vim.fn.delete(history_path)
-        vim.notify("project.nvim: corrupted history cleared", vim.log.levels.WARN)
-      end
-    end
-
     -- DMS base46 theme initialization
-    -- base46 plugin loads dms colorscheme from ~/.config/nvim/colors/dms.lua
     pcall(function()
       require("base46").load_theme("dms")
     end)
