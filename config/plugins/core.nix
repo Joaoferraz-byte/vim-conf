@@ -92,7 +92,7 @@
         owner = "AvengeMedia";
         repo = "base46";
         rev = "83522e02c6c3b4ea901c4bffd9e0a5e0371c1fe6";
-        hash = "sha256:11662aaa69150daaa3eb2f6dcbefac00faf13b0f775afe412a7de69c962b96c7";
+        hash = "sha256-kwDMC6rYzJYECmGnwn8JiAbffUq7hAXcUH6gPSkk2uI=";
       };
     })
   ];
