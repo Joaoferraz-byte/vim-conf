@@ -221,9 +221,31 @@
       settings.filters.dotfiles = false;
     };
 
-    # Noice (Desativado para depurar press-any-key)
+    # Noice
     noice = {
-      enable = false;
+      enable = true;
+      settings = {
+        lsp.override = {
+          "vim.lsp.util.convert_input_to_markdown_lines" = true;
+          "vim.lsp.util.set_formatting_params" = true;
+        };
+        presets = {
+          bottom_search = true;
+          command_palette = true;
+          long_message_to_split = true;
+        };
+        # Ignorar mensagens de inicialização que causam o prompt
+        routes = [
+          {
+            filter = {
+              event = "msg_show";
+              kind = "";
+              find = "written";
+            };
+            opts = { skip = true };
+          }
+        ];
+      };
     };
 
     barbecue.enable = true;
@@ -357,7 +379,7 @@
         vim.opt_local.syntax = "off"
         vim.opt_local.scrolloff = 0
         vim.cmd("nohlsearch")
-        require('snacks').indent.disable()
+        pcall(function() require('snacks').indent.disable() end)
       '';
     }
     # Float windows: ensure transparency

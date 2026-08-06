@@ -38,6 +38,7 @@
     fillchars = "eob: ";
     shortmess = "atIcF"; # a: all, t: truncate, I: no intro, c: no completion messages, F: no file info
     cmdheight = 1;
+    more = false; # Desativa o prompt "press enter" para mensagens longas
   };
 
   # DMS theme
@@ -118,8 +119,15 @@
       end,
     })
 
-    -- Aplicação imediata
+    -- Aplicação imediata e no final do boot para garantir transparência e sem tildes
     _G.apply_dms_theme()
+    
+    vim.api.nvim_create_autocmd("VimEnter", {
+      callback = function()
+        _G.apply_dms_theme()
+        vim.opt.fillchars:append("eob: ")
+      end,
+    })
 
     -- Silenciamento total na inicialização
     vim.opt.shortmess:append("s")
