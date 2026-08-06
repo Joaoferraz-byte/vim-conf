@@ -242,7 +242,7 @@
               kind = "";
               find = "written";
             };
-            opts = { skip = true };
+            opts = { skip = true; };
           }
         ];
       };
