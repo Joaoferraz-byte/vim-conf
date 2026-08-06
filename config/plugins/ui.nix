@@ -1,6 +1,14 @@
 { ... }:
 {
   plugins = {
+    # NixVim enables lazy.nvim's update checker by default in its plugin-manager
+    # integration. Its startup update report can overflow the message area and
+    # create the visible hit-enter widget on the dashboard.
+    lazy.settings = {
+      checker.enabled = false;
+      change_detection.notify = false;
+    };
+
     # Snacks.nvim
     snacks = {
       enable = true;
