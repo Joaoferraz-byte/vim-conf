@@ -26,8 +26,6 @@
         hide = {
           statusline = true;
           tabline = true;
-          # Ensure all UI chrome is hidden on the dashboard buffer
-          tabline = true;
         };
         config = {
           header = [
