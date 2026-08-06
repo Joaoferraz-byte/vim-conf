@@ -22,6 +22,22 @@
     };
   };
 
+  # ─── Neotest + neotest-java (Test Runner Inline) ───
+  # neotest-java não está no catálogo nativo do nixvim (só dotnet, zig,
+  # foundry, vitest, deno, plenary, playwright, etc. têm módulo dedicado),
+  # então é adicionado via extraPlugins, no mesmo padrão já usado para o
+  # base46 em config/plugins/core.nix.
+  plugins.neotest = {
+    enable = true;
+    settings = {
+      adapters.__raw = ''{ require("neotest-java") }'';
+    };
+  };
+
+  extraPlugins = with pkgs.vimPlugins; [
+    neotest-java
+  ];
+
   extraPackages = with pkgs; [
     jdk21
     jdt-language-server

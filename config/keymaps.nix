@@ -261,6 +261,44 @@
       options = { silent = true; desc = "Terminate Debugging"; };
     }
 
+    # ─── Tests (<leader>t) ───
+    {
+      key = "<leader>tt";
+      action.__raw = "function() require('neotest').run.run(vim.fn.expand('%')) end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Run Test File"; };
+    }
+    {
+      key = "<leader>tr";
+      action.__raw = "function() require('neotest').run.run() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Run Nearest Test"; };
+    }
+    {
+      key = "<leader>td";
+      action.__raw = "function() require('neotest').run.run({ strategy = 'dap' }) end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Debug Nearest Test"; };
+    }
+    {
+      key = "<leader>ts";
+      action.__raw = "function() require('neotest').summary.toggle() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Toggle Test Summary"; };
+    }
+    {
+      key = "<leader>to";
+      action.__raw = "function() require('neotest').output_panel.toggle() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Toggle Test Output Panel"; };
+    }
+    {
+      key = "<leader>tS";
+      action.__raw = "function() require('neotest').run.stop() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Stop Running Test"; };
+    }
+
     # ─── Flash ───
     {
       key = "s";

@@ -91,7 +91,21 @@
               key = "q";
             }
           ];
-          footer = [ "" ];
+          footer.__raw = ''
+            function()
+              local stats = #vim.tbl_keys(package.loaded)
+              local ver = vim.version()
+              return {
+                "",
+                string.format(
+                  "nvim v%d.%d.%d  •  %d módulos Lua carregados  •  %s",
+                  ver.major, ver.minor, ver.patch,
+                  stats,
+                  os.date("%d/%m/%Y")
+                ),
+              }
+            end
+          '';
         };
       };
     };
@@ -157,6 +171,11 @@
             __unkeyed-1 = "<leader>x";
             group = "Debug";
             icon = "󰃤";
+          }
+          {
+            __unkeyed-1 = "<leader>t";
+            group = "Test";
+            icon = "󰙨";
           }
           {
             __unkeyed-1 = "<leader>?";
@@ -326,11 +345,8 @@
       end)
     end
 
-    -- Floating window transparency for DMS theme consistency
-    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE", fg = nil })
-    vim.api.nvim_set_hl(0, "FloatBorder", { bg = "NONE" })
-    vim.api.nvim_set_hl(0, "FloatTitle", { bg = "NONE" })
-    vim.api.nvim_set_hl(0, "FloatFooter", { bg = "NONE" })
+    -- (Transparência de fundo: ver _G.apply_dms_theme em config/options.nix,
+    -- reaplicada em todo ColorScheme para sobreviver a reloads do tema DMS)
   '';
 
   autoCmd = [

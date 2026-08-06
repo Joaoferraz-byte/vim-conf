@@ -1,5 +1,13 @@
 ## [Unreleased] - 2026-08-06
 
+### Added
+- **Neotest + neotest-java**: Test runner inline para Java (run/debug arquivo ou teste mais próximo, summary, output panel) sob `<leader>t`, integrado ao DAP existente
+- **Dashboard Footer Dinâmico**: Mostra versão do nvim, módulos Lua carregados e data, mantendo header LIVARA e center intactos
+
+### Changed
+- **Transparência Total**: Fundo do editor (não só floats) agora transparente igual ao terminal — Normal, StatusLine, TabLine, Pmenu, SignColumn, etc.
+- **Tema DMS Reativo**: Cores e transparência agora são reaplicadas a cada `ColorScheme` (autocmd), não só no startup, sobrevivendo a reloads de tema disparados pelo DMS/matugen
+
 ### Fixed
 - **Catppuccin Theme Removed**: Replaced Catppuccin Mocha with DMS dynamic theme
 - **DMS Theme Integration**: Neovim now reads colors from DankMaterialShell matugen palette
