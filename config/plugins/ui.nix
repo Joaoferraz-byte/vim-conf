@@ -71,7 +71,7 @@
               key_format = " %s";
             }
             {
-              icon = "󰌢 ";
+              icon = "󰉋 "; # Substituído para evitar erro de glyph f60e
               desc = "Projects";
               action = "Telescope projects";
               key = "p";
@@ -380,16 +380,18 @@
     {
       event = "VimEnter";
       command = ''lua
-        -- Silencia mensagens durante a inicialização para evitar o prompt "press any key"
-        local old_shortmess = vim.opt.shortmess:get()
-        vim.opt.shortmess:append("atI")
+        -- Silencia mensagens e erros durante o boot
+        local old_errorbell = vim.opt.errorbells:get()
+        local old_visualbell = vim.opt.visualbell:get()
+        vim.opt.errorbells = false
+        vim.opt.visualbell = false
         
-        -- Atraso mínimo para garantir que o UI esteja pronto
+        -- Garante que o dashboard não dispare mensagens
         vim.defer_fn(function()
-          vim.cmd("Dashboard")
-          -- Restaura as configurações após o carregamento
-          vim.opt.shortmess = old_shortmess
-        end, 50)
+          vim.cmd("silent! Dashboard")
+          vim.opt.errorbells = old_errorbell
+          vim.opt.visualbell = old_visualbell
+        end, 5)
       '';
       once = true;
       nested = true;

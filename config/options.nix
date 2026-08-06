@@ -36,13 +36,12 @@
     undolevels = 10000;
 
     fillchars = "eob: ";
-    shortmess = "atIc"; # a: all, t: truncate, I: no intro, c: no completion messages
-    cmdheight = 0; # Oculta a linha de comando quando não está em uso, reduzindo prompts
+    shortmess = "atIcF"; # a: all, t: truncate, I: no intro, c: no completion messages, F: no file info
+    cmdheight = 1; # cmdheight=0 pode causar "press any key" em alguns casos de mensagens de erro
   };
 
   # DMS theme
-  # O colorscheme é aplicado via Lua para garantir que as variáveis do DMS existam
-  # colorscheme = "dms";
+  colorscheme = "dms";
 
   performance = {
     byteCompileLua = {
@@ -107,19 +106,21 @@
       vim.api.nvim_set_hl(0, "DashboardShortCut", { fg = vim.g.dms_colors.comment or "#565f89" })
     end
 
-    -- Força a aplicação imediata
-    _G.apply_dms_theme()
-    
-    -- Aplica o colorscheme dms após definir as funções de highlight
-    vim.cmd("colorscheme dms")
-
+    -- Aplica o colorscheme primeiro, depois os nossos overrides de transparência
     vim.api.nvim_create_autocmd("ColorScheme", {
       group = vim.api.nvim_create_augroup("DmsDynamicTheme", { clear = true }),
-      callback = _G.apply_dms_theme,
+      callback = function()
+        _G.apply_dms_theme()
+      end,
     })
+
+    -- Força a aplicação inicial
+    vim.defer_fn(function()
+      _G.apply_dms_theme()
+    end, 10)
 
     -- Silenciamento total na inicialização
     vim.opt.shortmess:append("s") -- Oculta "search hit BOTTOM"
-    vim.opt.lazyredraw = true     -- Evita redraws desnecessários durante a inicialização
+    -- vim.opt.lazyredraw = true  -- Desabilitado: pode causar artefatos visuais no dashboard
   '';
 }
