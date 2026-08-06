@@ -37,10 +37,12 @@
 
     fillchars = "eob: ";
     shortmess = "atIc"; # a: all, t: truncate, I: no intro, c: no completion messages
+    cmdheight = 0; # Oculta a linha de comando quando não está em uso, reduzindo prompts
   };
 
   # DMS theme
-  colorscheme = "dms";
+  # O colorscheme é aplicado via Lua para garantir que as variáveis do DMS existam
+  # colorscheme = "dms";
 
   performance = {
     byteCompileLua = {
@@ -105,10 +107,19 @@
       vim.api.nvim_set_hl(0, "DashboardShortCut", { fg = vim.g.dms_colors.comment or "#565f89" })
     end
 
+    -- Força a aplicação imediata
     _G.apply_dms_theme()
+    
+    -- Aplica o colorscheme dms após definir as funções de highlight
+    vim.cmd("colorscheme dms")
+
     vim.api.nvim_create_autocmd("ColorScheme", {
       group = vim.api.nvim_create_augroup("DmsDynamicTheme", { clear = true }),
       callback = _G.apply_dms_theme,
     })
+
+    -- Silenciamento total na inicialização
+    vim.opt.shortmess:append("s") -- Oculta "search hit BOTTOM"
+    vim.opt.lazyredraw = true     -- Evita redraws desnecessários durante a inicialização
   '';
 }
