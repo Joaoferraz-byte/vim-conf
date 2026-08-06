@@ -380,7 +380,16 @@
     {
       event = "VimEnter";
       command = ''lua
-        vim.cmd("Dashboard")
+        -- Silencia mensagens durante a inicialização para evitar o prompt "press any key"
+        local old_shortmess = vim.opt.shortmess:get()
+        vim.opt.shortmess:append("atI")
+        
+        -- Atraso mínimo para garantir que o UI esteja pronto
+        vim.defer_fn(function()
+          vim.cmd("Dashboard")
+          -- Restaura as configurações após o carregamento
+          vim.opt.shortmess = old_shortmess
+        end, 50)
       '';
       once = true;
       nested = true;

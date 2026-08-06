@@ -36,6 +36,7 @@
     undolevels = 10000;
 
     fillchars = "eob: ";
+    shortmess = "atIc"; # a: all, t: truncate, I: no intro, c: no completion messages
   };
 
   # DMS theme
