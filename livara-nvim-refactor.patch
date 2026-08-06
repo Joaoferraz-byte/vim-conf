@@ -66,10 +66,10 @@ index e0c5509..bd17c65 100644
      {
        key = "s";
 diff --git a/config/languages/java.nix b/config/languages/java.nix
-index 959f1ec..3b36d9a 100644
+index 959f1ec..073428c 100644
 --- a/config/languages/java.nix
 +++ b/config/languages/java.nix
-@@ -22,6 +22,22 @@
+@@ -22,6 +22,24 @@
      };
    };
  
@@ -81,7 +81,9 @@ index 959f1ec..3b36d9a 100644
 +  plugins.neotest = {
 +    enable = true;
 +    settings = {
-+      adapters.__raw = ''{ require("neotest-java") }'';
++      adapters = [
++        { __raw = ''require("neotest-java")''; }
++      ];
 +    };
 +  };
 +
