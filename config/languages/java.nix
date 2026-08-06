@@ -16,21 +16,19 @@
       java_cmd = "${pkgs.jdk21}/bin/java";
       server = {
         root_dir = {
-          __raw = ''vim.fs.root(0, { '.git', 'mvnw', 'gradlew' })'';
+          __raw = "vim.fs.root(0, { '.git', 'mvnw', 'gradlew' })";
         };
       };
     };
   };
 
   # ─── Neotest + neotest-java (Test Runner Inline) ───
-  # neotest-java não está no catálogo nativo do nixvim (só dotnet, zig,
-  # foundry, vitest, deno, plenary, playwright, etc. têm módulo dedicado),
-  # então é adicionado via extraPlugins, no mesmo padrão já usado para o
-  # base46 em config/plugins/core.nix.
   plugins.neotest = {
     enable = true;
     settings = {
-      adapters.__raw = ''{ require("neotest-java") }'';
+      adapters = [
+        { __raw = ''require("neotest-java")''; }
+      ];
     };
   };
 
