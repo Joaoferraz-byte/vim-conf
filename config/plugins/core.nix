@@ -12,7 +12,7 @@ let
       rev = "83522e02c6c3b4ea901c4bffd9e0a5e0371c1fe6";
       hash = "sha256-kwDMC6rYzJYECmGnwn8JiAbffUq7hAXcUH6gPSkk2uI=";
     };
-    neovimRequireCheck = false;
+    doCheck = false;
   };
 in
 {
