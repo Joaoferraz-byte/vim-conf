@@ -77,6 +77,12 @@
       options = { silent = true; desc = "Find Text"; };
     }
     {
+      key = "<leader>fi";
+      action = "<cmd>Telescope media_files<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Find Images with Preview"; };
+    }
+    {
       key = "<leader>fb";
       action = "<cmd>Telescope buffers<CR>";
       mode = [ "n" ];

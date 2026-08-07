@@ -12,6 +12,8 @@
 - **Targeted Fix**: Disable `checker.enabled` and `change_detection.notify` in lazy.nvim so startup does not emit an update report into the dashboard message area.
 
 ### Fixed — UI Polish
+- **Mini Files Keybind Icons**: Add explicit Which-Key icons for the `<leader>m` group and `<leader>mf` Mini Files action.
+- **Image Preview**: Enable NixVim's native `image.nvim` module with the ueberzug backend and add the packaged Telescope media-files extension for image previews in a dedicated `<leader>fi` picker.
 - **Wallpaper Transparency**: Reapply transparent backgrounds for editor, floating windows, menus, statusline, tabline, separators, and dashboard-related surfaces after every DMS/base46 colorscheme reload
 - **Dashboard Return Prompt**: Hide Noice `return_prompt` messages so the dashboard no longer displays a distracting “Press any key to continue” prompt
 - **English UI**: Translate the dashboard footer and interactive file/project creation prompts to English

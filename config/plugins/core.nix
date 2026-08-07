@@ -97,6 +97,21 @@ in
       extensions.file-browser.enable = true;
     };
 
+    # Image preview: native NixVim module backed by ueberzugpp so it works
+    # in WezTerm/Niri terminals without relying on Kitty-only rendering.
+    image = {
+      enable = true;
+      autoLoad = true;
+      settings = {
+        backend = "ueberzug";
+        processor = "magick_cli";
+        hijack_file_patterns = [ "*.png" "*.jpg" "*.jpeg" "*.gif" "*.webp" "*.avif" ];
+        max_height_window_percentage = 50;
+        max_width_window_percentage = 90;
+        window_overlap_clear_enabled = true;
+      };
+    };
+
     # Lazydev — Lua LSP completion for Neovim config
     lazydev = {
       enable = true;
@@ -186,10 +201,13 @@ in
     };
   };
 
-  extraPlugins = [ base46-plugin ];
+  extraPlugins = with pkgs.vimPlugins; [
+    base46-plugin
+    telescope-media-files-nvim
+  ];
 
   extraPackages = with pkgs; [
-    git ripgrep fd gnumake nodejs jdk21 maven gradle chafa
+    git ripgrep fd gnumake nodejs jdk21 maven gradle chafa imagemagick ueberzugpp
   ];
 
   # DMS base46 setup: enable transparency and register DMS integrations.

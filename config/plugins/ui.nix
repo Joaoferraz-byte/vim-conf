@@ -170,6 +170,16 @@
             icon = " ";
           }
           {
+            __unkeyed-1 = "<leader>m";
+            group = "Mini Files";
+            icon = "󰉋 ";
+          }
+          {
+            __unkeyed-1 = "<leader>mf";
+            desc = "Open Mini Files";
+            icon = "󰈔 ";
+          }
+          {
             __unkeyed-1 = "<leader>h";
             group = "Harpoon";
             icon = " ";
@@ -278,6 +288,10 @@
   };
 
   extraConfigLua = ''
+    pcall(function()
+      require("telescope").load_extension("media_files")
+    end)
+
     _G.advanced_new_file = function()
       local telescope = require("telescope")
       local actions = require("telescope.actions")
