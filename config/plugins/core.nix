@@ -58,7 +58,9 @@ in
       enable = true;
       enableTelescope = true;
       settings = {
-        datapath.__raw = ''vim.fn.stdpath("data") .. "/project_nvim"'';
+        history = {
+          save_dir.__raw = ''vim.fn.stdpath("data")'';
+        };
       };
     };
 

@@ -7,9 +7,11 @@
     jdtLanguageServerPackage = pkgs.jdt-language-server;
   };
 
-  # Spring Boot
+  # Spring Boot LS is not shipped by nixpkgs and is not installed through Mason.
+  # Keep JDTLS fully enabled, but do not initialize spring-boot.nvim until its
+  # VMware language-server bundle is explicitly provisioned.
   plugins.spring-boot = {
-    enable = true;
+    enable = false;
     autoLoad = true;
     settings = {
       autocmd = true;
