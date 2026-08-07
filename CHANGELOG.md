@@ -3,7 +3,7 @@
 ## [Unreleased] - 2026-08-06
 
 ### Fixed — Startup Warnings
-- **project.nvim Corrupt History Recovery**: Use a fresh `project_history_v2.json` file so the invalid legacy JSON cannot trigger errors during `BufEnter` or `BufWipeout`; the legacy file remains preserved for manual recovery.
+- **project.nvim Corrupt History Recovery**: Use a fresh `project_history_clean.json` file, whose characters satisfy project.nvim validation, so invalid legacy JSON cannot trigger errors during `BufEnter` or `BufWipeout`; the legacy file remains preserved for manual recovery.
 - **project.nvim History**: Replaced deprecated `options.datapath` with the current `options.history.save_dir` schema.
 - **Spring Boot LS**: Disabled automatic `spring-boot.nvim` initialization until the VMware Spring Boot language-server bundle is explicitly installed; JDTLS Java support remains enabled.
 
