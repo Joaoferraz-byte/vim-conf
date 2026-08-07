@@ -59,7 +59,11 @@ in
       enableTelescope = true;
       settings = {
         history = {
+          # The previous project_history.json is corrupt and is preserved as a
+          # legacy backup; a fresh file prevents project.nvim callbacks from
+          # failing during BufEnter and BufWipeout.
           save_dir.__raw = ''vim.fn.stdpath("data")'';
+          save_file = "project_history_v2.json";
         };
       };
     };
