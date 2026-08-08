@@ -11,6 +11,17 @@ let
     };
     doCheck = false;
   };
+  mermaid-plugin = pkgs.vimUtils.buildVimPlugin {
+    pname = "mermaid.nvim";
+    version = "unstable";
+    src = pkgs.fetchFromGitHub {
+      owner = "kevalin";
+      repo = "mermaid.nvim";
+      rev = "b6ab941f418809d40102f11ace9da3569c33e52e";
+      hash = "sha256-oj97tf1f8ftltj0hcadcquni1e5438sffajeplfb894dneu0r1f0";
+    };
+    doCheck = false;
+  };
 in
 {
   plugins = {
@@ -204,10 +215,11 @@ in
   extraPlugins = with pkgs.vimPlugins; [
     base46-plugin
     telescope-media-files-nvim
+    mermaid-plugin
   ];
 
   extraPackages = with pkgs; [
-    git ripgrep fd gnumake nodejs jdk21 maven gradle chafa imagemagick ueberzugpp
+    git ripgrep fd gnumake nodejs jdk21 maven gradle chafa imagemagick ueberzugpp wl-clipboard
   ];
 
   # DMS base46 setup: enable transparency and register DMS integrations.

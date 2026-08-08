@@ -82,7 +82,7 @@
             {
               icon = "󰉋 ";
               desc = "Projects";
-              action = "Telescope projects";
+              action = "lua _G.open_projects()";
               key = "p";
               key_format = " %s";
             }
@@ -278,18 +278,38 @@
       };
     };
 
-    # Render Markdown
+    # Render Markdown (mermaid.nvim, packaged in core.nix, hooks into it).
     render-markdown = {
       enable = true;
       settings = {
         preset = "minimal";
       };
     };
+
   };
 
   extraConfigLua = ''
     pcall(function()
       require("telescope").load_extension("media_files")
+    end)
+
+    -- Show images in telescope previews using chafa instead of raw bytes
+    pcall(function()
+      local previewers = require("telescope.previewers")
+      local telescope_conf = require("telescope.config").values
+      local image_exts = { png = true, jpg = true, jpeg = true, gif = true, webp = true, avif = true, svg = true }
+      telescope_conf.file_previewer = function(opts)
+        local ext = string.lower(vim.fn.fnamemodify(opts.filepath or "", ":e"))
+        if image_exts[ext] then
+          return previewers.new_termopen_previewer {
+            title = "Image",
+            get_command = function(entry)
+              return { "chafa", "-s", "60x28", entry.value }
+            end,
+          }
+        end
+        return previewers.vim_buffer_cat.new(opts)
+      end
     end)
 
     _G.advanced_new_file = function()
@@ -313,10 +333,11 @@
               dir = selection.is_dir and selection.path or vim.fn.fnamemodify(selection.path, ":h")
             end
             actions.close(prompt_bufnr)
-            vim.ui.input({ prompt = "New file name: " }, function(input)
+            vim.ui.input({ prompt = "New file name (use / for nested dirs): " }, function(input)
               if input and input ~= "" then
                 local path = dir .. "/" .. input
-                vim.cmd("edit " .. path)
+                vim.fn.mkdir(vim.fn.fnamemodify(path, ":h"), "p")
+                vim.cmd("edit " .. vim.fn.fnameescape(path))
                 vim.cmd("write")
               end
             end)
@@ -326,6 +347,46 @@
           return true
         end,
       })
+    end
+
+    _G.open_projects = function()
+      local telescope = require("telescope")
+      local pickers = telescope.pickers
+      local finders = telescope.finders
+      local conf = telescope.config
+      local actions = telescope.actions
+      local action_state = telescope.actions.state
+      local ok, history = pcall(require, "project_nvim.utils.history")
+      local projects = (ok and history.get_recent_projects and history.get_recent_projects()) or {}
+      if #projects == 0 then
+        vim.notify("No projects indexed by project.nvim", vim.log.levels.WARN)
+        return
+      end
+      pickers.new({}, {
+        prompt_title = "Projects",
+        finder = finders.new_table {
+          results = projects,
+          entry_maker = function(project_path)
+            return {
+              value = project_path,
+              display = vim.fn.fnamemodify(project_path, ":t"),
+              ordinal = project_path,
+            }
+          end,
+        },
+        sorter = conf.generic_sorter({}),
+        previewer = false,
+        attach_mappings = function(prompt_bufnr)
+          actions.select_default:replace(function()
+            local selection = action_state.get_selected_entry()
+            actions.close(prompt_bufnr)
+            if selection then
+              pcall(vim.cmd, "Neotree " .. vim.fn.fnameescape(selection.value))
+            end
+          end)
+          return true
+        end,
+      }):find()
     end
 
     _G.spring_boot_wizard = function()
