@@ -106,6 +106,7 @@ in
       enable = true;
       extensions.fzf-native.enable = true;
       extensions.file-browser.enable = true;
+      extensions.media-files.enable = true;
     };
 
     # Image preview: native NixVim module backed by ueberzugpp so it works
@@ -219,7 +220,7 @@ in
   ];
 
   extraPackages = with pkgs; [
-    git ripgrep fd gnumake nodejs jdk21 maven gradle chafa imagemagick ueberzugpp wl-clipboard
+    git ripgrep fd gnumake nodejs jdk21 maven gradle chafa imagemagick ueberzugpp wl-clipboard ffmpeg
   ];
 
   # DMS base46 setup: enable transparency and register DMS integrations.
@@ -282,6 +283,19 @@ in
           ["vim-illuminate"] = true,
         },
       })
+
+      -- Initialize Telescope early and load its extensions (media_files,
+      -- file_browser, fzf). Telescope defers loading its actions and
+      -- state modules until setup runs, so functions called from other
+      -- plugins (e.g. dashboard actions) can see a nil `telescope.actions`
+      -- if Telescope was never touched before them.
+      local telescope_ok, telescope = pcall(require, "telescope")
+      if telescope_ok then
+        telescope.setup {}
+        pcall(telescope.load_extension, "media_files")
+        pcall(telescope.load_extension, "file_browser")
+        pcall(telescope.load_extension, "fzf")
+      end
 
       -- DMS/base46 may reapply opaque highlight groups when the generated
       -- colorscheme reloads. Reassert transparent backgrounds after every

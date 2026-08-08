@@ -289,10 +289,6 @@
   };
 
   extraConfigLua = ''
-    pcall(function()
-      require("telescope").load_extension("media_files")
-    end)
-
     -- Show images in telescope previews using chafa instead of raw bytes
     pcall(function()
       local previewers = require("telescope.previewers")
@@ -314,6 +310,9 @@
 
     _G.advanced_new_file = function()
       local telescope = require("telescope")
+      if not telescope.actions then
+        pcall(telescope.setup, {})
+      end
       local actions = require("telescope.actions")
       local action_state = require("telescope.actions.state")
       local fb = telescope.extensions.file_browser
@@ -351,6 +350,13 @@
 
     _G.open_projects = function()
       local telescope = require("telescope")
+      -- Telescope may be loaded as a module without having been initialized
+      -- yet; in that state `telescope.actions` is nil and indexing it throws
+      -- "attempt to index field 'actions' (a nil value)". Initialize it
+      -- before touching its modules (the setup call is idempotent).
+      if not telescope.actions then
+        pcall(telescope.setup, {})
+      end
       local pickers = telescope.pickers
       local finders = telescope.finders
       local conf = telescope.config
@@ -401,6 +407,9 @@
             vim.ui.input({ prompt = "Artifact ID (ex: demo): ", default = "demo" }, function(artifact)
               if not artifact then return end
               local telescope = require("telescope")
+              if not telescope.actions then
+                pcall(telescope.setup, {})
+              end
               local fb = telescope.extensions.file_browser
               fb.file_browser({
                 prompt_title = "Select project root directory",
