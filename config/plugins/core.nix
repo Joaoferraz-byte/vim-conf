@@ -18,7 +18,7 @@ let
       owner = "kevalin";
       repo = "mermaid.nvim";
       rev = "b6ab941f418809d40102f11ace9da3569c33e52e";
-      hash = "sha256-oj97tf1f8ftltj0hcadcquni1e5438sffajeplfb894dneu0r1f0";
+      hash = "sha256-SHNfpIinSGFLsx5SVvG1T8XJUZSK4BMEpqko6Vb0YzU=";
     };
     doCheck = false;
   };

@@ -7,7 +7,7 @@ let
       owner = "gipo355";
       repo = "nvim-intellij-lsp";
       rev = "4f51c0270b5e1369569c5a7b00d3831d3ec05616";
-      hash = "sha256-icj2k53c0alne5qajs5g0nmf5btiju4lgh6im1qc7tfg33t1nnq0";
+      hash = "sha256-5/ZAOUCEYGM9bqMQFfVbM6wzZI5exLAciPQXYjEDcj4=";
     };
     doCheck = false;
   };
