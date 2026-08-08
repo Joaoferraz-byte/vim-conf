@@ -18,7 +18,7 @@
     }
     {
       key = "<leader>e";
-      action = "<cmd>NeotreeToggle<CR>";
+      action.__raw = "function() require('neo-tree.command').execute({ toggle = true, dir = vim.fn.getcwd() }) end";
       mode = [ "n" ];
       options = { silent = true; desc = "Toggle File Explorer"; };
     }
@@ -96,7 +96,7 @@
     }
     {
       key = "<leader>fp";
-      action = "<cmd>Telescope projects<CR>";
+      action = "<cmd>lua _G.open_projects()<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "List Projects"; };
     }
@@ -319,6 +319,31 @@
       options = { silent = true; desc = "Flash Treesitter Selection"; };
     }
 
+    # Clipboard — direct system-wide copy/paste
+    {
+      key = "<C-S-c>";
+      action.__raw = "function() vim.cmd('normal! \"+yy') end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Copy Line to System Clipboard"; };
+    }
+    {
+      key = "<C-S-c>";
+      action.__raw = "function() vim.cmd('normal! \"+y') end";
+      mode = [ "v" ];
+      options = { silent = true; desc = "Copy Selection to System Clipboard"; };
+    }
+    {
+      key = "<C-S-v>";
+      action.__raw = "function() vim.cmd('normal! \"+p') end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Paste from System Clipboard"; };
+    }
+    {
+      key = "<C-S-v>";
+      action.__raw = "function() vim.cmd('normal! \"+p') end";
+      mode = [ "v" ];
+      options = { silent = true; desc = "Replace Selection with System Clipboard"; };
+    }
     # Smart Splits
     {
       key = "<C-h>";
