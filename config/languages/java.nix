@@ -46,6 +46,11 @@ in
     if not ok then
       return
     end
+    -- The plugin validates the configured JDK by checking <dir>/bin/javac,
+    -- so the path must be the JDK ROOT directory, NOT the java binary.
+    -- nixpkgs jdk21 already exposes bin/javac at its root, so `${pkgs.jdk21}`
+    -- is the correct value (previously `/bin/java` was rejected with
+    -- "configured jdk is not a JDK").
     vim.api.nvim_create_autocmd("FileType", {
       pattern = "java",
       once = true,
@@ -58,7 +63,7 @@ in
       end,
     })
     require("intellij-lsp").setup({
-      jdk = "${pkgs.jdk21}/bin/java",
+      jdk = "${pkgs.jdk21}",
       accept_eula = true,
       inlay_hints = true,
       codelens = true,
