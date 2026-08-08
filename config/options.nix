@@ -20,6 +20,12 @@
     incsearch = true;
     hlsearch = false;
     completeopt = [ "menu" "menuone" "noselect" ];
+    # Command-line autocomplete popup (Vim-level ":" completion)
+    wildmode = "longest:full,full";
+    wildoptions = "pum";
+    pumheight = 12;
+    # Default yank/put registers use the system clipboard
+    clipboard = "unnamedplus";
 
     splitbelow = true;
     splitright = true;
