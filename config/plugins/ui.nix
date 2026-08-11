@@ -589,19 +589,27 @@
             local deep = base .. child.name .. "/"
             local deep_handle = vim.loop.fs_scandir(deep)
             if deep_handle then
-              local deep_name, deep_type = vim.loop.fs_scandir_next(deep_handle)
-              while deep_name and deep_type == 2 do
-                -- Check if this dir has exactly 1 child
-                local next_name = vim.loop.fs_scandir_next(deep_handle)
-                if next_name then break end -- more than 1 child, stop compacting
-                chain = chain .. "/" .. deep_name
-                deep = deep .. deep_name .. "/"
+              -- Helper to get valid (non-hidden) children
+              local function get_valid_children(h)
+                local c = {}
+                while true do
+                  local n, t = vim.loop.fs_scandir_next(h)
+                  if not n then break end
+                  if n:sub(1, 1) ~= "." then
+                    c[#c + 1] = {name = n, type = t}
+                  end
+                end
+                return c
+              end
+              
+              local deep_children = get_valid_children(deep_handle)
+              while #deep_children == 1 and deep_children[1].type == 2 do
+                local child_name = deep_children[1].name
+                chain = chain .. "/" .. child_name
+                deep = deep .. child_name .. "/"
                 local h = vim.loop.fs_scandir(deep)
                 if not h then break end
-                deep_name, deep_type = vim.loop.fs_scandir_next(h)
-                if not deep_name then break end -- empty dir
-                handle = h -- reuse for next iteration check
-                handle = nil -- clear to avoid double-use
+                deep_children = get_valid_children(h)
               end
             end
             results[#results + 1] = { value = full_path .. "/", display = chain .. "/ " }
@@ -612,10 +620,28 @@
         return results
       end
 
+      local devicons_ok, devicons = pcall(require, "nvim-web-devicons")
       local entry_maker = function(cand)
+        local icon, icon_hl
+        if devicons_ok then
+          if cand.value:match("/$") then
+            icon, icon_hl = devicons.get_icon("folder", "folder", { default = true })
+            icon = icon or ""
+          else
+            local ext = cand.value:match("%.([^.]+)$") or ""
+            icon, icon_hl = devicons.get_icon(cand.value, ext, { default = true })
+            icon = icon or ""
+          end
+        else
+          icon = cand.value:match("/$") and "" or ""
+          icon_hl = "Normal"
+        end
+
+        local display_str = string.format("%s %s", icon, cand.display)
+
         return {
           value = cand.value,
-          display = cand.display,
+          display = display_str,
           ordinal = cand.value,
         }
       end
@@ -638,7 +664,12 @@
             if sel then
               local picker = action_state.get_current_picker(prompt_bufnr)
               if picker then
+                -- set_prompt(text, true) substitui o prompt completamente.
+                -- O '/' já está incluído em sel.value para diretórios.
                 picker:set_prompt(sel.value, true)
+                -- Atualiza o finder manualmente para listar os filhos do diretório selecionado,
+                -- pois set_prompt não dispara on_input_filter_cb automaticamente.
+                picker:refresh(make_finder(get_compact_candidates(sel.value)), {})
               end
             end
           end)
