@@ -492,14 +492,17 @@
       end
     end)
 
-    -- Smart advanced new file: path-based creation with templates.
-    -- Uses Snacks.input with file completion for correct Tab/autocomplete behavior.
+    -- Smart advanced new file: path-based creation with templates and compact folders.
+    -- Compact folders: nested dirs with single child are grouped (java/com/seila -> seila).
+    -- Tab = complete path, Enter = create file.
     _G.advanced_new_file = function()
-      local ok, snacks = pcall(require, "snacks")
-      if not ok or not snacks.input then
-        vim.notify("snacks.input not available", vim.log.levels.ERROR)
-        return
-      end
+      local ok = pcall(require, "telescope")
+      if not ok then return end
+      local pickers = require("telescope.pickers")
+      local finders = require("telescope.finders")
+      local conf = require("telescope.config").values
+      local actions = require("telescope.actions")
+      local action_state = require("telescope.actions.state")
 
       -- Templates for common file types
       local templates = {
@@ -546,21 +549,115 @@
         end
       end
 
-      snacks.input({
-        prompt = "New File",
-        default = cwd .. "/",
-        completion = "file",
-      }, function(value)
-        if not value or value == "" or value == "/" then
-          return
+      -- Get compact path: collapse single-child dir chains (java/com/seila -> java/com/seila)
+      -- Returns { full_path, display_parts } where display_parts shows only the leaf names
+      local function get_compact_candidates(prompt)
+        local base, partial = prompt:match("^(.*/)([^/]*)$")
+        if not base then
+          base = ""
+          partial = prompt
         end
-        -- Remove trailing slash if directory selected
-        local path = value:gsub("/$", "")
-        if path == "" or path == cwd or path == cwd .. "/" then
-          return
+        local scan_dir = cwd .. "/" .. base
+        if vim.fn.isdirectory(scan_dir) == 0 then
+          return {}
         end
-        create_file(path)
-      end)
+        local results = {}
+        -- Scan immediate children
+        local handle = vim.loop.fs_scandir(scan_dir)
+        if not handle then return results end
+        local children = {}
+        while true do
+          local name, dtype = vim.loop.fs_scandir_next(handle)
+          if not name then break end
+          if name:sub(1, 1) == "." then goto skip end
+          if name == ".git" then goto skip end
+          if partial == "" or name:sub(1, #partial) == partial then
+            children[#children + 1] = { name = name, type = dtype }
+          end
+          ::skip::
+        end
+        table.sort(children, function(a, b)
+          if a.type ~= b.type then return a.type == 2 end
+          return a.name < b.name
+        end)
+        for _, child in ipairs(children) do
+          local full_path = base .. child.name
+          local display_name = child.name
+          if child.type == 2 then
+            -- Compact folders: follow single-child dir chains
+            local chain = child.name
+            local deep = base .. child.name .. "/"
+            local deep_handle = vim.loop.fs_scandir(deep)
+            if deep_handle then
+              local deep_name, deep_type = vim.loop.fs_scandir_next(deep_handle)
+              while deep_name and deep_type == 2 do
+                -- Check if this dir has exactly 1 child
+                local next_name = vim.loop.fs_scandir_next(deep_handle)
+                if next_name then break end -- more than 1 child, stop compacting
+                chain = chain .. "/" .. deep_name
+                deep = deep .. deep_name .. "/"
+                local h = vim.loop.fs_scandir(deep)
+                if not h then break end
+                deep_name, deep_type = vim.loop.fs_scandir_next(h)
+                if not deep_name then break end -- empty dir
+                handle = h -- reuse for next iteration check
+                handle = nil -- clear to avoid double-use
+              end
+            end
+            results[#results + 1] = { value = full_path .. "/", display = chain .. "/ " }
+          else
+            results[#results + 1] = { value = full_path, display = display_name }
+          end
+        end
+        return results
+      end
+
+      local entry_maker = function(cand)
+        return {
+          value = cand.value,
+          display = cand.display,
+          ordinal = cand.value,
+        }
+      end
+
+      local function make_finder(results)
+        return finders.new_table { results = results, entry_maker = entry_maker }
+      end
+
+      pickers.new({}, {
+        prompt_title = "New File (Tab=complete, Enter=create)",
+        prompt_prefix = cwd .. "/ ",
+        finder = make_finder(get_compact_candidates("")),
+        sorter = conf.file_sorter({}),
+        on_input_filter_cb = function(prompt)
+          return { updated_finder = make_finder(get_compact_candidates(prompt)) }
+        end,
+        attach_mappings = function(prompt_bufnr, map)
+          map("i", "<Tab>", function()
+            local sel = action_state.get_selected_entry()
+            if sel then
+              local picker = action_state.get_current_picker(prompt_bufnr)
+              if picker then
+                picker:set_prompt(sel.value, true)
+              end
+            end
+          end)
+          map("i", "<CR>", function()
+            local prompt = action_state.get_current_line()
+            local sel = action_state.get_selected_entry()
+            local path
+            if prompt == "" and sel then
+              path = sel.value
+            else
+              path = prompt
+            end
+            if path == "" or path == "/" then return end
+            actions.close(prompt_bufnr)
+            create_file(cwd .. "/" .. path)
+          end)
+          return true
+        end,
+      }):find()
     end
 
     -- Browse keymaps by category using the actual Neovim keymap registry.
