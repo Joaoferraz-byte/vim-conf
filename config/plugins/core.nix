@@ -155,6 +155,9 @@ in
             enabled = true;
             leave_dirs_open = true;
           };
+          # Group nested dirs with single child into one line (java/com/seila)
+          group_empty_dirs = true;
+          scan_mode = "deep";
           filtered_items = {
             visible = true;
             show_hidden = true;
