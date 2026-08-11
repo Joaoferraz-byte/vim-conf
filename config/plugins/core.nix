@@ -1,0 +1,361 @@
+{ config, pkgs, lib, ... }:
+let
+  base46-plugin = pkgs.vimUtils.buildVimPlugin {
+    pname = "base46";
+    version = "unstable";
+    src = pkgs.fetchFromGitHub {
+      owner = "AvengeMedia";
+      repo = "base46";
+      rev = "83522e02c6c3b4ea901c4bffd9e0a5e0371c1fe6";
+      hash = "sha256-kwDMC6rYzJYECmGnwn8JiAbffUq7hAXcUH6gPSkk2uI=";
+    };
+    doCheck = false;
+  };
+  mermaid-plugin = pkgs.vimUtils.buildVimPlugin {
+    pname = "mermaid.nvim";
+    version = "unstable";
+    src = pkgs.fetchFromGitHub {
+      owner = "kevalin";
+      repo = "mermaid.nvim";
+      rev = "b6ab941f418809d40102f11ace9da3569c33e52e";
+      hash = "sha256-SHNfpIinSGFLsx5SVvG1T8XJUZSK4BMEpqko6Vb0YzU=";
+    };
+    doCheck = false;
+  };
+in
+{
+  plugins = {
+    web-devicons.enable = true;
+    gitsigns.enable = true;
+    neogit.enable = true;
+    diffview.enable = true;
+    comment.enable = true;
+    todo-comments.enable = true;
+    undotree.enable = true;
+    which-key.enable = true;
+    nvim-autopairs.enable = true;
+    illuminate = {
+      enable = true;
+      settings = {
+        filetypes_denylist = [ "dashboard" "alpha" "NvimTree" "help" ];
+        under_cursor = false;
+      };
+    };
+    trouble.enable = true;
+
+    # Flash
+    flash.enable = true;
+
+    # Aerial
+    aerial = {
+      enable = true;
+      settings = {
+        backends = [ "lsp" "treesitter" "markdown" ];
+        show_guides = true;
+      };
+    };
+
+    # Harpoon
+    harpoon = {
+      enable = true;
+      enableTelescope = true;
+      settings.settings = {
+        save_on_toggle = true;
+      };
+    };
+
+    # Project.nvim
+    project-nvim = {
+      enable = true;
+      enableTelescope = true;
+      settings = {
+        history = {
+          # The previous project_history.json is corrupt and is preserved as a
+          # legacy backup; a fresh file prevents project.nvim callbacks from
+          # failing during BufEnter and BufWipeout.
+          save_dir.__raw = ''vim.fn.stdpath("data")'';
+          save_file = "project_history_clean.json";
+        };
+      };
+    };
+
+    # TS Autotag
+    ts-autotag.enable = true;
+
+    # Zen Mode
+    zen-mode.enable = true;
+
+    # Smart Splits
+    smart-splits.enable = true;
+
+    # Oil
+    oil.enable = true;
+
+    # Treesitter
+    treesitter = {
+      enable = true;
+      nixGrammars = true;
+      settings = {
+        highlight.enable = true;
+        indent.enable = true;
+      };
+    };
+
+    # grug-far — project-wide find and replace powered by ripgrep
+    grug-far = {
+      enable = true;
+      settings = {
+        engine = "ripgrep";
+        engines.ripgrep.showReplaceDiff = true;
+        minSearchChars = 1;
+      };
+    };
+
+    # Telescope
+    telescope = {
+      enable = true;
+      extensions.fzf-native.enable = true;
+      extensions.file-browser.enable = true;
+      extensions.media-files.enable = true;
+    };
+
+    # Image preview: native NixVim module backed by ueberzugpp so it works
+    # in WezTerm/Niri terminals without relying on Kitty-only rendering.
+    image = {
+      enable = true;
+      autoLoad = true;
+      settings = {
+        backend = "ueberzug";
+        processor = "magick_cli";
+        hijack_file_patterns = [ "*.png" "*.jpg" "*.jpeg" "*.gif" "*.webp" "*.avif" ];
+        max_height_window_percentage = 50;
+        max_width_window_percentage = 90;
+        window_overlap_clear_enabled = true;
+      };
+    };
+
+    # Lazydev — Lua LSP completion for Neovim config
+    lazydev = {
+      enable = true;
+      settings = {
+        integrations = {
+          lspconfig = true;
+          cmp = true;
+        };
+      };
+    };
+
+    # Neo-tree — modern file explorer (replaces dashboard-nvim's NvimTree dependency)
+    neo-tree = {
+      enable = true;
+      settings = {
+        close_if_last_window = true;
+        filesystem = {
+          follow_current_file = {
+            enabled = true;
+            leave_dirs_open = true;
+          };
+          filtered_items = {
+            visible = true;
+            show_hidden = true;
+            always_show = [ ".git" ];
+          };
+        };
+        window = {
+          mappings = {
+            "<bs>" = "navigate_up";
+            "s" = "open_split";
+            "S" = "open_vsplit";
+          };
+        };
+      };
+    };
+
+    # Mini.nvim modules — essential modern Neovim utilities
+    mini = {
+      enable = true;
+      modules = {
+        animate = {
+          cursor.enable = false;
+          scroll.enable = false;
+          resize.enable = true;
+          open.enable = true;
+          close.enable = true;
+        };
+        icons = {
+          mockDevIcons = true;
+        };
+        surround = {};
+        ai = {};
+        bracketed = {};
+        files = {
+          mappings = {
+            create = "c";
+            copy = "y";
+            copy_to_base = "Y";
+            delete = "d";
+            detail = ".";
+            find = "f";
+            go_in = "l";
+            go_in_plus = "L";
+            go_out = "h";
+            go_out_plus = "H";
+            hide_dotfiles = "gh";
+            hide_parent = "gp";
+            join = "j";
+            mark_goto = "'";
+            mark_toggle = "m";
+            open = "o";
+            open_cwd = "<C-g>c";
+            open_external = "x";
+            open_in_split = "s";
+            pick = "p";
+            pick_cwd = "<C-g>f";
+            rename = "r";
+            show_help = "g?";
+            sort_name = "<C-n>";
+            sort_mtime = "<C-m>";
+            sort_size = "<C-s>";
+            synchronize = "S";
+            trim_rslash = "T";
+          };
+        };
+      };
+    };
+  };
+
+  extraPlugins = with pkgs.vimPlugins; [
+    base46-plugin
+    telescope-media-files-nvim
+    mermaid-plugin
+    # vim-sleuth: automatically detects and sets indentation (tabstop, shiftwidth,
+    # expandtab) per buffer by inspecting the file content. Replaces manual
+    # per-filetype indentation rules and handles mixed-indent codebases.
+    vim-sleuth
+  ];
+
+  extraPackages = with pkgs; [
+    git ripgrep fd gnumake nodejs jdk21 maven gradle chafa imagemagick ueberzugpp wl-clipboard ffmpeg
+  ];
+
+  # DMS base46 setup: enable transparency and register DMS integrations.
+  # The actual theme loading is handled by DMS matugen-generated dms.lua
+  # at ~/.config/nvim/colors/dms.lua, which calls base46.theme_harmonize()
+  # and base46.load("dms") dynamically.
+  extraConfigLua = ''
+    pcall(function()
+      local b46 = require("base46")
+      b46.setup({
+        transparency = true,
+        set_background = true,
+        term_colors = true,
+        integrations = {
+          blankline = true,
+          cmp = true,
+          defaults = true,
+          devicons = true,
+          git = true,
+          lsp = true,
+          mason = true,
+          neotest = true,
+          nvimtree = true,
+          statusline = true,
+          syntax = true,
+          treesitter = true,
+          tbline = true,
+          telescope = true,
+          whichkey = true,
+          alpha = true,
+          ["blink-pair"] = true,
+          bufferline = true,
+          codeactionmenu = true,
+          dap = true,
+          diffview = true,
+          edgy = true,
+          flash = true,
+          ["git-conflict"] = true,
+          gitsigns = true,
+          grug_far = true,
+          hop = true,
+          leap = true,
+          lspsaga = true,
+          markview = true,
+          ["mini-tabline"] = true,
+          ["mini-icons"] = true,
+          navic = true,
+          neogit = true,
+          notify = true,
+          nvshades = true,
+          orgmode = true,
+          rainbowdelimiters = true,
+          ["render-markdown"] = true,
+          semantic_tokens = true,
+          ["snacks-dashboard"] = true,
+          ["tiny-inline-diagnostic"] = true,
+          todo = true,
+          trouble = true,
+          ["vim-illuminate"] = true,
+        },
+      })
+
+      -- Initialize Telescope early and load its extensions (media_files,
+      -- file_browser, fzf). Telescope defers loading its actions and
+      -- state modules until setup runs, so functions called from other
+      -- plugins (e.g. dashboard actions) can see a nil `telescope.actions`
+      -- if Telescope was never touched before them.
+      local telescope_ok, telescope = pcall(require, "telescope")
+      if telescope_ok then
+        telescope.setup {}
+        pcall(telescope.load_extension, "media_files")
+        pcall(telescope.load_extension, "file_browser")
+        pcall(telescope.load_extension, "fzf")
+      end
+
+      -- DMS/base46 may reapply opaque highlight groups when the generated
+      -- colorscheme reloads. Reassert transparent backgrounds after every
+      -- colorscheme event so the terminal wallpaper remains visible.
+      local function apply_transparent_backgrounds()
+        local groups = {
+          "Normal", "NormalNC", "NormalFloat", "FloatBorder", "FloatTitle", "FloatShadow",
+          "WinBar", "WinBarNC", "SignColumn", "FoldColumn", "EndOfBuffer", "NonText", "LineNr",
+          "CursorLine", "CursorLineNr", "StatusLine", "StatusLineNC", "StatusLineTerm", "StatusLineTermNC",
+          "TabLine", "TabLineFill", "TabLineSel", "WinSeparator", "VertSplit", "MsgArea",
+          "BufferLineFill", "BufferLineBackground", "BufferLineBuffer", "BufferLineBufferSelected",
+          "BufferLineTab", "BufferLineTabSelected", "BufferLineTabClose", "BufferLineCloseButton",
+          "BufferLineCloseButtonSelected", "BufferLineIndicatorSelected", "BufferLineModified",
+          "BufferLineModifiedSelected", "BufferLineDuplicate", "BufferLineDuplicateSelected",
+          "BufferLineDevIconDefault", "BufferLineDevIconDefaultSelected",
+          "Pmenu", "PmenuSel", "PmenuSbar", "PmenuThumb", "WildMenu", "CmpNormal", "CmpBorder",
+          "CmpDoc", "CmpDocBorder", "TelescopeNormal", "TelescopeBorder", "TelescopePromptNormal",
+          "TelescopePromptBorder", "TelescopeResultsNormal", "TelescopeResultsBorder",
+          "TelescopePreviewNormal", "TelescopePreviewBorder", "WhichKeyNormal", "WhichKeyFloat",
+          "NotifyBackground", "NoiceCmdlinePopup", "NoiceCmdlinePopupBorder", "SnacksNormal",
+          "SnacksBackdrop", "MiniFilesNormal", "MiniFilesBorder", "MiniFilesTitle",
+          "NeoTreeNormal", "NeoTreeNormalNC", "NeoTreeWinSeparator", "NeoTreeEndOfBuffer",
+          "NeoTreeFloatBorder", "NeoTreeFloatTitle", "NvimTreeNormal", "NvimTreeNormalNC",
+          "NvimTreeEndOfBuffer", "MasonNormal", "MasonHeader", "AerialNormal", "TroubleNormal",
+          "NavicIconsFile", "NavicIconsModule", "NavicIconsNamespace", "NavicIconsPackage",
+          "NavicIconsClass", "NavicIconsMethod", "NavicIconsProperty", "NavicIconsField",
+          "NavicIconsConstructor", "NavicIconsEnum", "NavicIconsInterface", "NavicIconsFunction",
+          "NavicIconsVariable", "NavicIconsConstant", "NavicIconsString", "NavicIconsNumber",
+          "NavicIconsBoolean", "NavicIconsArray", "NavicIconsObject", "NavicIconsKey",
+          "NavicIconsNull", "NavicIconsEnumMember", "NavicIconsStruct", "NavicIconsEvent",
+          "NavicIconsOperator", "NavicIconsTypeParameter",
+        }
+        for _, group in ipairs(groups) do
+          local highlight = vim.api.nvim_get_hl(0, { name = group, link = false })
+          highlight.bg = nil
+          highlight.ctermbg = nil
+          vim.api.nvim_set_hl(0, group, highlight)
+        end
+      end
+
+      local transparency_group = vim.api.nvim_create_augroup("DmsTransparency", { clear = true })
+      vim.api.nvim_create_autocmd({ "ColorScheme", "VimEnter", "UIEnter" }, {
+        group = transparency_group,
+        callback = apply_transparent_backgrounds,
+      })
+      vim.schedule(apply_transparent_backgrounds)
+    end)
+  '';
+}
