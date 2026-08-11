@@ -492,19 +492,14 @@
       end
     end)
 
-    -- Smart advanced new file: clean path-based creation with templates.
-    -- Tab = complete path from candidates, Enter = confirm/create.
-    -- Implementation inspired by telescope file_browser patterns.
+    -- Smart advanced new file: path-based creation with templates.
+    -- Uses Snacks.input with file completion for correct Tab/autocomplete behavior.
     _G.advanced_new_file = function()
-      local telescope = require("telescope")
-      if not pcall(require, "telescope.pickers") then
-        telescope.setup {}
+      local ok, snacks = pcall(require, "snacks")
+      if not ok or not snacks.input then
+        vim.notify("snacks.input not available", vim.log.levels.ERROR)
+        return
       end
-      local pickers = require("telescope.pickers")
-      local finders = require("telescope.finders")
-      local conf = require("telescope.config").values
-      local actions = require("telescope.actions")
-      local action_state = require("telescope.actions.state")
 
       -- Templates for common file types
       local templates = {
@@ -551,101 +546,21 @@
         end
       end
 
-      local function get_candidates(prompt)
-        -- Parse prompt into base_dir and partial_name
-        local base, partial = prompt:match("^(.*/)([^/]*)$")
-        if not base then
-          base = ""
-          partial = prompt
+      snacks.input({
+        prompt = "New File",
+        default = cwd .. "/",
+        completion = "file",
+      }, function(value)
+        if not value or value == "" or value == "/" then
+          return
         end
-        local scan_dir = cwd .. "/" .. base
-        local results = {}
-        if vim.fn.isdirectory(scan_dir) == 0 then
-          return results
+        -- Remove trailing slash if directory selected
+        local path = value:gsub("/$", "")
+        if path == "" or path == cwd or path == cwd .. "/" then
+          return
         end
-        local handle = vim.loop.fs_scandir(scan_dir)
-        if not handle then
-          return results
-        end
-        local items = {}
-        while true do
-          local name, dtype = vim.loop.fs_scandir_next(handle)
-          if not name then break end
-          if name:sub(1, 1) == "." then goto continue end
-          if dtype ~= 2 and name == ".git" then goto continue end
-          if partial == "" or name:sub(1, #partial) == partial then
-            items[#items + 1] = { name = name, type = dtype }
-          end
-          ::continue::
-        end
-        table.sort(items, function(a, b)
-          if a.type ~= b.type then return a.type == 2 end
-          return a.name < b.name
-        end)
-        for _, item in ipairs(items) do
-          local full = base .. item.name
-          if item.type == 2 then
-            results[#results + 1] = { value = full .. "/", display = full .. "/ " }
-          else
-            results[#results + 1] = { value = full, display = full }
-          end
-        end
-        return results
-      end
-
-      local entry_maker = function(cand)
-        return {
-          value = cand.value,
-          display = cand.display,
-          ordinal = cand.value,
-        }
-      end
-
-      local function build_picker()
-        return pickers.new({}, {
-          prompt_title = "New File (Tab=autocomplete, Enter=create)",
-          prompt_prefix = cwd .. "/ ",
-          finder = finders.new_table { results = get_candidates(""), entry_maker = entry_maker },
-          sorter = conf.file_sorter({}),
-          -- on_input_filter_cb is the official Telescope API for reacting to prompt changes
-          on_input_filter_cb = function(prompt)
-            return { finder = finders.new_table { results = get_candidates(prompt), entry_maker = entry_maker } }
-          end,
-          attach_mappings = function(prompt_bufnr, map)
-            -- Tab: autocomplete the prompt with the selected candidate
-            map("i", "<Tab>", function()
-              local sel = action_state.get_selected_entry()
-              if sel then
-                local picker = action_state.get_current_picker(prompt_bufnr)
-                if picker then
-                  picker:set_prompt(sel.value, false)
-                end
-              end
-            end)
-
-            -- Enter: create the file from prompt text
-            map("i", "<CR>", function()
-              local prompt = action_state.get_current_line()
-              local sel = action_state.get_selected_entry()
-              local path
-              if prompt == "" and sel then
-                path = sel.value
-              else
-                path = prompt
-              end
-              if path == "" or path == "/" then
-                return
-              end
-              actions.close(prompt_bufnr)
-              create_file(cwd .. "/" .. path)
-            end)
-
-            return true
-          end,
-        })
-      end
-
-      build_picker():find()
+        create_file(path)
+      end)
     end
 
     -- Browse keymaps by category using the actual Neovim keymap registry.
