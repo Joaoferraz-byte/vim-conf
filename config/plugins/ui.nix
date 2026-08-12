@@ -116,7 +116,7 @@
               icon_hl = "DashboardIcon";
               desc = "Config              ";
               desc_hl = "String";
-              action = "Neotree ~/.config/nvim";
+              action = "Neotree ~/.config/nixos";
               key = "c";
               key_hl = "Number";
               key_format = " %s";
@@ -126,12 +126,14 @@
               icon_hl = "DashboardIcon";
               desc = "Browse Keymaps        ";
               desc_hl = "String";
-              /* telescope.builtin.keymaps crashes on Lua 5.1 when a keymap
-                 callback has no desc: make_entry calls debug.getinfo(cb)
-                 without the "S" option, so info.source is nil and
-                 telescope/actions/utils.lua blows up on path:new.
-                 which-key shows categorized groups with icons natively,
-                 so the logic lives in _G.browse_keymaps below. */
+              /*
+                telescope.builtin.keymaps crashes on Lua 5.1 when a keymap
+                callback has no desc: make_entry calls debug.getinfo(cb)
+                without the "S" option, so info.source is nil and
+                telescope/actions/utils.lua blows up on path:new.
+                which-key shows categorized groups with icons natively,
+                so the logic lives in _G.browse_keymaps below.
+              */
               action = "lua _G.browse_keymaps()";
               key = "?";
               key_hl = "Number";
@@ -427,7 +429,11 @@
             "branch"
             {
               __unkeyed-1 = "diff";
-              symbols = { added = " "; modified = " "; removed = " "; };
+              symbols = {
+                added = " ";
+                modified = " ";
+                removed = " ";
+              };
             }
             {
               __unkeyed-1 = "diagnostics";
@@ -435,7 +441,10 @@
             }
           ];
           lualine_c = [
-            { __unkeyed-1 = "filename"; path = 1; }
+            {
+              __unkeyed-1 = "filename";
+              path = 1;
+            }
           ];
           lualine_x = [
             "encoding"
@@ -922,82 +931,86 @@
     {
       event = "FileType";
       pattern = "dashboard";
-      command = ''lua
-        vim.opt_local.number = false
-        vim.opt_local.relativenumber = false
-        vim.opt_local.cursorline = false
-        vim.opt_local.signcolumn = "no"
-        vim.opt_local.syntax = "off"
-        vim.opt_local.scrolloff = 0
-        vim.cmd("nohlsearch")
-        -- Disable all plugins that could highlight on dashboard
-        pcall(function() require('snacks').indent.disable() end)
-        pcall(function() require('snacks').scroll.disable() end)
-        pcall(function() require('illuminate').pause() end)
-        pcall(function() require('illuminate').toggle_buffer() end)
-        -- Clear all search highlights and plugin highlights on dashboard
-        pcall(function() vim.cmd("hi clear Search") end)
-        pcall(function() vim.cmd("hi clear IncSearch") end)
+      command = ''
+        lua
+                vim.opt_local.number = false
+                vim.opt_local.relativenumber = false
+                vim.opt_local.cursorline = false
+                vim.opt_local.signcolumn = "no"
+                vim.opt_local.syntax = "off"
+                vim.opt_local.scrolloff = 0
+                vim.cmd("nohlsearch")
+                -- Disable all plugins that could highlight on dashboard
+                pcall(function() require('snacks').indent.disable() end)
+                pcall(function() require('snacks').scroll.disable() end)
+                pcall(function() require('illuminate').pause() end)
+                pcall(function() require('illuminate').toggle_buffer() end)
+                -- Clear all search highlights and plugin highlights on dashboard
+                pcall(function() vim.cmd("hi clear Search") end)
+                pcall(function() vim.cmd("hi clear IncSearch") end)
       '';
     }
     # WinLeave: clear highlights when leaving dashboard (resume when returning)
     {
       event = "WinLeave";
       pattern = "*";
-      command = ''lua
-        -- Resume illuminate when leaving the dashboard window
-        pcall(function()
-          if vim.bo.filetype ~= "dashboard" then
-            require('illuminate').resume()
-          end
-        end)
+      command = ''
+        lua
+                -- Resume illuminate when leaving the dashboard window
+                pcall(function()
+                  if vim.bo.filetype ~= "dashboard" then
+                    require('illuminate').resume()
+                  end
+                end)
       '';
     }
     # Neo-tree: ensure transparency for file explorer windows
     {
       event = "FileType";
       pattern = "neo-tree";
-      command = ''lua
-        vim.opt_local.number = false
-        vim.opt_local.relativenumber = false
-        vim.opt_local.cursorline = false
+      command = ''
+        lua
+                vim.opt_local.number = false
+                vim.opt_local.relativenumber = false
+                vim.opt_local.cursorline = false
       '';
     }
     # Improve float window borders globally
     {
       event = "VimEnter";
       pattern = "*";
-      command = ''lua
-        -- Override default LSP float borders to rounded style
-        local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
-        function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
-          opts = opts or {}
-          opts.border = opts.border or "rounded"
-          return orig_util_open_floating_preview(contents, syntax, opts, ...)
-        end
-        -- Override vim.diagnostic float borders
-        vim.diagnostic.config({
-          float = {
-            border = "rounded",
-            source = true,
-            header = "",
-            prefix = "",
-          },
-          virtual_text = {
-            prefix = "●",
-            spacing = 4,
-          },
-          signs = true,
-          underline = true,
-          update_in_insert = false,
-          severity_sort = true,
-        })
-        -- Set diagnostic signs with icons
-        local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
-        for type, icon in pairs(signs) do
-          local hl = "DiagnosticSign" .. type
-          vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-        end
+      command = ''
+        lua
+                -- Override default LSP float borders to rounded style
+                local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
+                function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+                  opts = opts or {}
+                  opts.border = opts.border or "rounded"
+                  return orig_util_open_floating_preview(contents, syntax, opts, ...)
+                end
+                -- Override vim.diagnostic float borders
+                vim.diagnostic.config({
+                  float = {
+                    border = "rounded",
+                    source = true,
+                    header = "",
+                    prefix = "",
+                  },
+                  virtual_text = {
+                    prefix = "●",
+                    spacing = 4,
+                  },
+                  signs = true,
+                  underline = true,
+                  update_in_insert = false,
+                  severity_sort = true,
+                })
+                -- Set diagnostic signs with icons
+                local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
+                for type, icon in pairs(signs) do
+                  local hl = "DiagnosticSign" .. type
+                  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+                end
       '';
     }
   ];
