@@ -802,7 +802,18 @@
       local conf = require("telescope.config").values
       local actions = require("telescope.actions")
       local action_state = require("telescope.actions.state")
-      local builtin_opts = { prompt_title = "Projects", cwd = projects_dir }
+      local builtin_opts = {
+        prompt_title = "󰉋  Projects",
+        prompt_prefix = "  ",
+        cwd = projects_dir,
+        layout_strategy = "flex",
+        layout_config = {
+          width = 0.72,
+          height = 0.62,
+          horizontal = { preview_width = 0.45 },
+          vertical = { preview_height = 0.35 },
+        },
+      }
       -- List immediate subfolders (depth 1), skipping hidden ones.
       local results = {}
       local handle = vim.loop.fs_scandir(projects_dir)
@@ -831,20 +842,34 @@
         )
         return
       end
+      local devicons_ok, devicons = pcall(require, "nvim-web-devicons")
+      local project_icon, project_icon_hl = "󰉋", "Directory"
+      if devicons_ok then
+        project_icon, project_icon_hl = devicons.get_icon("folder", "folder", { default = true })
+        project_icon = project_icon or "󰉋"
+        project_icon_hl = project_icon_hl or "Directory"
+      end
+
       pickers.new(builtin_opts, {
-        prompt_title = "Projects",
+        prompt_title = "󰉋  Projects",
         finder = finders.new_table {
           results = results,
           entry_maker = function(name)
             return {
               value = name,
-              display = name,
+              display = function()
+                return string.format("%s  %s", project_icon, name), {
+                  { 0, #project_icon, project_icon_hl },
+                  { #project_icon + 2, -1, "TelescopeResultsIdentifier" },
+                }
+              end,
               ordinal = name,
             }
           end,
         },
         sorter = conf.generic_sorter(builtin_opts),
         previewer = false,
+        results_title = "Projects",
         attach_mappings = function(prompt_bufnr)
           actions.select_default:replace(function()
             local selection = action_state.get_selected_entry()
