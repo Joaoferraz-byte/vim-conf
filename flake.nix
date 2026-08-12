@@ -1,9 +1,8 @@
 {
-  description = "NixVim IDE para Java, Spring Boot, Angular e desenvolvimento web";
+  description = "NixVim IDE for Java, Spring Boot, Angular, and web development";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    # Sem `follows`: NixVim testa sua própria revisão compatível de nixpkgs.
     nixvim.url = "github:nix-community/nixvim";
   };
 

@@ -13,9 +13,6 @@ let
   };
 in
 {
-  # IntelliJ LSP (JetBrains "Java by IntelliJ IDEA" server).
-  # The server ships its own bundled JBR and downloads from the JetBrains CDN
-  # on first :IntellijInstall; a JDK is still needed for symbol resolution.
   plugins.jdtls.enable = false;
 
   plugins.neotest = {

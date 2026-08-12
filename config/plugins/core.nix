@@ -43,10 +43,8 @@ in
     };
     trouble.enable = true;
 
-    # Flash
     flash.enable = true;
 
-    # Aerial
     aerial = {
       enable = true;
       settings = {
@@ -55,7 +53,6 @@ in
       };
     };
 
-    # Harpoon
     harpoon = {
       enable = true;
       enableTelescope = true;
@@ -64,34 +61,25 @@ in
       };
     };
 
-    # Project.nvim
     project-nvim = {
       enable = true;
       enableTelescope = true;
       settings = {
         history = {
-          # The previous project_history.json is corrupt and is preserved as a
-          # legacy backup; a fresh file prevents project.nvim callbacks from
-          # failing during BufEnter and BufWipeout.
           save_dir.__raw = ''vim.fn.stdpath("data")'';
           save_file = "project_history_clean.json";
         };
       };
     };
 
-    # TS Autotag
     ts-autotag.enable = true;
 
-    # Zen Mode
     zen-mode.enable = true;
 
-    # Smart Splits
     smart-splits.enable = true;
 
-    # Oil
     oil.enable = true;
 
-    # Treesitter
     treesitter = {
       enable = true;
       nixGrammars = true;
@@ -101,7 +89,6 @@ in
       };
     };
 
-    # grug-far — project-wide find and replace powered by ripgrep
     grug-far = {
       enable = true;
       settings = {
@@ -111,7 +98,6 @@ in
       };
     };
 
-    # Telescope
     telescope = {
       enable = true;
       extensions.fzf-native.enable = true;
@@ -119,8 +105,6 @@ in
       extensions.media-files.enable = true;
     };
 
-    # Image preview: native NixVim module backed by ueberzugpp so it works
-    # in WezTerm/Niri terminals without relying on Kitty-only rendering.
     image = {
       enable = true;
       autoLoad = true;
@@ -134,7 +118,6 @@ in
       };
     };
 
-    # Lazydev — Lua LSP completion for Neovim config
     lazydev = {
       enable = true;
       settings = {
@@ -145,7 +128,6 @@ in
       };
     };
 
-    # Neo-tree — modern file explorer (replaces dashboard-nvim's NvimTree dependency)
     neo-tree = {
       enable = true;
       settings = {
@@ -155,7 +137,6 @@ in
             enabled = true;
             leave_dirs_open = true;
           };
-          # Group nested dirs with single child into one line (java/com/seila)
           group_empty_dirs = true;
           scan_mode = "deep";
           filtered_items = {
@@ -174,7 +155,6 @@ in
       };
     };
 
-    # Mini.nvim modules — essential modern Neovim utilities
     mini = {
       enable = true;
       modules = {
@@ -231,9 +211,6 @@ in
     base46-plugin
     telescope-media-files-nvim
     mermaid-plugin
-    # vim-sleuth: automatically detects and sets indentation (tabstop, shiftwidth,
-    # expandtab) per buffer by inspecting the file content. Replaces manual
-    # per-filetype indentation rules and handles mixed-indent codebases.
     vim-sleuth
   ];
 
@@ -241,10 +218,6 @@ in
     git ripgrep fd gnumake nodejs jdk21 maven gradle chafa imagemagick ueberzugpp wl-clipboard ffmpeg
   ];
 
-  # DMS base46 setup: enable transparency and register DMS integrations.
-  # The actual theme loading is handled by DMS matugen-generated dms.lua
-  # at ~/.config/nvim/colors/dms.lua, which calls base46.theme_harmonize()
-  # and base46.load("dms") dynamically.
   extraConfigLua = ''
     pcall(function()
       local b46 = require("base46")

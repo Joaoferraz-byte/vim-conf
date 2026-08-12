@@ -1,15 +1,11 @@
 { ... }:
 {
   plugins = {
-    # NixVim enables lazy.nvim's update checker by default in its plugin-manager
-    # integration. Its startup update report can overflow the message area and
-    # create the visible hit-enter widget on the dashboard.
     lazy.settings = {
       checker.enabled = false;
       change_detection.notify = false;
     };
 
-    # Snacks.nvim
     snacks = {
       enable = true;
       settings = {
@@ -22,11 +18,10 @@
         input.enabled = true;
         scope.enabled = true;
         scroll.enabled = false; # Disable visual scrollbar to avoid | markers on the right edge
-        dashboard.enabled = false; # Desabilitado para não conflitar com dashboard-nvim
+        dashboard.enabled = false;
       };
     };
 
-    # Dashboard-nvim — Doom layout with Neo-tree integration
     dashboard = {
       enable = true;
       settings = {
@@ -169,7 +164,6 @@
       };
     };
 
-    # Which-Key
     which-key = {
       enable = true;
       settings = {
@@ -275,15 +269,12 @@
       };
     };
 
-    # Mini.nvim modules are configured in core.nix.
 
-    # Nvim-Tree (kept for compatibility, but neo-tree is the primary explorer)
     nvim-tree = {
       enable = false;
       settings.filters.dotfiles = false;
     };
 
-    # Noice
     noice = {
       enable = true;
       settings = {
@@ -315,9 +306,7 @@
       enable = true;
       settings = {
         options = {
-          # Use thin separators between buffers (slant style is too heavy with transparency)
           separator_style = "thin";
-          # Show diagnostics in the bufferline
           diagnostics = "nvim_lsp";
           diagnostics_indicator.__raw = ''
             function(count, level)
@@ -325,14 +314,10 @@
               return " " .. icon .. count
             end
           '';
-          # Show ordinal numbers for BufferLineGoToBuffer navigation
           numbers = "ordinal";
-          # Keep bufferline visible even with a single buffer
           always_show_bufferline = true;
-          # Show close button
           show_buffer_close_icons = true;
           show_close_icon = true;
-          # Offset for neo-tree sidebar
           offsets = [
             {
               filetype = "neo-tree";
@@ -342,8 +327,6 @@
             }
           ];
         };
-        # Transparent highlights — bg = "" means inherit from terminal background.
-        # This keeps the bufferline visually consistent with the transparent theme.
         highlights = {
           fill.bg = "";
           background.bg = "";
@@ -413,7 +396,6 @@
         options = {
           theme = "dms";
           globalstatus = true;
-          # Powerline-style separators for a clean look
           section_separators = {
             left = "";
             right = "";
@@ -471,7 +453,6 @@
       };
     };
 
-    # Render Markdown (mermaid.nvim, packaged in core.nix, hooks into it).
     render-markdown = {
       enable = true;
       settings = {
@@ -610,7 +591,7 @@
                 end
                 return c
               end
-              
+
               local deep_children = get_valid_children(deep_handle)
               while #deep_children == 1 and deep_children[1].type == 2 do
                 local child_name = deep_children[1].name
@@ -673,11 +654,10 @@
             if sel then
               local picker = action_state.get_current_picker(prompt_bufnr)
               if picker then
-                -- set_prompt(text, true) substitui o prompt completamente.
-                -- O '/' já está incluído em sel.value para diretórios.
+                -- set_prompt(text, true) replaces the prompt completely.
+                -- The '/' is already included in sel.value for directories.
                 picker:set_prompt(sel.value, true)
-                -- Atualiza o finder manualmente para listar os filhos do diretório selecionado,
-                -- pois set_prompt não dispara on_input_filter_cb automaticamente.
+                -- Refresh the finder manually because set_prompt does not trigger on_input_filter_cb.
                 picker:refresh(make_finder(get_compact_candidates(sel.value)), {})
               end
             end
@@ -952,7 +932,6 @@
   '';
 
   autoCmd = [
-    # Dashboard: suppress all visual noise — numbers, signs, highlights, scrollbars
     {
       event = "FileType";
       pattern = "dashboard";
@@ -975,7 +954,6 @@
                 pcall(function() vim.cmd("hi clear IncSearch") end)
       '';
     }
-    # WinLeave: clear highlights when leaving dashboard (resume when returning)
     {
       event = "WinLeave";
       pattern = "*";
@@ -989,7 +967,6 @@
                 end)
       '';
     }
-    # Neo-tree: ensure transparency for file explorer windows
     {
       event = "FileType";
       pattern = "neo-tree";
@@ -1000,7 +977,6 @@
                 vim.opt_local.cursorline = false
       '';
     }
-    # Improve float window borders globally
     {
       event = "VimEnter";
       pattern = "*";
