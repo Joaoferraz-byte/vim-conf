@@ -1,16 +1,5 @@
 { config, pkgs, lib, ... }:
 let
-  base46-plugin = pkgs.vimUtils.buildVimPlugin {
-    pname = "base46";
-    version = "unstable";
-    src = pkgs.fetchFromGitHub {
-      owner = "AvengeMedia";
-      repo = "base46";
-      rev = "83522e02c6c3b4ea901c4bffd9e0a5e0371c1fe6";
-      hash = "sha256-kwDMC6rYzJYECmGnwn8JiAbffUq7hAXcUH6gPSkk2uI=";
-    };
-    doCheck = false;
-  };
   mermaid-plugin = pkgs.vimUtils.buildVimPlugin {
     pname = "mermaid.nvim";
     version = "unstable";
@@ -208,7 +197,6 @@ in
   };
 
   extraPlugins = with pkgs.vimPlugins; [
-    base46-plugin
     telescope-media-files-nvim
     mermaid-plugin
     vim-sleuth
@@ -220,60 +208,6 @@ in
 
   extraConfigLua = ''
     pcall(function()
-      local b46 = require("base46")
-      b46.setup({
-        transparency = true,
-        set_background = true,
-        term_colors = true,
-        integrations = {
-          blankline = true,
-          cmp = true,
-          defaults = true,
-          devicons = true,
-          git = true,
-          lsp = true,
-          mason = true,
-          neotest = true,
-          nvimtree = true,
-          statusline = true,
-          syntax = true,
-          treesitter = true,
-          tbline = true,
-          telescope = true,
-          whichkey = true,
-          alpha = true,
-          ["blink-pair"] = true,
-          bufferline = true,
-          codeactionmenu = true,
-          dap = true,
-          diffview = true,
-          edgy = true,
-          flash = true,
-          ["git-conflict"] = true,
-          gitsigns = true,
-          grug_far = true,
-          hop = true,
-          leap = true,
-          lspsaga = true,
-          markview = true,
-          ["mini-tabline"] = true,
-          ["mini-icons"] = true,
-          navic = true,
-          neogit = true,
-          notify = true,
-          nvshades = true,
-          orgmode = true,
-          rainbowdelimiters = true,
-          ["render-markdown"] = true,
-          semantic_tokens = true,
-          ["snacks-dashboard"] = true,
-          ["tiny-inline-diagnostic"] = true,
-          todo = true,
-          trouble = true,
-          ["vim-illuminate"] = true,
-        },
-      })
-
       -- Initialize Telescope early and load its extensions (media_files,
       -- file_browser, fzf). Telescope defers loading its actions and
       -- state modules until setup runs, so functions called from other
@@ -287,9 +221,9 @@ in
         pcall(telescope.load_extension, "fzf")
       end
 
-      -- DMS/base46 may reapply opaque highlight groups when the generated
-      -- colorscheme reloads. Reassert transparent backgrounds after every
-      -- colorscheme event so the terminal wallpaper remains visible.
+      -- A theme reload may reapply opaque highlight groups. Reassert
+      -- transparent backgrounds after every colorscheme event so the
+      -- terminal wallpaper remains visible.
       local function apply_transparent_backgrounds()
         local groups = {
           "Normal", "NormalNC", "NormalFloat", "FloatBorder", "FloatTitle", "FloatShadow",

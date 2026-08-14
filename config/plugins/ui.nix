@@ -394,7 +394,7 @@
       enable = true;
       settings = {
         options = {
-          theme = "dms";
+          theme = "auto";
           globalstatus = true;
           section_separators = {
             left = "";

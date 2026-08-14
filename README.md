@@ -1,45 +1,37 @@
-# NixVim Development Environment
+# vim-conf
 
-This repository provides a declarative and reproducible NixVim environment for Java, Spring Boot, Angular, web, C/C++, embedded, and competitive programming workflows. Editor servers, formatters, debuggers, and other dependencies are provided by Nix rather than installed through Mason.
+Este repositório fornece um ambiente NixVim declarativo e reproduzível para Java, Spring Boot, Angular, web, C/C++, embedded e programação competitiva. Servidores, formatadores, debuggers e demais dependências são fornecidos por Nix em vez de serem instalados pelo Mason.
 
-## Public contract
+## Contrato público
 
-The flake exposes the following interfaces:
-
-| Output | Purpose |
+| Output | Finalidade |
 |---|---|
-| `lib.nixvimModule` | Reusable NixVim module imported by Home Manager or another NixVim composition. |
-| `lib.nixvimModules.default` | Alias for the default reusable module. |
-| `packages.<system>.default` | Standalone NixVim package. |
-| `checks.<system>.nixvim` | Build check for the standalone package. |
-| `formatter.<system>` | Nix formatter for this repository. |
+| `lib.nixvimModule` | Módulo NixVim reutilizável por Home Manager ou outra composição. |
+| `lib.nixvimModules.default` | Alias do módulo reutilizável padrão. |
+| `packages.<system>.default` | Pacote NixVim standalone. |
+| `checks.<system>.nixvim` | Check de build do pacote standalone. |
+| `formatter.<system>` | Formatador do repositório. |
 
-The main configuration is composed under `config/`. It includes language servers and tooling for Java/Spring Boot, Angular, TypeScript, ESLint, HTML, CSS, JSON, YAML, Emmet, Tailwind CSS, C/C++, CMake, embedded workflows, and debugging through DAP.
+A configuração é composta em `config/` e inclui tooling para Java/Spring Boot, Angular, TypeScript, ESLint, HTML, CSS, JSON, YAML, Emmet, Tailwind, C/C++, CMake, embedded e DAP.
 
-## Theme integration
+## Tema adaptativo
 
-The editor uses the `dms` colorscheme adapter. DMS/Matugen owns runtime-generated colors, while this repository owns editor behavior, plugin declarations, keymaps, language tooling, and the small Lua adapter required to load the generated palette. Editor evaluation does not require DMS to be running.
+O editor mantém um fallback local `habamax` e não exige que Matugen, QuickShell ou uma sessão gráfica estejam ativos durante a avaliação Nix. Quando o arquivo opcional `~/.config/nvim/matugen_colors.lua` existe, ele é carregado como uma tabela Lua e aplicado aos principais grupos de highlight.
 
-## Compatibility
+O loader é reexecutado quando o arquivo muda, permitindo que o `shell-conf` atualize o Neovim após uma troca de wallpaper. O editor também mantém uma paleta funcional quando o arquivo ainda não existe ou possui conteúdo inválido. A geração pertence ao Serpantinum; este repositório apenas consome o contrato de runtime.
 
-NixVim should remain compatible with the nixpkgs revision against which it is tested. The flake intentionally keeps its `nixvim` input independent and does not force `nixvim.inputs.nixpkgs.follows = nixpkgs` without an explicit compatibility decision.
+## Compatibilidade
 
-Before publishing a change, run:
+NixVim permanece compatível com a revisão de nixpkgs contra a qual é testado. O flake mantém seu input `nixvim` independente e não força `nixvim.inputs.nixpkgs.follows = nixpkgs` sem uma decisão explícita de compatibilidade.
+
+Antes de publicar mudanças:
 
 ```bash
 nix flake check --all-systems
 nix build .#packages.x86_64-linux.default
 ```
 
-To run the standalone package after publishing:
-
-```bash
-nix run github:Joaoferraz-byte/vim-conf
-```
-
-## Integrate with NixOS and Home Manager
-
-Add this flake as an input and keep the official NixVim Home Manager module in the consuming profile. Import this repository's module inside `programs.nixvim.imports`:
+## Integração com NixOS e Home Manager
 
 ```nix
 {
@@ -61,64 +53,39 @@ Add this flake as an input and keep the official NixVim Home Manager module in t
 
 ## Workflows
 
-The configuration includes JDTLS, Spring Boot tooling, AngularLS, TypeScript, ESLint, HTML, CSS, JSON, YAML, Emmet, Tailwind CSS, Conform, DAP, Clangd, CMake Tools, GDB, LLDB, OpenOCD, Cppcheck, Competitest, Telescope, Aerial, Harpoon, Neogit, Diffview, Trouble, Treesitter, Bufferline, Lualine, Gitsigns, Smart Splits, Zen Mode, Todo Comments, Web Devicons, and Oil.
+A configuração inclui JDTLS, Spring Boot, AngularLS, TypeScript, ESLint, HTML, CSS, JSON, YAML, Emmet, Tailwind, Conform, DAP, Clangd, CMake Tools, GDB, LLDB, OpenOCD, Cppcheck, Competitest, Telescope, Aerial, Harpoon, Neogit, Diffview, Trouble, Treesitter, Bufferline, Lualine, Gitsigns, Smart Splits, Zen Mode, Todo Comments, Web Devicons e Oil.
 
-Java projects are detected from `pom.xml`, Gradle files, wrapper scripts, or Git metadata. JDTLS uses an isolated workspace per project, with source downloads, code lenses, import organization, inlay hints, and DAP support. Spring Boot debugging attaches to port `5005` through the configured DAP profile.
+Projetos Java são detectados por `pom.xml`, arquivos Gradle, wrappers ou metadados Git. JDTLS usa workspace isolado por projeto, com source downloads, code lenses, organização de imports, inlay hints e suporte DAP. AngularLS e TypeScript LSP são instalados declarativamente; versões específicas de Angular permanecem em `devDependencies` de cada projeto.
 
-AngularLS and TypeScript LSP are installed declaratively by the NixVim module. Project-specific Angular CLI versions should remain in each application's `devDependencies`, so the editor does not impose a global project version.
-
-Formatting runs on save with a timeout and an LSP fallback when a dedicated formatter is unavailable. Use `<leader>lf` for manual formatting. The dashboard opens when Neovim starts without files, and the file explorer, Telescope, project picker, outline, Git tools, and DAP controls are exposed through the configured leader mappings.
-
-## Dynamic DMS theme
-
-The Neovim theme follows DankMaterialShell dynamically. Colors are read from the Matugen-generated file at `~/.config/DankMaterialShell/dms.css`, keeping the terminal, editor, and desktop shell visually aligned. This is a runtime palette adapter only; editor behavior remains declarative and does not require DMS during Nix evaluation.
+Formatação ocorre no save com timeout e fallback LSP. O dashboard abre quando o Neovim inicia sem arquivos, e explorer, Telescope, picker de projetos, outline, Git e DAP ficam disponíveis pelos keymaps declarados.
 
 ## Key mappings
 
-| Mapping | Action |
+| Mapping | Ação |
 |---|---|
-| `<leader>e` | Toggle the file explorer. |
-| `<leader>d` | Open the dashboard. |
-| `<leader>?` | Search all key mappings. |
-| `<leader>ff` / `<leader>fg` | Find files / search content with Telescope. |
-| `<leader>fr` / `<leader>fp` | Recent files / projects. |
-| `<leader>o` | Toggle the Aerial outline. |
-| `<leader>ha` / `<leader>ht` | Add to Harpoon / open the Harpoon list. |
-| `s` / `S` | Flash navigation / Treesitter selection. |
-| `<leader>z` | Toggle Zen Mode. |
-| `gd`, `gD`, `gi`, `gr`, `K` | LSP navigation and documentation. |
-| `<leader>lr`, `<leader>la`, `<leader>lf` | Rename, code action, and format. |
-| `<leader>ld` | Toggle diagnostics with Trouble. |
-| `<C-h/j/k/l>` | Navigate between splits. |
-| `<leader>xb`, `<leader>xc`, `<leader>xn` | DAP breakpoint, continue, and step over. |
-| `<leader>xi`, `<leader>xo`, `<leader>xt` | DAP step into, step out, and terminate. |
-| `<leader>gg` / `<leader>gc` | Open Git status / create a commit with Neogit. |
-| `<leader>gb`, `<leader>gl`, `<leader>gp`, `<leader>gr` | Branches, pull, push, and rebase. |
-| `<leader>gd`, `<leader>gh`, `<leader>gH`, `<leader>gB` | Diff, file history, repository history, and line blame. |
+| `<leader>e` | Alternar o file explorer. |
+| `<leader>d` | Abrir o dashboard. |
+| `<leader>?` | Pesquisar todos os keymaps. |
+| `<leader>ff` / `<leader>fg` | Encontrar arquivos / pesquisar conteúdo com Telescope. |
+| `<leader>fr` / `<leader>fp` | Arquivos recentes / projetos. |
+| `<leader>o` | Alternar o outline Aerial. |
+| `<leader>ha` / `<leader>ht` | Adicionar ao Harpoon / abrir lista. |
+| `s` / `S` | Navegação Flash / seleção Treesitter. |
+| `<leader>z` | Alternar Zen Mode. |
+| `gd`, `gD`, `gi`, `gr`, `K` | Navegação e documentação LSP. |
+| `<leader>lr`, `<leader>la`, `<leader>lf` | Rename, code action e format. |
+| `<leader>ld` | Alternar diagnósticos com Trouble. |
+| `<C-h/j/k/l>` | Navegar entre splits no Neovim; o remapeamento físico global é owner do keyd. |
 
-## Validation
-
-The repository declares a standalone package and a NixVim check:
+## Validação
 
 ```bash
 nix flake check --no-build
 nix build .#default
 ```
 
-The consuming NixOS configuration can be evaluated with:
+A configuração NixOS consumidora pode ser avaliada com:
 
 ```bash
 nix eval .#nixosConfigurations.myMachine.config.system.build.toplevel.drvPath
 ```
-
-## References
-
-[1]: https://nix-community.github.io/nixvim/user-guide/install.html "NixVim — Installation"
-[2]: https://nix-community.github.io/nixvim/plugins/jdtls/index.html "NixVim — JDTLS"
-[3]: https://nix-community.github.io/nixvim/plugins/dap/index.html "NixVim — DAP"
-[4]: https://nix-community.github.io/nixvim/plugins/lsp/servers/angularls/index.html "NixVim — AngularLS"
-[5]: https://github.com/nix-community/nixvim/blob/main/plugins/by-name/conform-nvim/default.nix "NixVim — Conform module"
-[6]: https://nix-community.github.io/nixvim/plugins/neogit/index.html "NixVim — Neogit"
-[7]: https://nix-community.github.io/nixvim/plugins/diffview/index.html "NixVim — Diffview"
-[8]: https://nix-community.github.io/nixvim/plugins/competitest/index.html "NixVim — Competitest"
-[9]: https://nix-community.github.io/nixvim/plugins/cmake-tools/index.html "NixVim — CMake Tools"
