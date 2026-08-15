@@ -96,9 +96,11 @@ in
 
     image = {
       enable = true;
-      autoLoad = true;
+      # Do not spawn ueberzugpp during startup. WezTerm can consume the
+      # Kitty graphics protocol directly; image.nvim will load on demand.
+      autoLoad = false;
       settings = {
-        backend = "ueberzug";
+        backend = "kitty";
         processor = "magick_cli";
         hijack_file_patterns = [ "*.png" "*.jpg" "*.jpeg" "*.gif" "*.webp" "*.avif" ];
         max_height_window_percentage = 50;
@@ -203,7 +205,7 @@ in
   ];
 
   extraPackages = with pkgs; [
-    git ripgrep fd gnumake nodejs jdk21 maven gradle chafa imagemagick ueberzugpp wl-clipboard ffmpeg
+    git ripgrep fd gnumake nodejs jdk21 maven gradle chafa imagemagick wl-clipboard ffmpeg
   ];
 
   extraConfigLua = ''
