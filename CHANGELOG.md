@@ -14,7 +14,7 @@
 ### Fixed — UI Polish
 - **Mini Files Keybind Icons**: Add explicit Which-Key icons for the `<leader>m` group and `<leader>mf` Mini Files action.
 - **Image Preview**: Enable NixVim's native `image.nvim` module with the ueberzug backend and add the packaged Telescope media-files extension for image previews in a dedicated `<leader>fi` picker.
-- **Wallpaper Transparency**: Reapply transparent backgrounds for editor, floating windows, menus, statusline, tabline, separators, and dashboard-related surfaces after every DMS/base46 colorscheme reload
+- **Wallpaper Transparency**: Reapply transparent backgrounds for editor, floating windows, menus, statusline, tabline, separators, and dashboard-related surfaces after every Livara Shell/Matugen colorscheme reload
 - **Dashboard Return Prompt**: Hide Noice `return_prompt` messages so the dashboard no longer displays a distracting “Press any key to continue” prompt
 - **English UI**: Translate the dashboard footer and interactive file/project creation prompts to English
 
@@ -26,11 +26,11 @@
 
 ### Changed
 - **Transparência Total**: Fundo do editor (não só floats) agora transparente igual ao terminal — Normal, StatusLine, TabLine, Pmenu, SignColumn, etc.
-- **Tema DMS Reativo**: Cores e transparência agora são reaplicadas a cada `ColorScheme` (autocmd), não só no startup, sobrevivendo a reloads de tema disparados pelo DMS/matugen
+- **Tema Livara Shell Reativo**: Cores e transparência agora são reaplicadas a cada `ColorScheme` (autocmd), não só no startup, sobrevivendo a reloads de tema disparados pelo Livara Shell/Matugen
 
 ### Fixed
-- **Catppuccin Theme Removed**: Replaced Catppuccin Mocha with DMS dynamic theme
-- **DMS Theme Integration**: Neovim now reads colors from DankMaterialShell matugen palette
+- **Catppuccin Theme Removed**: Replaced Catppuccin Mocha with the Livara Shell dynamic theme
+- **Livara Shell Theme Integration**: Neovim now reads colors from Livara Shell Matugen palette
 - **Dashboard UI Clean**: Disabled line numbers, syntax, cursorline, and word highlights on startup
 - **Floating Window Transparency**: Telescope, leader menus, and popups now match terminal background
 - **project.nvim Corruption**: Added error handling for corrupted history.json
@@ -44,13 +44,13 @@
 - **Dashboard Neotree Integration**: Dashboard now uses Neotree for directory navigation
 
 ### Changed
-- **Options Refactored**: Replaced manual `dms.css` parsing with `base46.setup({ transparency = true })` and fillchars/WinEnter autocmds
-- **Lualine Theme**: Changed from `base46` to `dms` for accurate DMS color integration
+- **Options Refactored**: Replaced manual static CSS parsing with `base46.setup({ transparency = true })` and fillchars/WinEnter autocmds
+- **Lualine Theme**: Changed from `base46` to the Livara dynamic palette for accurate shell color integration
 - **Keymaps**: All `NvimTree` references replaced with `Neotree`; added `mini.files` keymap (`<leader>e`)
-- **Core Plugins**: Removed duplicate `base46.load_theme("dms")` call (handled by DMS matugen generation)
+- **Core Plugins**: Removed duplicate dynamic-theme loader call (handled by Livara Shell Matugen generation)
 
 ### Fixed
-- **DMS Theme Crash**: Fixed `apply_dms_theme()` which tried to read a non-existent `dms.css`; DMS matugen generates `~/.config/nvim/colors/dms.lua` internally via `base46.load("dms")`
+- **Dynamic Theme Crash**: Fixed the theme loader so it reads the generated Livara Matugen palette instead of a non-existent static CSS file
 - **NvimTree Conflict**: Disabled `nvim-tree` in `ui.nix` (replaced by NeoTree)
 - **Mini.nvim Conflict**: Removed duplicate mini definition from `ui.nix` (consolidated in `core.nix`)
 - **Dashboard NvimTree Reference**: Updated dashboard config to use Neotree instead of NvimTree
