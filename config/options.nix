@@ -118,13 +118,13 @@
       set("DiagnosticInfo", colors.blue, nil)
       set("DiagnosticHint", colors.teal, nil)
       set("Pmenu", colors.text, colors.surface1)
-      set("PmenuSel", colors.base, colors.blue)
+      set("PmenuSel", colors.on_primary, colors.primary)
       set("StatusLine", colors.text, colors.surface1)
       set("StatusLineNC", colors.overlay2, colors.surface0)
       set("VertSplit", colors.overlay0, colors.base)
       set("Visual", nil, colors.surface2)
-      set("Search", colors.base, colors.yellow)
-      set("IncSearch", colors.base, colors.blue)
+      set("Search", colors.on_secondary, colors.secondary)
+      set("IncSearch", colors.on_primary, colors.primary)
       vim.g.colors_name = "serpantinum-matugen"
     end
 
