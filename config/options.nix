@@ -96,35 +96,60 @@
         vim.api.nvim_set_hl(0, name, spec)
       end
 
+      local function apply_transparency()
+        -- Keep the editor canvas transparent so Hyprland/QuickShell can show
+        -- through it. This must run after every colorscheme/palette reload:
+        -- many plugins recreate these groups with opaque backgrounds.
+        local transparent_groups = {
+          "Normal", "NormalNC", "SignColumn", "FoldColumn", "Folded",
+          "EndOfBuffer", "LineNr", "CursorLineNr", "CursorLine",
+          "ColorColumn", "Conceal", "NonText", "Whitespace", "VertSplit",
+          "WinSeparator", "StatusLine", "StatusLineNC", "TabLine",
+          "TabLineFill", "TabLineSel", "NvimTreeNormal", "NvimTreeNormalNC",
+          "NvimTreeEndOfBuffer", "NeoTreeNormal", "NeoTreeNormalNC",
+          "TelescopeNormal", "TelescopeBorder", "TelescopePromptNormal",
+          "TelescopeResultsNormal", "TelescopePreviewNormal",
+          "WhichKeyNormal", "FloatShadow", "FloatShadowThrough",
+        }
+        for _, group in ipairs(transparent_groups) do
+          local current = vim.api.nvim_get_hl(0, { name = group, link = false })
+          current.bg = nil
+          current.ctermbg = nil
+          vim.api.nvim_set_hl(0, group, current)
+        end
+      end
+
       vim.cmd("colorscheme habamax")
-      set("Normal", colors.text, colors.base)
-      set("NormalFloat", colors.text, colors.surface0)
-      set("FloatBorder", colors.blue, colors.surface0)
-      set("CursorLine", nil, colors.surface0)
+      set("Normal", colors.text)
+      set("NormalNC", colors.text)
+      set("NormalFloat", colors.text, colors.surface0, { blend = 8 })
+      set("FloatBorder", colors.blue, colors.surface0, { blend = 8 })
+      set("CursorLine", nil, colors.surface0, { blend = 15 })
       set("CursorLineNr", colors.blue, nil, { bold = true })
-      set("LineNr", colors.overlay1, nil)
+      set("LineNr", colors.overlay1)
       set("Comment", colors.overlay2, nil, { italic = true })
-      set("String", colors.green, nil)
+      set("String", colors.green)
       set("Function", colors.blue, nil, { bold = true })
-      set("Keyword", colors.mauve, nil)
-      set("Type", colors.yellow, nil)
-      set("Constant", colors.peach, nil)
-      set("Number", colors.peach, nil)
-      set("Identifier", colors.text, nil)
-      set("Statement", colors.red, nil)
+      set("Keyword", colors.mauve)
+      set("Type", colors.yellow)
+      set("Constant", colors.peach)
+      set("Number", colors.peach)
+      set("Identifier", colors.text)
+      set("Statement", colors.red)
       set("Error", colors.red, nil, { bold = true })
-      set("DiagnosticError", colors.red, nil)
-      set("DiagnosticWarn", colors.yellow, nil)
-      set("DiagnosticInfo", colors.blue, nil)
-      set("DiagnosticHint", colors.teal, nil)
-      set("Pmenu", colors.text, colors.surface1)
-      set("PmenuSel", colors.on_primary, colors.primary)
-      set("StatusLine", colors.text, colors.surface1)
-      set("StatusLineNC", colors.overlay2, colors.surface0)
-      set("VertSplit", colors.overlay0, colors.base)
-      set("Visual", nil, colors.surface2)
-      set("Search", colors.on_secondary, colors.secondary)
-      set("IncSearch", colors.on_primary, colors.primary)
+      set("DiagnosticError", colors.red)
+      set("DiagnosticWarn", colors.yellow)
+      set("DiagnosticInfo", colors.blue)
+      set("DiagnosticHint", colors.teal)
+      set("Pmenu", colors.text, colors.surface1, { blend = 8 })
+      set("PmenuSel", colors.on_primary, colors.primary, { bold = true })
+      set("StatusLine", colors.text, colors.surface1, { blend = 10 })
+      set("StatusLineNC", colors.overlay2, colors.surface0, { blend = 10 })
+      set("VertSplit", colors.overlay0)
+      set("Visual", nil, colors.surface2, { blend = 12 })
+      set("Search", colors.on_secondary, colors.secondary, { bold = true })
+      set("IncSearch", colors.on_primary, colors.primary, { bold = true })
+      apply_transparency()
       vim.g.colors_name = "serpantinum-matugen"
     end
 
