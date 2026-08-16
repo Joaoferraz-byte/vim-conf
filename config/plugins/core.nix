@@ -94,19 +94,13 @@ in
       extensions.media-files.enable = true;
     };
 
+    # WezTerm is the supported terminal for Livara, not Kitty. image.nvim's
+    # alternative ueberzug backend was crashing during startup and produced
+    # the terminal's "press any key to continue" pause. Keep image rendering
+    # opt-in until a terminal/backend pair is explicitly configured by the
+    # user; Neovim itself must never depend on a graphics helper process.
     image = {
-      enable = true;
-      # Do not spawn ueberzugpp during startup. WezTerm can consume the
-      # Kitty graphics protocol directly; image.nvim will load on demand.
-      autoLoad = false;
-      settings = {
-        backend = "kitty";
-        processor = "magick_cli";
-        hijack_file_patterns = [ "*.png" "*.jpg" "*.jpeg" "*.gif" "*.webp" "*.avif" ];
-        max_height_window_percentage = 50;
-        max_width_window_percentage = 90;
-        window_overlap_clear_enabled = true;
-      };
+      enable = false;
     };
 
     lazydev = {
