@@ -109,7 +109,12 @@
           "NvimTreeEndOfBuffer", "NeoTreeNormal", "NeoTreeNormalNC",
           "TelescopeNormal", "TelescopeBorder", "TelescopePromptNormal",
           "TelescopeResultsNormal", "TelescopePreviewNormal",
-          "WhichKeyNormal", "FloatShadow", "FloatShadowThrough",
+          "WhichKeyNormal", "WhichKeyFloat", "WhichKeyBorder", "WhichKeyTitle",
+          "SnacksInputNormal", "SnacksInputBorder", "SnacksInputTitle", "SnacksInputIcon",
+          "TelescopePromptBorder", "TelescopePromptTitle", "TelescopeResultsBorder",
+          "TelescopeResultsTitle", "TelescopePreviewBorder", "TelescopePreviewTitle",
+          "WinBar", "WinBarNC", "NavicText", "NavicSeparator",
+          "FloatShadow", "FloatShadowThrough",
         }
         for _, group in ipairs(transparent_groups) do
           local current = vim.api.nvim_get_hl(0, { name = group, link = false })
@@ -149,6 +154,10 @@
       -- readable material background.
       set("StatusLine", colors.text, "NONE", { blend = 10 })
       set("StatusLineNC", colors.overlay2, "NONE", { blend = 10 })
+      set("WinBar", colors.subtext1, "NONE", { blend = 18 })
+      set("WinBarNC", colors.overlay1, "NONE", { blend = 24 })
+      set("NavicText", colors.subtext1, "NONE", { blend = 18 })
+      set("NavicSeparator", colors.overlay1, "NONE", { blend = 24 })
       set("VertSplit", colors.overlay0)
 
       local function set_lualine_group(name, fg, bg, blend, bold)
