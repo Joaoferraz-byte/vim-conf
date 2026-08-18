@@ -394,45 +394,109 @@
       enable = true;
       settings = {
         options = {
-          theme = "auto";
+          theme = {
+            normal = {
+              a = "SerpantinumLualineNormalA";
+              b = "SerpantinumLualineNormalB";
+              c = "SerpantinumLualineNormalC";
+              x = "SerpantinumLualineNormalB";
+              y = "SerpantinumLualineNormalB";
+              z = "SerpantinumLualineNormalA";
+            };
+            insert = {
+              a = "SerpantinumLualineInsertA";
+              b = "SerpantinumLualineInsertB";
+              c = "SerpantinumLualineInsertC";
+              x = "SerpantinumLualineInsertB";
+              y = "SerpantinumLualineInsertB";
+              z = "SerpantinumLualineInsertA";
+            };
+            visual = {
+              a = "SerpantinumLualineVisualA";
+              b = "SerpantinumLualineVisualB";
+              c = "SerpantinumLualineVisualC";
+              x = "SerpantinumLualineVisualB";
+              y = "SerpantinumLualineVisualB";
+              z = "SerpantinumLualineVisualA";
+            };
+            replace = {
+              a = "SerpantinumLualineReplaceA";
+              b = "SerpantinumLualineReplaceB";
+              c = "SerpantinumLualineReplaceC";
+              x = "SerpantinumLualineReplaceB";
+              y = "SerpantinumLualineReplaceB";
+              z = "SerpantinumLualineReplaceA";
+            };
+            command = {
+              a = "SerpantinumLualineCommandA";
+              b = "SerpantinumLualineCommandB";
+              c = "SerpantinumLualineCommandC";
+              x = "SerpantinumLualineCommandB";
+              y = "SerpantinumLualineCommandB";
+              z = "SerpantinumLualineCommandA";
+            };
+            inactive = {
+              a = "SerpantinumLualineInactiveA";
+              b = "SerpantinumLualineInactiveB";
+              c = "SerpantinumLualineInactiveC";
+              x = "SerpantinumLualineInactiveB";
+              y = "SerpantinumLualineInactiveB";
+              z = "SerpantinumLualineInactiveA";
+            };
+          };
           globalstatus = true;
+          icons_enabled = true;
+          always_divide_middle = true;
           section_separators = {
-            left = "";
-            right = "";
+            left = "";
+            right = "";
           };
           component_separators = {
-            left = "";
-            right = "";
+            left = "│";
+            right = "│";
+          };
+          disabled_filetypes = {
+            statusline = [ "dashboard" "alpha" ];
           };
         };
         sections = {
           lualine_a = [ "mode" ];
           lualine_b = [
-            "branch"
+            {
+              __unkeyed-1 = "branch";
+              icon = "";
+            }
             {
               __unkeyed-1 = "diff";
               symbols = {
-                added = " ";
-                modified = " ";
-                removed = " ";
+                added = " ";
+                modified = " ";
+                removed = " ";
               };
             }
             {
               __unkeyed-1 = "diagnostics";
               sources = [ "nvim_lsp" ];
+              symbols = {
+                error = " ";
+                warn = " ";
+                info = " ";
+                hint = "󰌵 ";
+              };
             }
           ];
           lualine_c = [
             {
               __unkeyed-1 = "filename";
               path = 1;
+              symbols = {
+                modified = " ●";
+                readonly = " ";
+                unnamed = " [No Name]";
+              };
             }
           ];
-          lualine_x = [
-            "encoding"
-            "fileformat"
-            "filetype"
-          ];
+          lualine_x = [ "filetype" "encoding" "fileformat" ];
           lualine_y = [ "progress" ];
           lualine_z = [ "location" ];
         };

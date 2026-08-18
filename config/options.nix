@@ -120,6 +120,7 @@
       end
 
       vim.cmd("colorscheme habamax")
+      vim.opt.background = "dark"
       set("Normal", colors.text)
       set("NormalNC", colors.text)
       set("NormalFloat", colors.text, colors.surface0, { blend = 8 })
@@ -143,14 +144,51 @@
       set("DiagnosticHint", colors.teal)
       set("Pmenu", colors.text, colors.surface1, { blend = 8 })
       set("PmenuSel", colors.on_primary, colors.primary, { bold = true })
-      set("StatusLine", colors.text, colors.surface1, { blend = 10 })
-      set("StatusLineNC", colors.overlay2, colors.surface0, { blend = 10 })
+      -- Keep the editor's global statusline transparent. Lualine receives
+      -- its own bounded surfaces below so only the footer segments have a
+      -- readable material background.
+      set("StatusLine", colors.text, "NONE", { blend = 10 })
+      set("StatusLineNC", colors.overlay2, "NONE", { blend = 10 })
       set("VertSplit", colors.overlay0)
+
+      local function set_lualine_group(name, fg, bg, blend, bold)
+        vim.api.nvim_set_hl(0, name, {
+          fg = fg,
+          bg = bg,
+          blend = blend or 0,
+          bold = bold or false,
+        })
+      end
+
+      -- Lualine references these highlight groups by name instead of storing
+      -- a one-time copy of the wallpaper palette. Matugen can therefore update
+      -- the footer in place on the next wallpaper change.
+      set_lualine_group("SerpantinumLualineNormalA", colors.on_primary, colors.primary, 0, true)
+      set_lualine_group("SerpantinumLualineNormalB", colors.text, colors.surface0, 18, false)
+      set_lualine_group("SerpantinumLualineNormalC", colors.text, "NONE", 0, false)
+      set_lualine_group("SerpantinumLualineInsertA", colors.base, colors.green, 0, true)
+      set_lualine_group("SerpantinumLualineInsertB", colors.text, colors.surface0, 18, false)
+      set_lualine_group("SerpantinumLualineInsertC", colors.text, "NONE", 0, false)
+      set_lualine_group("SerpantinumLualineVisualA", colors.base, colors.mauve, 0, true)
+      set_lualine_group("SerpantinumLualineVisualB", colors.text, colors.surface0, 18, false)
+      set_lualine_group("SerpantinumLualineVisualC", colors.text, "NONE", 0, false)
+      set_lualine_group("SerpantinumLualineReplaceA", colors.base, colors.red, 0, true)
+      set_lualine_group("SerpantinumLualineReplaceB", colors.text, colors.surface0, 18, false)
+      set_lualine_group("SerpantinumLualineReplaceC", colors.text, "NONE", 0, false)
+      set_lualine_group("SerpantinumLualineCommandA", colors.base, colors.peach, 0, true)
+      set_lualine_group("SerpantinumLualineCommandB", colors.text, colors.surface0, 18, false)
+      set_lualine_group("SerpantinumLualineCommandC", colors.text, "NONE", 0, false)
+      set_lualine_group("SerpantinumLualineInactiveA", colors.subtext0, colors.surface0, 28, true)
+      set_lualine_group("SerpantinumLualineInactiveB", colors.subtext0, colors.surface0, 28, false)
+      set_lualine_group("SerpantinumLualineInactiveC", colors.subtext0, "NONE", 0, false)
       set("Visual", nil, colors.surface2, { blend = 12 })
       set("Search", colors.on_secondary, colors.secondary, { bold = true })
       set("IncSearch", colors.on_primary, colors.primary, { bold = true })
       apply_transparency()
       vim.g.colors_name = "serpantinum-matugen"
+      pcall(function()
+        require("lualine").refresh()
+      end)
     end
 
     _G.reload_serpantinum_theme = apply_serpantinum_theme
