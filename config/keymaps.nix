@@ -17,7 +17,7 @@
     }
     {
       key = "<leader>e";
-      action.__raw = "function() require('neo-tree.command').execute({ toggle = true, dir = vim.fn.getcwd() }) end";
+      action = "<cmd>lua Snacks.explorer()<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Toggle File Explorer"; };
     }
@@ -68,31 +68,31 @@
 
     {
       key = "<leader>ff";
-      action = "<cmd>Telescope find_files<CR>";
+      action = "<cmd>lua Snacks.picker.files()<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Find Files"; };
     }
     {
       key = "<leader>fg";
-      action = "<cmd>Telescope live_grep<CR>";
+      action = "<cmd>lua Snacks.picker.grep()<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Find Text"; };
     }
     {
       key = "<leader>fi";
-      action = "<cmd>Telescope media_files<CR>";
+      action = "<cmd>lua Snacks.picker.files({ ft = { \"png\", \"jpg\", \"jpeg\", \"gif\", \"webp\", \"svg\", \"pdf\" } })<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Find Images with Preview"; };
     }
     {
       key = "<leader>fb";
-      action = "<cmd>Telescope buffers<CR>";
+      action = "<cmd>lua Snacks.picker.buffers()<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "List Buffers"; };
     }
     {
       key = "<leader>fr";
-      action = "<cmd>Telescope oldfiles<CR>";
+      action = "<cmd>lua Snacks.picker.recent()<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "List Recent Files"; };
     }
@@ -118,13 +118,13 @@
 
     {
       key = "<leader>cn";
-      action = "<cmd>Neotree ~/.config/nvim<CR>";
+      action = "<cmd>Oil ~/.config/nvim<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Open Neovim Configuration"; };
     }
     {
       key = "<leader>cs";
-      action = "<cmd>Neotree /etc/nixos<CR>";
+      action = "<cmd>Oil /etc/nixos<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Open System Configuration"; };
     }
@@ -137,7 +137,7 @@
     }
     {
       key = "<leader>z";
-      action = "<cmd>ZenMode<CR>";
+      action = "<cmd>lua Snacks.zen()<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Toggle Zen Mode"; };
     }
@@ -150,9 +150,9 @@
     }
     {
       key = "<leader>ht";
-      action = "<cmd>Telescope harpoon marks<CR>";
+      action.__raw = "function() require('harpoon').ui:toggle_quick_menu(require('harpoon'):list()) end";
       mode = [ "n" ];
-      options = { silent = true; desc = "Open Harpoon Marks"; };
+      options = { silent = true; desc = "Open Harpoon Quick Menu"; };
     }
     {
       key = "<leader>h1";
@@ -365,13 +365,13 @@
     }
     {
       key = "<leader>bd";
-      action.__raw = "function() require('mini.bufremove').delete(0, false) end";
+      action = "<cmd>lua Snacks.bufdelete()<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Delete Buffer"; };
     }
     {
       key = "<leader>bD";
-      action.__raw = "function() require('mini.bufremove').delete(0, true) end";
+      action = "<cmd>lua Snacks.bufdelete({ force = true })<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Delete Buffer (Force)"; };
     }
@@ -519,7 +519,7 @@
 
     {
       key = "<leader>mf";
-      action.__raw = "function() require('mini.files').open() end";
+      action = "<cmd>lua Snacks.explorer()<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Open Mini Files"; };
     }

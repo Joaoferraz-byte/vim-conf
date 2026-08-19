@@ -14,12 +14,12 @@
       ...
     }:
     let
-      systems = [
-        "x86_64-linux"
-        "aarch64-linux"
-        "x86_64-darwin"
-        "aarch64-darwin"
-      ];
+      # The configuration intentionally targets NixOS/Wayland. Filter the
+      # NixVim systems by the platform family instead of promising Darwin
+      # packages that cannot evaluate Linux-only tools such as wl-clipboard.
+      systems = builtins.filter (system: nixpkgs.lib.hasSuffix "-linux" system) (
+        builtins.attrNames nixvim.legacyPackages
+      );
       forAllSystems = nixpkgs.lib.genAttrs systems;
       nixvimModule = import ./config;
     in
