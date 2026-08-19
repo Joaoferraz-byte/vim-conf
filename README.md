@@ -1,6 +1,6 @@
-# vim-conf
+# Livara NixVim
 
-Este repositório fornece um ambiente NixVim declarativo e reproduzível para Java, Spring Boot, Angular, web, C/C++, embedded e programação competitiva. Servidores, formatadores, debuggers e demais dependências são fornecidos por Nix em vez de serem instalados pelo Mason.
+Este repositório fornece um ambiente NixVim declarativo e reproduzível para Java, Spring Boot, Angular, web, C/C++, embedded e programação competitiva. Servidores LSP, formatadores, debuggers e dependências de desenvolvimento são fornecidos por Nix em vez de depender de instalação imperativa via Mason.
 
 ## Contrato público
 
@@ -8,28 +8,87 @@ Este repositório fornece um ambiente NixVim declarativo e reproduzível para Ja
 |---|---|
 | `lib.nixvimModule` | Módulo NixVim reutilizável por Home Manager ou outra composição. |
 | `lib.nixvimModules.default` | Alias do módulo reutilizável padrão. |
-| `packages.<system>.default` | Pacote NixVim standalone. |
-| `checks.<system>.nixvim` | Check de build do pacote standalone. |
+| `packages.<system>.default` | Pacote NixVim standalone para Linux. |
+| `checks.<system>.nixvim` | Check do pacote standalone. |
 | `formatter.<system>` | Formatador do repositório. |
 
-A configuração é composta em `config/` e inclui tooling para Java/Spring Boot, Angular, TypeScript, ESLint, HTML, CSS, JSON, YAML, Emmet, Tailwind, C/C++, CMake, embedded e DAP.
+O flake publica somente sistemas Linux porque a configuração inclui ferramentas Wayland como `wl-clipboard`, além de imagem, terminal e integrações próprias do desktop Livara. O input NixVim upstream pode suportar outros sistemas, mas esta configuração não promete compatibilidade que não foi avaliada.
 
-## Tema adaptativo
+## Arquitetura
 
-O editor mantém um fallback local `habamax` e não exige que Matugen, QuickShell ou uma sessão gráfica estejam ativos durante a avaliação Nix. Quando o arquivo opcional `~/.config/nvim/matugen_colors.lua` existe, ele é carregado como uma tabela Lua e aplicado aos principais grupos de highlight.
+A configuração usa uma arquitetura híbrida de **camadas e workflows**, não um padrão dendrítico imposto:
 
-O loader é reexecutado quando o arquivo muda, permitindo que o `shell-conf` atualize o Neovim após uma troca de wallpaper. O editor também mantém uma paleta funcional quando o arquivo ainda não existe ou possui conteúdo inválido. A geração pertence ao Serpantinum; este repositório apenas consome o contrato de runtime.
+| Camada | Owner |
+|---|---|
+| Contrato do flake | `flake.nix`: inputs, outputs, sistemas e formatter. |
+| Editor | `config/options.nix`: opções globais, defaults e performance. |
+| Tema | `config/theme.nix`: Matugen, highlights, transparência e reload. |
+| UI | `config/plugins/ui.nix`: Snacks, Oil, Which-Key, Noice, statusline e superfícies de interface. |
+| Core | `config/plugins/core.nix`: Git, treesitter, movimento, text objects e ferramentas especializadas. |
+| Linguagens | `config/languages/*.nix`: LSP, toolchains e testes por ecossistema. |
+| Workflows | `config/keymaps.nix` e helpers Lua: Java/Spring, projetos, criação de arquivos, Git, DAP e testes. |
 
-## Compatibilidade
+Cada plugin possui um owner principal. A organização não fragmenta artificialmente cada opção em um arquivo: plugins que formam um workflow permanecem juntos, enquanto domínios diferentes continuam isolados.
 
-NixVim permanece compatível com a revisão de nixpkgs contra a qual é testado. O flake mantém seu input `nixvim` independente e não força `nixvim.inputs.nixpkgs.follows = nixpkgs` sem uma decisão explícita de compatibilidade.
+A decisão arquitetural completa, incluindo comparação com dendritic, camadas, slices verticais, NixVim, nvf e nixCats, está em [`ARCHITECTURE_PROPOSAL.md`](./ARCHITECTURE_PROPOSAL.md).
 
-Antes de publicar mudanças:
+## Tema Matugen/Livara
+
+O editor mantém `habamax` como fallback durante a primeira inicialização e força `background = "dark"`. Quando `~/.config/nvim/matugen_colors.lua` existe, `config/theme.nix` carrega a tabela Lua produzida pelo adapter Livara e aplica a paleta derivada do wallpaper.
+
+O loader usa um único contrato `_G.reload_livara_theme`, grupos de statusline `LivaraLualine*` e um watcher `vim.uv.new_fs_event`. A transparência é limitada ao canvas e às superfícies estruturais. Menus, floats, completion e segmentos legíveis do statusline mantêm superfícies com contraste; portanto, o tema não apaga indiscriminadamente todos os backgrounds.
+
+Matugen é o owner da paleta dinâmica. O NixVim apenas consome o arquivo gerado e não inicia compositor, shell visual, QuickShell, Hyprland ou Serpantinum.
+
+## Interface e workflows
+
+Snacks é a fundação de picker, explorer, dashboard, input, notifier, quickfile, terminal, image, scope, indent e zen. Oil é o owner da edição de filesystem como buffer. Neo-tree, NvimTree, Telescope, Mini Files e project.nvim não fazem parte da configuração ativa.
+
+Plugins especializados permanecem quando não existe paridade real: Aerial para outline, Neogit/Diffview/Gitsigns para Git, nvim-dap para debugging, Conform para formatação, Neotest para testes e o adapter Intellij LSP/neotest-java para Java/Spring. A modernização não remove uma feature somente porque existe um plugin mais novo em outra área.
+
+| Mapping | Ação |
+|---|---|
+| `<leader>e` / `<leader>mf` | Abrir Snacks Explorer. |
+| `-` | Abrir Oil no diretório pai. |
+| `<leader>cn` / `<leader>cs` | Abrir a configuração do Neovim / sistema no Oil. |
+| `<leader>d` | Abrir o dashboard Snacks. |
+| `<leader>ff` / `<leader>fg` | Encontrar arquivos / pesquisar conteúdo com Snacks Picker. |
+| `<leader>fi` | Encontrar arquivos de imagem/documentos com preview Snacks quando suportado pelo terminal. |
+| `<leader>fr` / `<leader>fp` | Arquivos recentes / projetos. |
+| `<leader>o` | Alternar o outline Aerial. |
+| `<leader>ha` / `<leader>ht` | Adicionar ao Harpoon / abrir seu quick menu nativo. |
+| `s` / `S` | Navegação Flash / seleção Treesitter. |
+| `<leader>z` | Alternar Snacks Zen. |
+| `gd`, `gD`, `gi`, `gr`, `K` | Navegação e documentação LSP. |
+| `<leader>lr`, `<leader>la`, `<leader>lf` | Rename, code action e format. |
+| `<leader>lx` | Alternar diagnósticos com Trouble. |
+| `<C-h/j/k/l>` | Navegar entre splits no Neovim; o remapeamento físico global continua sendo owner do keyd. |
+
+A criação avançada de arquivos, o picker de projetos e o Spring Boot wizard usam APIs documentadas do Snacks (`Snacks.input`, `Snacks.picker.pick` e `vim.ui.select`). O wizard valida o diretório e usa `curl`/`tar` com escaping explícito, mantendo o processo fora da avaliação Nix.
+
+## Linguagens e toolchains
+
+A configuração inclui LSP para Lua, Nix, Bash, Docker, C/C++, Python, Markdown, Angular, TypeScript, ESLint, HTML, CSS, JSON, YAML, Emmet e Tailwind. Também inclui CMake Tools, OpenOCD, Cppcheck e Competitest.
+
+Java é tratado como workflow próprio. A configuração atual mantém `jdtls` desabilitado e usa o `nvim-intellij-lsp` versionado, `neotest-java`, JDK21, Lombok, Maven e Gradle. Essa escolha não será trocada especulativamente por JDTLS sem validar inicialização, workspace, imports, code lens, testes e DAP attach.
+
+A formatação é declarada pelo Conform com fallback LSP e executáveis Nix para Java, C/C++, web, Nix, Lua e shell. Debugging usa LLDB para C/C++ e attach Java na porta 5005.
+
+## Validação incremental
+
+Como a configuração NixOS consumidora possui uma closure grande, a validação recomendada é incremental:
 
 ```bash
-nix flake check --all-systems
-nix build .#packages.x86_64-linux.default
+# Sintaxe Nix de cada módulo
+find config -name '*.nix' -print0 | xargs -0 -n1 nix-instantiate --parse
+
+# Avaliação dos outputs e opções, sem materializar o sistema
+nix flake check --no-build --show-trace --all-systems
+nix eval .#packages.x86_64-linux.default
+nix eval .#checks.x86_64-linux.nixvim
 ```
+
+O `nix build` do pacote standalone é uma validação posterior e deve ser executado em uma máquina com espaço e memória adequados. Não é necessário construir o toplevel NixOS inteiro para validar alterações de sintaxe, opções, imports ou contratos do NixVim.
 
 ## Integração com NixOS e Home Manager
 
@@ -51,41 +110,10 @@ nix build .#packages.x86_64-linux.default
 }
 ```
 
-## Workflows
+## Referências
 
-A configuração inclui JDTLS, Spring Boot, AngularLS, TypeScript, ESLint, HTML, CSS, JSON, YAML, Emmet, Tailwind, Conform, DAP, Clangd, CMake Tools, GDB, LLDB, OpenOCD, Cppcheck, Competitest, Telescope, Aerial, Harpoon, Neogit, Diffview, Trouble, Treesitter, Bufferline, Lualine, Gitsigns, Smart Splits, Zen Mode, Todo Comments, Web Devicons e Oil.
-
-Projetos Java são detectados por `pom.xml`, arquivos Gradle, wrappers ou metadados Git. JDTLS usa workspace isolado por projeto, com source downloads, code lenses, organização de imports, inlay hints e suporte DAP. AngularLS e TypeScript LSP são instalados declarativamente; versões específicas de Angular permanecem em `devDependencies` de cada projeto.
-
-Formatação ocorre no save com timeout e fallback LSP. O dashboard abre quando o Neovim inicia sem arquivos, e explorer, Telescope, picker de projetos, outline, Git e DAP ficam disponíveis pelos keymaps declarados.
-
-## Key mappings
-
-| Mapping | Ação |
-|---|---|
-| `<leader>e` | Alternar o file explorer. |
-| `<leader>d` | Abrir o dashboard. |
-| `<leader>?` | Pesquisar todos os keymaps. |
-| `<leader>ff` / `<leader>fg` | Encontrar arquivos / pesquisar conteúdo com Telescope. |
-| `<leader>fr` / `<leader>fp` | Arquivos recentes / projetos. |
-| `<leader>o` | Alternar o outline Aerial. |
-| `<leader>ha` / `<leader>ht` | Adicionar ao Harpoon / abrir lista. |
-| `s` / `S` | Navegação Flash / seleção Treesitter. |
-| `<leader>z` | Alternar Zen Mode. |
-| `gd`, `gD`, `gi`, `gr`, `K` | Navegação e documentação LSP. |
-| `<leader>lr`, `<leader>la`, `<leader>lf` | Rename, code action e format. |
-| `<leader>ld` | Alternar diagnósticos com Trouble. |
-| `<C-h/j/k/l>` | Navegar entre splits no Neovim; o remapeamento físico global é owner do keyd. |
-
-## Validação
-
-```bash
-nix flake check --no-build
-nix build .#default
-```
-
-A configuração NixOS consumidora pode ser avaliada com:
-
-```bash
-nix eval .#nixosConfigurations.myMachine.config.system.build.toplevel.drvPath
-```
+- [NixVim](https://github.com/nix-community/nixvim)
+- [Snacks.nvim](https://github.com/folke/snacks.nvim)
+- [Oil.nvim](https://github.com/stevearc/oil.nvim)
+- [Proposta arquitetural](./ARCHITECTURE_PROPOSAL.md)
+- [Achados comunitários](../nixvim-community-findings.md)
