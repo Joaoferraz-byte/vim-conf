@@ -19,6 +19,10 @@
       vim.api.nvim_set_hl(0, name, current)
     end
 
+    local function theme_color(colors, key, fallback)
+      return colors[key] or (fallback and colors[fallback]) or colors.text or "#e1e2e8"
+    end
+
     local function apply_transparency_policy(colors)
       -- The canvas and structural UI must reveal the compositor wallpaper.
       -- Popup surfaces remain translucent rather than opaque: this preserves
@@ -29,13 +33,17 @@
         "EndOfBuffer", "LineNr", "CursorLine", "CursorColumn", "ColorColumn",
         "Conceal", "NonText", "Whitespace", "VertSplit", "WinSeparator",
         "TabLine", "TabLineFill", "TabLineSel", "WinBar", "WinBarNC",
-        "StatusLine", "StatusLineNC", "BufferLineFill", "BufferLineBackground",
-        "OilColumn", "OilDir", "OilDirIcon", "OilFile", "OilType",
-        "SnacksNormal", "SnacksBackdrop", "SnacksDashboardNormal",
-        "SnacksDashboardFooter", "SnacksPickerList", "SnacksPickerInput",
-        "SnacksPickerPreview", "SnacksInputNormal", "SnacksWin", "WhichKey",
+        "StatusLine", "StatusLineNC", "StatusLineTerm", "StatusLineTermNC",
+        "BufferLineFill", "BufferLineBackground", "BufferLineTab",
+        "MsgArea", "ModeMsg", "MoreMsg", "Question", "Title", "Directory",
+        "WildMenu", "MatchParen", "QuickFixLine", "CursorLineSign", "CursorLineFold",
+        "PmenuSbar", "PmenuThumb", "OilColumn", "OilDir", "OilDirIcon", "OilFile", "OilType",
+        "SnacksNormal", "SnacksBackdrop", "SnacksDashboardNormal", "SnacksDashboardFooter",
+        "SnacksPickerList", "SnacksPickerInput", "SnacksPickerPreview", "SnacksPickerBox",
+        "SnacksPickerHeader", "SnacksInputNormal", "SnacksWin", "WhichKey",
         "WhichKeyGroup", "WhichKeyDesc", "WhichKeySeparator", "WhichKeyValue",
-        "NoiceCmdlinePopup", "NoicePopup", "NoicePopupmenu", "LspFloatWinNormal",
+        "NoiceCmdlinePopup", "NoicePopup", "NoicePopupmenu", "NoiceMini",
+        "NoiceFormatProgressDone", "NoiceFormatProgressTodo", "LspFloatWinNormal",
         "BarbecueNormal", "BarbecueContext", "BarbecueDirname", "BarbecueFilename",
         "BarbecueSeparator", "BarbecueEllipsis", "BarbecueModified",
       }
@@ -52,11 +60,21 @@
         { "SnacksPickerPrompt", colors.text, colors.surface0, 16 },
         { "SnacksPickerPromptTitle", colors.primary, colors.surface0, 16 },
         { "SnacksPickerPreviewBorder", colors.secondary, colors.surface0, 20 },
+        { "SnacksPickerPreviewTitle", colors.primary, colors.surface0, 16 },
         { "SnacksPickerListCursorLine", colors.text, colors.surface2, 18 },
         { "SnacksInputBorder", colors.primary, colors.surface0, 20 },
         { "SnacksInputTitle", colors.primary, colors.surface0, 18 },
+        { "SnacksInputPrompt", colors.text, colors.surface0, 16 },
+        { "SnacksInputIcon", colors.primary, colors.surface0, 16 },
         { "WhichKeyFloat", colors.text, colors.surface0, 20 },
+        { "WhichKeyNormal", colors.text, colors.surface0, 18 },
         { "WhichKeyBorder", colors.primary, colors.surface0, 20 },
+        { "WhichKeyTitle", colors.primary, colors.surface0, 16 },
+        { "WhichKeyDesc", colors.text, colors.surface0, 16 },
+        { "WhichKeyGroup", colors.secondary, colors.surface0, 16 },
+        { "WhichKeySeparator", colors.overlay1, colors.surface0, 16 },
+        { "WhichKeyValue", colors.subtext0, colors.surface0, 16 },
+        { "WhichKeyIcon", colors.primary, colors.surface0, 16 },
         { "NoiceCmdlinePopupBorder", colors.primary, colors.surface0, 20 },
         { "NoicePopupBorder", colors.primary, colors.surface0, 20 },
         { "NoicePopupmenuBorder", colors.primary, colors.surface0, 20 },
@@ -102,7 +120,7 @@
       set_livara_highlight("CursorLine", nil, colors.surface0, { blend = 15 })
       set_livara_highlight("CursorLineNr", colors.blue, nil, { bold = true })
       set_livara_highlight("LineNr", colors.overlay1)
-      set_livara_highlight("Comment", colors.overlay2, nil, { italic = true })
+      set_livara_highlight("Comment", theme_color(colors, "overlay2", "overlay1"), nil, { italic = true })
       set_livara_highlight("String", colors.green)
       set_livara_highlight("Function", colors.blue, nil, { bold = true })
       set_livara_highlight("Keyword", colors.mauve)
@@ -119,11 +137,11 @@
       set_livara_highlight("Pmenu", colors.text, colors.surface1, { blend = 8 })
       set_livara_highlight("PmenuSel", colors.on_primary, colors.primary, { bold = true })
       set_livara_highlight("StatusLine", colors.text, "NONE", { blend = 10 })
-      set_livara_highlight("StatusLineNC", colors.overlay2, "NONE", { blend = 10 })
-      set_livara_highlight("WinBar", colors.subtext1, "NONE", { blend = 18 })
+      set_livara_highlight("StatusLineNC", theme_color(colors, "overlay2", "overlay1"), "NONE", { blend = 10 })
+      set_livara_highlight("WinBar", theme_color(colors, "subtext1", "subtext0"), "NONE", { blend = 18 })
       set_livara_highlight("WinBarNC", colors.overlay1, "NONE", { blend = 24 })
       set_livara_highlight("Visual", nil, colors.surface2, { blend = 12 })
-      set_livara_highlight("Search", colors.on_secondary, colors.secondary, { bold = true })
+      set_livara_highlight("Search", theme_color(colors, "on_secondary", "on_surface"), colors.secondary, { bold = true })
       set_livara_highlight("IncSearch", colors.on_primary, colors.primary, { bold = true })
 
       local function set_lualine_group(name, fg, bg, blend, bold)
@@ -150,7 +168,7 @@
       set_lualine_group("LivaraLualineCommandA", colors.base, colors.peach, 0, true)
       set_lualine_group("LivaraLualineCommandB", colors.text, colors.surface0, 18, false)
       set_lualine_group("LivaraLualineCommandC", colors.text, "NONE", 0, false)
-      set_lualine_group("LivaraLualineInactiveA", colors.subtext0, colors.surface0, 28, true)
+      set_lualine_group("LivaraLualineInactiveA", theme_color(colors, "subtext1", "subtext0"), colors.surface0, 28, true)
       set_lualine_group("LivaraLualineInactiveB", colors.subtext0, colors.surface0, 28, false)
       set_lualine_group("LivaraLualineInactiveC", colors.subtext0, "NONE", 0, false)
 
