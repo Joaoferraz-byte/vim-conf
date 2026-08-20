@@ -10,23 +10,81 @@
       vim.api.nvim_set_hl(0, name, spec)
     end
 
-    local function clear_transparent_backgrounds()
-      -- Only the editor canvas and structural separators are transparent.
-      -- Float menus, completion menus and statusline segments retain bounded
-      -- surfaces so contrast is not destroyed by a wallpaper reload.
-      local groups = {
+    local function set_transparent_group(name, fg, blend)
+      local current = vim.api.nvim_get_hl(0, { name = name, link = false })
+      current.fg = fg or current.fg
+      current.bg = "NONE"
+      current.ctermbg = "NONE"
+      current.blend = blend or 0
+      vim.api.nvim_set_hl(0, name, current)
+    end
+
+    local function apply_transparency_policy(colors)
+      -- The canvas and structural UI must reveal the compositor wallpaper.
+      -- Popup surfaces remain translucent rather than opaque: this preserves
+      -- readability while ensuring every interactive layer participates in the
+      -- same wallpaper-backed visual hierarchy.
+      local transparent = {
         "Normal", "NormalNC", "SignColumn", "FoldColumn", "Folded",
-        "EndOfBuffer", "LineNr", "CursorLine", "ColorColumn", "Conceal",
-        "NonText", "Whitespace", "VertSplit", "WinSeparator", "TabLine",
-        "TabLineFill", "TabLineSel", "WinBar", "WinBarNC", "OilColumn",
-        "OilDir", "OilDirIcon", "OilFile", "SnacksNormal", "SnacksBackdrop",
-        "SnacksDashboardNormal", "SnacksPickerList", "SnacksPickerInput",
+        "EndOfBuffer", "LineNr", "CursorLine", "CursorColumn", "ColorColumn",
+        "Conceal", "NonText", "Whitespace", "VertSplit", "WinSeparator",
+        "TabLine", "TabLineFill", "TabLineSel", "WinBar", "WinBarNC",
+        "StatusLine", "StatusLineNC", "BufferLineFill", "BufferLineBackground",
+        "OilColumn", "OilDir", "OilDirIcon", "OilFile", "OilType",
+        "SnacksNormal", "SnacksBackdrop", "SnacksDashboardNormal",
+        "SnacksDashboardFooter", "SnacksPickerList", "SnacksPickerInput",
+        "SnacksPickerPreview", "SnacksInputNormal", "SnacksWin", "WhichKey",
+        "WhichKeyGroup", "WhichKeyDesc", "WhichKeySeparator", "WhichKeyValue",
+        "NoiceCmdlinePopup", "NoicePopup", "NoicePopupmenu", "LspFloatWinNormal",
+        "BarbecueNormal", "BarbecueContext", "BarbecueDirname", "BarbecueFilename",
+        "BarbecueSeparator", "BarbecueEllipsis", "BarbecueModified",
       }
-      for _, group in ipairs(groups) do
-        local current = vim.api.nvim_get_hl(0, { name = group, link = false })
-        current.bg = nil
-        current.ctermbg = nil
-        vim.api.nvim_set_hl(0, group, current)
+      for _, group in ipairs(transparent) do
+        set_transparent_group(group)
+      end
+
+      local translucent = {
+        { "NormalFloat", colors.text, colors.surface0, 18 },
+        { "FloatBorder", colors.primary, colors.surface0, 18 },
+        { "Pmenu", colors.text, colors.surface1, 22 },
+        { "PmenuSel", colors.on_primary, colors.primary, 8 },
+        { "SnacksPickerBorder", colors.primary, colors.surface0, 20 },
+        { "SnacksPickerPrompt", colors.text, colors.surface0, 16 },
+        { "SnacksPickerPromptTitle", colors.primary, colors.surface0, 16 },
+        { "SnacksPickerPreviewBorder", colors.secondary, colors.surface0, 20 },
+        { "SnacksPickerListCursorLine", colors.text, colors.surface2, 18 },
+        { "SnacksInputBorder", colors.primary, colors.surface0, 20 },
+        { "SnacksInputTitle", colors.primary, colors.surface0, 18 },
+        { "WhichKeyFloat", colors.text, colors.surface0, 20 },
+        { "WhichKeyBorder", colors.primary, colors.surface0, 20 },
+        { "NoiceCmdlinePopupBorder", colors.primary, colors.surface0, 20 },
+        { "NoicePopupBorder", colors.primary, colors.surface0, 20 },
+        { "NoicePopupmenuBorder", colors.primary, colors.surface0, 20 },
+        { "LspFloatWinBorder", colors.primary, colors.surface0, 20 },
+        { "OilFloat", colors.text, colors.surface0, 18 },
+        { "OilFloatBorder", colors.primary, colors.surface0, 20 },
+        { "BarbecueFilename", colors.text, "NONE", 0 },
+        { "BufferLineIndicatorSelected", colors.primary, "NONE", 0 },
+      }
+      for _, item in ipairs(translucent) do
+        set_livara_highlight(item[1], item[2], item[3], { blend = item[4] })
+      end
+
+      -- These groups are commonly linked by plugins after colorscheme load;
+      -- explicit links keep their backgrounds consistent on every reload.
+      local links = {
+        SnacksPickerInputBorder = "SnacksPickerBorder",
+        SnacksPickerPreviewTitle = "SnacksPickerPromptTitle",
+        SnacksPickerListCursorLineNr = "CursorLineNr",
+        SnacksPickerSelected = "PmenuSel",
+        SnacksPickerMatch = "Search",
+        SnacksInputIcon = "SnacksPickerPromptTitle",
+        WhichKeyIcon = "SnacksPickerPromptTitle",
+        NoiceCmdlineIcon = "SnacksPickerPromptTitle",
+        NoiceCmdlineIcon2 = "SnacksPickerPromptTitle",
+      }
+      for target, source in pairs(links) do
+        vim.api.nvim_set_hl(0, target, { link = source })
       end
     end
 
@@ -96,7 +154,7 @@
       set_lualine_group("LivaraLualineInactiveB", colors.subtext0, colors.surface0, 28, false)
       set_lualine_group("LivaraLualineInactiveC", colors.subtext0, "NONE", 0, false)
 
-      clear_transparent_backgrounds()
+      apply_transparency_policy(colors)
       vim.g.colors_name = "livara-matugen"
       pcall(function() require("lualine").refresh() end)
       return true
@@ -105,10 +163,16 @@
     _G.reload_livara_theme = apply_livara_theme
     apply_livara_theme()
 
-    vim.api.nvim_create_autocmd({ "VimEnter", "ColorScheme" }, {
+    vim.api.nvim_create_autocmd({ "VimEnter", "UIEnter", "ColorScheme" }, {
       group = vim.api.nvim_create_augroup("LivaraFillchars", { clear = true }),
-      callback = function()
+      callback = function(args)
         vim.opt.fillchars:append("eob: ")
+        if args.event == "VimEnter" or args.event == "UIEnter" then
+          vim.defer_fn(function()
+            pcall(apply_livara_theme)
+            vim.cmd("redraw!")
+          end, 50)
+        end
       end,
     })
 
