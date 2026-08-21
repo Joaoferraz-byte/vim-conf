@@ -241,7 +241,70 @@
       set_lualine_group("LivaraLualineInactiveB", colors.subtext0, "NONE", 0, false)
       set_lualine_group("LivaraLualineInactiveC", colors.subtext0, "NONE", 0, false)
 
+      -- lualine owns its generated lualine_* highlight groups. Supplying
+      -- concrete colors here is more reliable than linking a section to a
+      -- group that may be created after lualine initializes. It also keeps
+      -- the footer transparent on every wallpaper reload.
+      local function lualine_section(fg, bg, bold)
+        return { fg = fg, bg = bg, gui = bold and "bold" or nil }
+      end
+      local lualine_theme = {
+        normal = {
+          a = lualine_section(colors.on_primary, colors.primary, true),
+          b = lualine_section(colors.text, "NONE", false),
+          c = lualine_section(colors.text, "NONE", false),
+          x = lualine_section(colors.text, "NONE", false),
+          y = lualine_section(colors.text, "NONE", false),
+          z = lualine_section(colors.on_primary, colors.primary, true),
+        },
+        insert = {
+          a = lualine_section(colors.base, colors.green, true),
+          b = lualine_section(colors.text, "NONE", false),
+          c = lualine_section(colors.text, "NONE", false),
+          x = lualine_section(colors.text, "NONE", false),
+          y = lualine_section(colors.text, "NONE", false),
+          z = lualine_section(colors.base, colors.green, true),
+        },
+        visual = {
+          a = lualine_section(colors.base, colors.mauve, true),
+          b = lualine_section(colors.text, "NONE", false),
+          c = lualine_section(colors.text, "NONE", false),
+          x = lualine_section(colors.text, "NONE", false),
+          y = lualine_section(colors.text, "NONE", false),
+          z = lualine_section(colors.base, colors.mauve, true),
+        },
+        replace = {
+          a = lualine_section(colors.base, colors.red, true),
+          b = lualine_section(colors.text, "NONE", false),
+          c = lualine_section(colors.text, "NONE", false),
+          x = lualine_section(colors.text, "NONE", false),
+          y = lualine_section(colors.text, "NONE", false),
+          z = lualine_section(colors.base, colors.red, true),
+        },
+        command = {
+          a = lualine_section(colors.base, colors.peach, true),
+          b = lualine_section(colors.text, "NONE", false),
+          c = lualine_section(colors.text, "NONE", false),
+          x = lualine_section(colors.text, "NONE", false),
+          y = lualine_section(colors.text, "NONE", false),
+          z = lualine_section(colors.base, colors.peach, true),
+        },
+        inactive = {
+          a = lualine_section(colors.subtext0, "NONE", true),
+          b = lualine_section(colors.subtext0, "NONE", false),
+          c = lualine_section(colors.subtext0, "NONE", false),
+          x = lualine_section(colors.subtext0, "NONE", false),
+          y = lualine_section(colors.subtext0, "NONE", false),
+          z = lualine_section(colors.subtext0, "NONE", true),
+        },
+      }
+
       apply_transparency_policy(colors)
+      pcall(function()
+        local lualine = require("lualine")
+        lualine.setup({ options = { theme = lualine_theme } })
+        lualine.refresh({ force = true })
+      end)
       vim.g.colors_name = "livara-matugen"
       pcall(function() require("lualine").refresh() end)
       return true
