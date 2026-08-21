@@ -136,9 +136,19 @@
     end
 
     local function apply_livara_theme()
-      if vim.fn.filereadable(livara_theme_path) ~= 1 then return false end
+      if vim.fn.filereadable(livara_theme_path) ~= 1 then
+        vim.notify("Livara Matugen palette not found: " .. livara_theme_path, vim.log.levels.WARN)
+        return false
+      end
       local ok, colors = pcall(dofile, livara_theme_path)
-      if not ok or type(colors) ~= "table" then return false end
+      if not ok then
+        vim.notify("Livara Matugen palette could not be loaded: " .. tostring(colors), vim.log.levels.ERROR)
+        return false
+      end
+      if type(colors) ~= "table" then
+        vim.notify("Livara Matugen palette did not return a Lua table", vim.log.levels.ERROR)
+        return false
+      end
 
       vim.opt.background = "dark"
       -- Load a neutral built-in baseline only once. Re-running :colorscheme
