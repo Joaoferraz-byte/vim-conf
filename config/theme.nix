@@ -40,7 +40,11 @@
         "PmenuSbar", "PmenuThumb", "OilColumn", "OilDir", "OilDirIcon", "OilFile", "OilType",
         "SnacksNormal", "SnacksBackdrop", "SnacksDashboardNormal", "SnacksDashboardFooter",
         "SnacksPickerList", "SnacksPickerInput", "SnacksPickerPreview", "SnacksPickerBox",
-        "SnacksPickerHeader", "SnacksInputNormal", "SnacksWin", "WhichKey",
+        "SnacksPickerHeader", "SnacksPickerPrompt", "SnacksPickerPromptPrefix",
+        "SnacksPickerInputSearch", "SnacksPickerInputIcon", "SnacksPickerInputTitle",
+        "SnacksPickerListBorder", "SnacksPickerPreviewTitle", "SnacksPickerMatch",
+        "SnacksPickerDir", "SnacksPickerFile", "SnacksPickerRow", "SnacksPickerCursorLine",
+        "SnacksInputNormal", "SnacksWin", "WhichKey",
         "WhichKeyGroup", "WhichKeyDesc", "WhichKeySeparator", "WhichKeyValue",
         "NoiceCmdlinePopup", "NoicePopup", "NoicePopupmenu", "NoiceMini",
         "NoiceFormatProgressDone", "NoiceFormatProgressTodo", "LspFloatWinNormal",
@@ -57,7 +61,6 @@
         { "Pmenu", colors.text, colors.surface1, 22 },
         { "PmenuSel", colors.on_primary, colors.primary, 8 },
         { "SnacksPickerBorder", colors.primary, colors.surface0, 20 },
-        { "SnacksPickerPrompt", colors.text, colors.surface0, 16 },
         { "SnacksPickerPromptTitle", colors.primary, colors.surface0, 16 },
         { "SnacksPickerPreviewBorder", colors.secondary, colors.surface0, 20 },
         { "SnacksPickerPreviewTitle", colors.primary, colors.surface0, 16 },
@@ -92,6 +95,7 @@
       -- explicit links keep their backgrounds consistent on every reload.
       local links = {
         SnacksPickerInputBorder = "SnacksPickerBorder",
+        SnacksPickerListBorder = "SnacksPickerBorder",
         SnacksPickerPreviewTitle = "SnacksPickerPromptTitle",
         SnacksPickerListCursorLineNr = "CursorLineNr",
         SnacksPickerSelected = "PmenuSel",
