@@ -141,7 +141,13 @@
       if not ok or type(colors) ~= "table" then return false end
 
       vim.opt.background = "dark"
-      vim.cmd("colorscheme habamax")
+      -- Load a neutral built-in baseline only once. Re-running :colorscheme
+      -- from the ColorScheme autocmd would recursively schedule this function
+      -- and could overwrite the dynamic palette after every wallpaper change.
+      if vim.g.livara_base_colorscheme_loaded ~= true then
+        vim.g.livara_base_colorscheme_loaded = true
+        pcall(vim.cmd, "colorscheme habamax")
+      end
       set_livara_highlight("Normal", colors.text, "NONE")
       set_livara_highlight("NormalNC", colors.text, "NONE")
       set_livara_highlight("NormalFloat", colors.text, "NONE")
@@ -342,6 +348,13 @@
       pattern = "VeryLazy",
       callback = function()
         vim.opt.fillchars:append("eob: ")
+        pcall(apply_livara_theme)
+        vim.cmd("redraw!")
+      end,
+    })
+    vim.api.nvim_create_autocmd("FocusGained", {
+      group = livara_autocmd_group,
+      callback = function()
         pcall(apply_livara_theme)
         vim.cmd("redraw!")
       end,
