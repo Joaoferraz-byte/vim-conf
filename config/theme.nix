@@ -30,7 +30,7 @@
       -- same wallpaper-backed visual hierarchy.
       local transparent = {
         "Normal", "NormalNC", "SignColumn", "FoldColumn", "Folded",
-        "EndOfBuffer", "LineNr", "CursorLine", "CursorColumn", "ColorColumn",
+        "EndOfBuffer", "LineNr", "CursorColumn", "ColorColumn",
         "Conceal", "NonText", "Whitespace", "VertSplit", "WinSeparator",
         "TabLine", "TabLineFill", "TabLineSel", "WinBar", "WinBarNC",
         "StatusLine", "StatusLineNC", "StatusLineTerm", "StatusLineTermNC",
@@ -305,6 +305,10 @@
         lualine.setup({ options = { theme = lualine_theme } })
         lualine.refresh({ force = true })
       end)
+      -- lualine may recreate StatusLine after the general policy; restate the
+      -- canvas groups after setup so the terminal background remains visible.
+      vim.api.nvim_set_hl(0, "StatusLine", { fg = colors.text, bg = "NONE" })
+      vim.api.nvim_set_hl(0, "StatusLineNC", { fg = theme_color(colors, "subtext1", "subtext0"), bg = "NONE" })
       vim.g.colors_name = "livara-matugen"
       pcall(function() require("lualine").refresh() end)
       return true
@@ -346,13 +350,19 @@
     if not _G.livara_theme_watcher_started then
       _G.livara_theme_watcher_started = true
       local theme_dir = vim.fn.fnamemodify(livara_theme_path, ":h")
-      local theme_file = vim.fn.fnamemodify(livara_theme_path, ":t")
       local watcher = vim.uv.new_fs_event()
       if watcher and vim.fn.isdirectory(theme_dir) == 1 then
-        watcher:start(theme_dir, {}, vim.schedule_wrap(function(err, filename)
-          if not err and (filename == nil or filename == theme_file) then
-            apply_livara_theme()
-            vim.cmd("redraw!")
+        watcher:start(theme_dir, {}, vim.schedule_wrap(function(err)
+          -- The sync service writes a temporary file and atomically renames it;
+          -- libuv may report the temporary basename or a nil filename. Watching
+          -- the directory and debouncing avoids missing wallpaper updates.
+          if not err then
+            vim.defer_fn(function()
+              if vim.fn.filereadable(livara_theme_path) == 1 then
+                apply_livara_theme()
+                vim.cmd("redraw!")
+              end
+            end, 100)
           end
         end))
         vim.api.nvim_create_autocmd("VimLeavePre", {

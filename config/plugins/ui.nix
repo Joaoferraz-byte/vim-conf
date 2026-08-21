@@ -292,7 +292,9 @@
             left = "·";
             right = "·";
           };
-          disabled_filetypes.statusline = [ "snacks_dashboard" "snacks_picker_list" "oil" ];
+          # Keep the global footer visible on the dashboard; only transient
+          # picker/file-manager buffers hide it to avoid duplicate chrome.
+          disabled_filetypes.statusline = [ "snacks_picker_list" "oil" ];
         };
         sections = {
           lualine_a = [ "mode" ];
