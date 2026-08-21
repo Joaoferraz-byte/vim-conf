@@ -50,42 +50,70 @@
         "NoiceFormatProgressDone", "NoiceFormatProgressTodo", "LspFloatWinNormal",
         "BarbecueNormal", "BarbecueContext", "BarbecueDirname", "BarbecueFilename",
         "BarbecueSeparator", "BarbecueEllipsis", "BarbecueModified",
+        "NeoTreeNormal", "NeoTreeNormalNC", "NeoTreeEndOfBuffer", "NeoTreeWinSeparator",
+        "NeoTreeFloatNormal", "NeoTreeFloatBorder", "NeoTreeTabInactive", "NeoTreeTabActive",
+        "NeoTreeDirectoryName", "NeoTreeFileName", "NeoTreeRootName", "NeoTreeGitModified",
+        "NvimTreeNormal", "NvimTreeNormalNC", "NvimTreeWinSeparator", "NvimTreeEndOfBuffer",
+        "BufferLineFill", "BufferLineBackground", "BufferLineBuffer", "BufferLineBufferVisible",
+        "BufferLineBufferSelected", "BufferLineTab", "BufferLineTabSelected", "BufferLineTabClose",
+        "BufferLineCloseButton", "BufferLineCloseButtonVisible", "BufferLineModified", "BufferLineModifiedSelected",
+        "BufferLineSeparator", "BufferLineSeparatorSelected", "BufferLineIndicatorSelected",
+        "AerialNormal", "AerialLine", "AerialGuide", "TroubleNormal", "TroubleText",
+        "TroubleCount", "TroubleIndent", "FidgetNormal", "RenderMarkdownCode", "RenderMarkdownCodeInfo",
+        "CmpNormal", "CmpDocNormal", "CmpBorder", "LazyNormal", "MasonNormal",
+        "SnacksDashboardHeader", "SnacksDashboardTitle", "SnacksDashboardDesc", "SnacksDashboardKey",
+        "SnacksDashboardIcon", "SnacksDashboardFile", "SnacksDashboardDir", "SnacksDashboardSpecial",
+        "SnacksDashboardSection", "SnacksPickerInputBorder", "SnacksPickerListBorder",
+        "SnacksPickerPreviewBorder", "SnacksPickerPromptTitle", "SnacksPickerPromptIcon",
+        "SnacksPickerListCursorLine", "SnacksPickerListCursorLineNr", "SnacksPickerSelected",
+        "SnacksPickerPath", "SnacksPickerLabel", "SnacksPickerToggle", "SnacksPickerTree",
       }
       for _, group in ipairs(transparent) do
         set_transparent_group(group)
       end
 
       local translucent = {
-        { "NormalFloat", colors.text, colors.surface0, 18 },
-        { "FloatBorder", colors.primary, colors.surface0, 18 },
+        { "NormalFloat", colors.text, "NONE", 0 },
+        { "FloatBorder", colors.primary, "NONE", 0 },
+        -- Completion and active selections retain a readable surface; all
+        -- structural/plugin containers reveal the terminal canvas.
         { "Pmenu", colors.text, colors.surface1, 22 },
         { "PmenuSel", colors.on_primary, colors.primary, 8 },
-        { "SnacksPickerBorder", colors.primary, colors.surface0, 20 },
-        { "SnacksPickerPromptTitle", colors.primary, colors.surface0, 16 },
-        { "SnacksPickerPreviewBorder", colors.secondary, colors.surface0, 20 },
-        { "SnacksPickerPreviewTitle", colors.primary, colors.surface0, 16 },
+        { "SnacksPicker", colors.text, "NONE", 0 },
+        { "SnacksPickerTitle", colors.text, "NONE", 0 },
+        { "SnacksPickerBorder", colors.primary, "NONE", 0 },
+        { "SnacksPickerInputTitle", colors.text, "NONE", 0 },
+        { "SnacksPickerInputBorder", colors.primary, "NONE", 0 },
+        { "SnacksPickerPromptTitle", colors.text, "NONE", 0 },
+        { "SnacksPickerPreview", colors.text, "NONE", 0 },
+        { "SnacksPickerPreviewBorder", colors.secondary, "NONE", 0 },
+        { "SnacksPickerPreviewTitle", colors.text, "NONE", 0 },
         { "SnacksPickerListCursorLine", colors.text, colors.surface2, 18 },
-        { "SnacksInputBorder", colors.primary, colors.surface0, 20 },
-        { "SnacksInputTitle", colors.primary, colors.surface0, 18 },
-        { "SnacksInputPrompt", colors.text, colors.surface0, 16 },
-        { "SnacksInputIcon", colors.primary, colors.surface0, 16 },
-        { "WhichKeyFloat", colors.text, colors.surface0, 20 },
-        { "WhichKeyNormal", colors.text, colors.surface0, 18 },
-        { "WhichKeyBorder", colors.primary, colors.surface0, 20 },
-        { "WhichKeyTitle", colors.primary, colors.surface0, 16 },
-        { "WhichKeyDesc", colors.text, colors.surface0, 16 },
-        { "WhichKeyGroup", colors.secondary, colors.surface0, 16 },
-        { "WhichKeySeparator", colors.overlay1, colors.surface0, 16 },
-        { "WhichKeyValue", colors.subtext0, colors.surface0, 16 },
-        { "WhichKeyIcon", colors.primary, colors.surface0, 16 },
-        { "NoiceCmdlinePopupBorder", colors.primary, colors.surface0, 20 },
-        { "NoicePopupBorder", colors.primary, colors.surface0, 20 },
-        { "NoicePopupmenuBorder", colors.primary, colors.surface0, 20 },
-        { "LspFloatWinBorder", colors.primary, colors.surface0, 20 },
-        { "OilFloat", colors.text, colors.surface0, 18 },
-        { "OilFloatBorder", colors.primary, colors.surface0, 20 },
+        { "SnacksInputBorder", colors.primary, "NONE", 0 },
+        { "SnacksInputTitle", colors.primary, "NONE", 0 },
+        { "SnacksInputPrompt", colors.text, "NONE", 0 },
+        { "SnacksInputIcon", colors.primary, "NONE", 0 },
+        { "WhichKeyBorder", colors.primary, "NONE", 0 },
+        { "WhichKeyTitle", colors.primary, "NONE", 0 },
+        { "WhichKeyDesc", colors.text, "NONE", 0 },
+        { "WhichKeyGroup", colors.secondary, "NONE", 0 },
+        { "WhichKeySeparator", colors.overlay1, "NONE", 0 },
+        { "WhichKeyValue", colors.subtext0, "NONE", 0 },
+        { "WhichKeyIcon", colors.primary, "NONE", 0 },
+        { "NoiceCmdlinePopupBorder", colors.primary, "NONE", 0 },
+        { "NoicePopupBorder", colors.primary, "NONE", 0 },
+        { "NoicePopupmenuBorder", colors.primary, "NONE", 0 },
+        { "LspFloatWinBorder", colors.primary, "NONE", 0 },
+        { "OilFloat", colors.text, "NONE", 0 },
+        { "OilFloatBorder", colors.primary, "NONE", 0 },
         { "BarbecueFilename", colors.text, "NONE", 0 },
         { "BufferLineIndicatorSelected", colors.primary, "NONE", 0 },
+        { "NeoTreeFloatBorder", colors.primary, "NONE", 0 },
+        { "NeoTreeRootName", colors.text, "NONE", 0 },
+        { "SnacksPickerPromptTitle", colors.text, "NONE", 0 },
+        { "SnacksPickerPromptIcon", colors.primary, "NONE", 0 },
+        { "WhichKeyFloat", colors.text, "NONE", 0 },
+        { "WhichKeyNormal", colors.text, "NONE", 0 },
       }
       for _, item in ipairs(translucent) do
         set_livara_highlight(item[1], item[2], item[3], { blend = item[4] })
@@ -94,12 +122,9 @@
       -- These groups are commonly linked by plugins after colorscheme load;
       -- explicit links keep their backgrounds consistent on every reload.
       local links = {
-        SnacksPickerInputBorder = "SnacksPickerBorder",
         SnacksPickerListBorder = "SnacksPickerBorder",
-        SnacksPickerPreviewTitle = "SnacksPickerPromptTitle",
         SnacksPickerListCursorLineNr = "CursorLineNr",
         SnacksPickerSelected = "PmenuSel",
-        SnacksPickerMatch = "Search",
         SnacksInputIcon = "SnacksPickerPromptTitle",
         WhichKeyIcon = "SnacksPickerPromptTitle",
         NoiceCmdlineIcon = "SnacksPickerPromptTitle",
@@ -117,10 +142,10 @@
 
       vim.opt.background = "dark"
       vim.cmd("colorscheme habamax")
-      set_livara_highlight("Normal", colors.text)
-      set_livara_highlight("NormalNC", colors.text)
-      set_livara_highlight("NormalFloat", colors.text, colors.surface0, { blend = 8 })
-      set_livara_highlight("FloatBorder", colors.blue, colors.surface0, { blend = 8 })
+      set_livara_highlight("Normal", colors.text, "NONE")
+      set_livara_highlight("NormalNC", colors.text, "NONE")
+      set_livara_highlight("NormalFloat", colors.text, "NONE")
+      set_livara_highlight("FloatBorder", colors.primary, "NONE")
       set_livara_highlight("CursorLine", nil, colors.surface0, { blend = 15 })
       set_livara_highlight("CursorLineNr", colors.blue, nil, { bold = true })
       set_livara_highlight("LineNr", colors.overlay1)
@@ -138,15 +163,55 @@
       set_livara_highlight("DiagnosticWarn", colors.yellow)
       set_livara_highlight("DiagnosticInfo", colors.blue)
       set_livara_highlight("DiagnosticHint", colors.teal)
-      set_livara_highlight("Pmenu", colors.text, colors.surface1, { blend = 8 })
+      set_livara_highlight("Pmenu", colors.text, colors.surface1, { blend = 22 })
       set_livara_highlight("PmenuSel", colors.on_primary, colors.primary, { bold = true })
-      set_livara_highlight("StatusLine", colors.text, "NONE", { blend = 10 })
-      set_livara_highlight("StatusLineNC", theme_color(colors, "overlay2", "overlay1"), "NONE", { blend = 10 })
-      set_livara_highlight("WinBar", theme_color(colors, "subtext1", "subtext0"), "NONE", { blend = 18 })
-      set_livara_highlight("WinBarNC", colors.overlay1, "NONE", { blend = 24 })
+      set_livara_highlight("StatusLine", colors.text, "NONE")
+      set_livara_highlight("StatusLineNC", theme_color(colors, "subtext1", "subtext0"), "NONE")
+      set_livara_highlight("WinBar", colors.text, "NONE")
+      set_livara_highlight("WinBarNC", colors.subtext0, "NONE")
+      set_livara_highlight("TabLine", colors.text, "NONE")
+      set_livara_highlight("TabLineFill", colors.text, "NONE")
+      set_livara_highlight("TabLineSel", colors.text, "NONE", { bold = true })
+      set_livara_highlight("Directory", colors.text, "NONE")
       set_livara_highlight("Visual", nil, colors.surface2, { blend = 12 })
       set_livara_highlight("Search", theme_color(colors, "on_secondary", "on_surface"), colors.secondary, { bold = true })
       set_livara_highlight("IncSearch", colors.on_primary, colors.primary, { bold = true })
+
+      -- Snacks defaults intentionally use separate semantic groups. Keep
+      -- dashboard prose white/readable; reserve Matugen colors for icons, keys,
+      -- headers and active selections instead of tinting all descriptions blue.
+      set_livara_highlight("SnacksDashboardNormal", colors.text, "NONE")
+      set_livara_highlight("SnacksDashboardHeader", colors.text, "NONE", { bold = true })
+      set_livara_highlight("SnacksDashboardTitle", colors.text, "NONE", { bold = true })
+      set_livara_highlight("SnacksDashboardDesc", colors.text, "NONE")
+      set_livara_highlight("SnacksDashboardFile", colors.text, "NONE")
+      set_livara_highlight("SnacksDashboardDir", colors.subtext1 or colors.subtext0, "NONE")
+      set_livara_highlight("SnacksDashboardKey", colors.secondary, "NONE", { bold = true })
+      set_livara_highlight("SnacksDashboardIcon", colors.primary, "NONE")
+      set_livara_highlight("SnacksDashboardSpecial", colors.tertiary, "NONE")
+      set_livara_highlight("SnacksDashboardFooter", colors.subtext0, "NONE")
+      set_livara_highlight("SnacksPicker", colors.text, "NONE")
+      set_livara_highlight("SnacksPickerTitle", colors.text, "NONE", { bold = true })
+      set_livara_highlight("SnacksPickerPrompt", colors.text, "NONE")
+      set_livara_highlight("SnacksPickerPromptPrefix", colors.primary, "NONE")
+      set_livara_highlight("SnacksPickerInput", colors.text, "NONE")
+      set_livara_highlight("SnacksPickerInputTitle", colors.text, "NONE", { bold = true })
+      set_livara_highlight("SnacksPickerInputBorder", colors.primary, "NONE")
+      set_livara_highlight("SnacksPickerList", colors.text, "NONE")
+      set_livara_highlight("SnacksPickerPreview", colors.text, "NONE")
+      set_livara_highlight("SnacksPickerPreviewBorder", colors.secondary, "NONE")
+      set_livara_highlight("SnacksPickerDir", colors.subtext0, "NONE")
+      set_livara_highlight("SnacksPickerFile", colors.text, "NONE")
+      set_livara_highlight("SnacksPickerPath", colors.subtext0, "NONE")
+      set_livara_highlight("SnacksPickerLabel", colors.text, "NONE")
+      set_livara_highlight("SnacksPickerDesc", colors.subtext0, "NONE")
+      set_livara_highlight("SnacksPickerMatch", colors.primary, "NONE")
+      set_livara_highlight("NeoTreeNormal", colors.text, "NONE")
+      set_livara_highlight("NeoTreeNormalNC", colors.subtext0, "NONE")
+      set_livara_highlight("BufferLineBackground", colors.subtext0, "NONE")
+      set_livara_highlight("BufferLineBufferSelected", colors.text, "NONE", { bold = true })
+      set_livara_highlight("BarbecueNormal", colors.text, "NONE")
+      set_livara_highlight("BarbecueFilename", colors.text, "NONE", { bold = true })
 
       local function set_lualine_group(name, fg, bg, blend, bold)
         vim.api.nvim_set_hl(0, name, {
@@ -158,22 +223,22 @@
       end
 
       set_lualine_group("LivaraLualineNormalA", colors.on_primary, colors.primary, 0, true)
-      set_lualine_group("LivaraLualineNormalB", colors.text, colors.surface0, 18, false)
+      set_lualine_group("LivaraLualineNormalB", colors.text, "NONE", 0, false)
       set_lualine_group("LivaraLualineNormalC", colors.text, "NONE", 0, false)
       set_lualine_group("LivaraLualineInsertA", colors.base, colors.green, 0, true)
-      set_lualine_group("LivaraLualineInsertB", colors.text, colors.surface0, 18, false)
+      set_lualine_group("LivaraLualineInsertB", colors.text, "NONE", 0, false)
       set_lualine_group("LivaraLualineInsertC", colors.text, "NONE", 0, false)
       set_lualine_group("LivaraLualineVisualA", colors.base, colors.mauve, 0, true)
-      set_lualine_group("LivaraLualineVisualB", colors.text, colors.surface0, 18, false)
+      set_lualine_group("LivaraLualineVisualB", colors.text, "NONE", 0, false)
       set_lualine_group("LivaraLualineVisualC", colors.text, "NONE", 0, false)
       set_lualine_group("LivaraLualineReplaceA", colors.base, colors.red, 0, true)
-      set_lualine_group("LivaraLualineReplaceB", colors.text, colors.surface0, 18, false)
+      set_lualine_group("LivaraLualineReplaceB", colors.text, "NONE", 0, false)
       set_lualine_group("LivaraLualineReplaceC", colors.text, "NONE", 0, false)
       set_lualine_group("LivaraLualineCommandA", colors.base, colors.peach, 0, true)
-      set_lualine_group("LivaraLualineCommandB", colors.text, colors.surface0, 18, false)
+      set_lualine_group("LivaraLualineCommandB", colors.text, "NONE", 0, false)
       set_lualine_group("LivaraLualineCommandC", colors.text, "NONE", 0, false)
-      set_lualine_group("LivaraLualineInactiveA", theme_color(colors, "subtext1", "subtext0"), colors.surface0, 28, true)
-      set_lualine_group("LivaraLualineInactiveB", colors.subtext0, colors.surface0, 28, false)
+      set_lualine_group("LivaraLualineInactiveA", theme_color(colors, "subtext1", "subtext0"), "NONE", 0, true)
+      set_lualine_group("LivaraLualineInactiveB", colors.subtext0, "NONE", 0, false)
       set_lualine_group("LivaraLualineInactiveC", colors.subtext0, "NONE", 0, false)
 
       apply_transparency_policy(colors)
@@ -185,16 +250,33 @@
     _G.reload_livara_theme = apply_livara_theme
     apply_livara_theme()
 
-    vim.api.nvim_create_autocmd({ "VimEnter", "UIEnter", "ColorScheme" }, {
-      group = vim.api.nvim_create_augroup("LivaraFillchars", { clear = true }),
-      callback = function(args)
+    local livara_autocmd_group = vim.api.nvim_create_augroup("LivaraFillchars", { clear = true })
+    vim.api.nvim_create_autocmd({ "VimEnter", "UIEnter" }, {
+      group = livara_autocmd_group,
+      callback = function()
         vim.opt.fillchars:append("eob: ")
-        if args.event == "VimEnter" or args.event == "UIEnter" then
-          vim.defer_fn(function()
-            pcall(apply_livara_theme)
-            vim.cmd("redraw!")
-          end, 50)
-        end
+        vim.defer_fn(function()
+          pcall(apply_livara_theme)
+          vim.cmd("redraw!")
+        end, 150)
+      end,
+    })
+    vim.api.nvim_create_autocmd("ColorScheme", {
+      group = livara_autocmd_group,
+      callback = function()
+        vim.schedule(function()
+          pcall(apply_livara_theme)
+          vim.cmd("redraw!")
+        end)
+      end,
+    })
+    vim.api.nvim_create_autocmd("User", {
+      group = livara_autocmd_group,
+      pattern = "VeryLazy",
+      callback = function()
+        vim.opt.fillchars:append("eob: ")
+        pcall(apply_livara_theme)
+        vim.cmd("redraw!")
       end,
     })
 
