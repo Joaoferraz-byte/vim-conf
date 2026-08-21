@@ -48,8 +48,8 @@
         "WhichKeyGroup", "WhichKeyDesc", "WhichKeySeparator", "WhichKeyValue",
         "NoiceCmdlinePopup", "NoicePopup", "NoicePopupmenu", "NoiceMini",
         "NoiceFormatProgressDone", "NoiceFormatProgressTodo", "LspFloatWinNormal",
-        "BarbecueNormal", "BarbecueContext", "BarbecueDirname", "BarbecueFilename",
-        "BarbecueSeparator", "BarbecueEllipsis", "BarbecueModified",
+        "barbecue_normal", "barbecue_context", "barbecue_dirname", "barbecue_basename",
+        "barbecue_separator", "barbecue_ellipsis", "barbecue_modified",
         "NeoTreeNormal", "NeoTreeNormalNC", "NeoTreeEndOfBuffer", "NeoTreeWinSeparator",
         "NeoTreeFloatNormal", "NeoTreeFloatBorder", "NeoTreeTabInactive", "NeoTreeTabActive",
         "NeoTreeDirectoryName", "NeoTreeFileName", "NeoTreeRootName", "NeoTreeGitModified",
@@ -226,8 +226,25 @@
       set_livara_highlight("NeoTreeNormalNC", colors.subtext0, "NONE")
       set_livara_highlight("BufferLineBackground", colors.subtext0, "NONE")
       set_livara_highlight("BufferLineBufferSelected", colors.text, "NONE", { bold = true })
-      set_livara_highlight("BarbecueNormal", colors.text, "NONE")
-      set_livara_highlight("BarbecueFilename", colors.text, "NONE", { bold = true })
+      -- barbecue.nvim owns the winbar with lowercase highlight names. The
+      -- previous Barbecue* names were never created by the plugin, so the
+      -- path row kept the default style after every palette reload.
+      set_livara_highlight("barbecue_normal", colors.text, "NONE")
+      set_livara_highlight("barbecue_ellipsis", colors.subtext0, "NONE")
+      set_livara_highlight("barbecue_separator", colors.overlay1, "NONE")
+      set_livara_highlight("barbecue_modified", colors.tertiary, "NONE", { bold = true })
+      set_livara_highlight("barbecue_dirname", colors.subtext0, "NONE")
+      set_livara_highlight("barbecue_basename", colors.text, "NONE", { bold = true })
+      set_livara_highlight("barbecue_context", colors.text, "NONE")
+      set_livara_highlight("barbecue_context_file", colors.primary, "NONE")
+      set_livara_highlight("barbecue_context_module", colors.secondary, "NONE")
+      set_livara_highlight("barbecue_context_namespace", colors.secondary, "NONE")
+      set_livara_highlight("barbecue_context_package", colors.tertiary, "NONE")
+      set_livara_highlight("barbecue_context_class", colors.yellow, "NONE")
+      set_livara_highlight("barbecue_context_method", colors.blue, "NONE")
+      set_livara_highlight("barbecue_context_function", colors.blue, "NONE")
+      set_livara_highlight("barbecue_context_variable", colors.text, "NONE")
+      set_livara_highlight("barbecue_context_constant", colors.peach, "NONE")
 
       local function set_lualine_group(name, fg, bg, blend, bold)
         vim.api.nvim_set_hl(0, name, {

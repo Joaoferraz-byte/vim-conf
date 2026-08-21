@@ -281,17 +281,15 @@
           };
           globalstatus = true;
           icons_enabled = true;
-          always_divide_middle = false;
-          # Keep the statusline canvas transparent; color only the mode/status
-          # accents through the Livara highlight groups.
+          always_divide_middle = true;
+          # Keep the statusline canvas transparent; use the documented
+          # powerline transition only around the mode accents and avoid noisy
+          # separators between transparent content components.
           section_separators = {
-            left = "";
-            right = "";
+            left = "";
+            right = "";
           };
-          component_separators = {
-            left = "·";
-            right = "·";
-          };
+          component_separators = "";
           # Keep the global footer visible on the dashboard; only transient
           # picker/file-manager buffers hide it to avoid duplicate chrome.
           disabled_filetypes.statusline = [ "snacks_picker_list" "oil" ];
@@ -314,12 +312,20 @@
             {
               __unkeyed-1 = "filename";
               path = 1;
+              shorting_target = 48;
               symbols = { modified = " ●"; readonly = " "; unnamed = " [No Name]"; };
             }
           ];
-          lualine_x = [ "filetype" "encoding" "fileformat" ];
-          lualine_y = [ "progress" ];
-          lualine_z = [ "location" ];
+          lualine_x = [
+            { __unkeyed-1 = "filetype"; colored = true; }
+            "encoding"
+            {
+              __unkeyed-1 = "fileformat";
+              symbols = { unix = "󰌽"; dos = ""; mac = ""; };
+            }
+          ];
+          lualine_y = [ { __unkeyed-1 = "progress"; icon = "󰯷"; } ];
+          lualine_z = [ { __unkeyed-1 = "location"; icon = "󰍒"; } ];
         };
       };
     };
