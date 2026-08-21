@@ -281,14 +281,16 @@
           };
           globalstatus = true;
           icons_enabled = true;
-          always_divide_middle = true;
+          always_divide_middle = false;
+          # Keep the statusline canvas transparent; color only the mode/status
+          # accents through the Livara highlight groups.
           section_separators = {
-            left = "";
-            right = "";
+            left = "";
+            right = "";
           };
           component_separators = {
-            left = "│";
-            right = "│";
+            left = "·";
+            right = "·";
           };
           disabled_filetypes.statusline = [ "snacks_dashboard" "snacks_picker_list" "oil" ];
         };
