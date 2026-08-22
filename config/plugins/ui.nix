@@ -65,7 +65,7 @@
                 icon = " ";
                 key = "c";
                 desc = "Config";
-                action = ":Oil ~/.config/nvim";
+                action = ":Oil ~/.config/nixos";
               }
               {
                 icon = "󰋤 ";
