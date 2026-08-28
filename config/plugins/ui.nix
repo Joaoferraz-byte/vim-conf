@@ -222,6 +222,32 @@
           show_buffer_close_icons = true;
           show_close_icon = true;
         };
+        # Keep file glyphs and close controls on the same transparent canvas as
+        # the tab text. The selected buffer remains identifiable through its
+        # foreground/bold treatment and the indicator, not a glyph rectangle.
+        highlights = {
+          fill = { bg = "NONE"; };
+          background = { bg = "NONE"; };
+          buffer = { bg = "NONE"; };
+          buffer_visible = { bg = "NONE"; };
+          buffer_selected = { bg = "NONE"; bold = true; };
+          tab = { bg = "NONE"; };
+          tab_selected = { bg = "NONE"; bold = true; };
+          tab_close = { bg = "NONE"; };
+          close_button = { bg = "NONE"; };
+          close_button_visible = { bg = "NONE"; };
+          close_button_selected = { bg = "NONE"; };
+          modified = { bg = "NONE"; };
+          modified_visible = { bg = "NONE"; };
+          modified_selected = { bg = "NONE"; };
+          numbers = { bg = "NONE"; };
+          numbers_visible = { bg = "NONE"; };
+          numbers_selected = { bg = "NONE"; };
+          separator = { bg = "NONE"; };
+          separator_visible = { bg = "NONE"; };
+          separator_selected = { bg = "NONE"; };
+          indicator_selected = { bg = "NONE"; };
+        };
       };
     };
 

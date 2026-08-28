@@ -31,6 +31,12 @@
         "BufferLineNumbers",
         "BufferLineNumbersVisible",
         "BufferLineNumbersSelected",
+        "BufferLineCloseButton",
+        "BufferLineCloseButtonVisible",
+        "BufferLineCloseButtonSelected",
+        "BufferLineTabClose",
+        "BufferLineTabCloseVisible",
+        "BufferLineTabCloseSelected",
       }
       for _, group in ipairs(static_groups) do
         set_transparent_group(group)
@@ -38,6 +44,7 @@
 
       local generated_prefixes = {
         "BufferLineDevIcon",
+        "BufferLineCloseButton",
         "barbecue_fileicon_",
       }
       for _, prefix in ipairs(generated_prefixes) do
