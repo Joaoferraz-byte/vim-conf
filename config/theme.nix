@@ -66,7 +66,6 @@
         "EndOfBuffer", "LineNr", "CursorColumn", "ColorColumn",
         "Conceal", "NonText", "Whitespace", "VertSplit", "WinSeparator",
         "TabLine", "TabLineFill", "TabLineSel", "WinBar", "WinBarNC",
-        "StatusLine", "StatusLineNC", "StatusLineTerm", "StatusLineTermNC",
         "BufferLineFill", "BufferLineBackground", "BufferLineTab",
         "MsgArea", "ModeMsg", "MoreMsg", "Question", "Title", "Directory",
         "WildMenu", "MatchParen", "QuickFixLine", "CursorLineSign", "CursorLineFold",
@@ -368,15 +367,24 @@
       }
 
       apply_transparency_policy(colors)
+      -- Keep only the footer canvas opaque. The editor canvas, tabs and winbar
+      -- remain transparent; this removes the apparent left/right margin while
+      -- the mode and location sections keep their own rounded colors.
+      set_livara_highlight("StatusLine", colors.text, colors.base)
+      set_livara_highlight("StatusLineNC", theme_color(colors, "subtext1", "subtext0"), colors.base)
+      set_livara_highlight("StatusLineTerm", colors.text, colors.base)
+      set_livara_highlight("StatusLineTermNC", theme_color(colors, "subtext1", "subtext0"), colors.base)
       pcall(function()
         local lualine = require("lualine")
         lualine.setup({ options = { theme = lualine_theme } })
         lualine.refresh({ force = true })
       end)
-      -- lualine may recreate StatusLine after the general policy; restate the
-      -- canvas groups after setup so the terminal background remains visible.
-      vim.api.nvim_set_hl(0, "StatusLine", { fg = colors.text, bg = "NONE" })
-      vim.api.nvim_set_hl(0, "StatusLineNC", { fg = theme_color(colors, "subtext1", "subtext0"), bg = "NONE" })
+      -- lualine may recreate StatusLine after the theme setup; restate the
+      -- solid footer canvas so the statusline has no outer transparent gaps.
+      vim.api.nvim_set_hl(0, "StatusLine", { fg = colors.text, bg = colors.base })
+      vim.api.nvim_set_hl(0, "StatusLineNC", { fg = theme_color(colors, "subtext1", "subtext0"), bg = colors.base })
+      vim.api.nvim_set_hl(0, "StatusLineTerm", { fg = colors.text, bg = colors.base })
+      vim.api.nvim_set_hl(0, "StatusLineTermNC", { fg = theme_color(colors, "subtext1", "subtext0"), bg = colors.base })
       vim.g.colors_name = "livara-matugen"
       pcall(function() require("lualine").refresh() end)
       return true
