@@ -6,5 +6,6 @@
     ./general.nix
     ./embedded.nix
     ./competitive.nix
+    ./specialized.nix
   ];
 }
