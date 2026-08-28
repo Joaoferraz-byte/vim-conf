@@ -86,7 +86,7 @@ Java é tratado como workflow próprio. A configuração atual mantém `jdtls` d
 
 O completion não depende de um servidor separado por linguagem. `plugins.cmp` habilita as fontes `nvim_lsp`, `luasnip`, `path` e `buffer`; como `autoEnableSources = true`, o NixVim habilita `cmp-nvim-lsp` e injeta `default_capabilities()` nos servidores declarados pela API legada `plugins.lsp`. Assim, cada servidor desta tabela participa do mesmo menu de completion, enquanto o Pyright fornece a base para scripts Manim dentro do ambiente Python do projeto.
 
-A formatação é declarada pelo Conform com fallback LSP e executáveis Nix para Java, C/C++, web, Nix, Lua e shell. Debugging usa LLDB para C/C++ e attach Java na porta 5005.
+A formatação é declarada pelo Conform com fallback LSP e executáveis Nix para Java, C/C++, Python, web, Nix, Lua e shell; Python usa o formatter Ruff. Debugging usa LLDB para C/C++ e attach Java na porta 5005.
 
 ## Validação incremental
 

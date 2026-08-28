@@ -34,6 +34,7 @@
         json = [ "prettierd" ];
         yaml = [ "prettierd" ];
         markdown = [ "prettierd" ];
+        python = [ "ruff_format" ];
         nix = [ "nixfmt" ];
         lua = [ "stylua" ];
         sh = [ "shfmt" ];
@@ -55,5 +56,6 @@
     nixfmt
     stylua
     shfmt
+    ruff
   ];
 }
