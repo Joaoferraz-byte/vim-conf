@@ -23,6 +23,32 @@
       return colors[key] or (fallback and colors[fallback]) or colors.text or "#e1e2e8"
     end
 
+    -- bufferline and barbecue create per-icon groups lazily. Clear only those
+    -- generated groups, plus the ordinal-number groups, instead of flattening
+    -- every plugin surface into the terminal background.
+    local function clear_generated_icon_backgrounds()
+      local static_groups = {
+        "BufferLineNumbers",
+        "BufferLineNumbersVisible",
+        "BufferLineNumbersSelected",
+      }
+      for _, group in ipairs(static_groups) do
+        set_transparent_group(group)
+      end
+
+      local generated_prefixes = {
+        "BufferLineDevIcon",
+        "barbecue_fileicon_",
+      }
+      for _, prefix in ipairs(generated_prefixes) do
+        for _, group in ipairs(vim.fn.getcompletion(prefix, "highlight")) do
+          if group:sub(1, #prefix) == prefix then
+            set_transparent_group(group)
+          end
+        end
+      end
+    end
+
     local function apply_transparency_policy(colors)
       -- The canvas and structural UI must reveal the compositor wallpaper.
       -- Popup surfaces remain translucent rather than opaque: this preserves
@@ -133,6 +159,8 @@
       for target, source in pairs(links) do
         vim.api.nvim_set_hl(0, target, { link = source })
       end
+
+      clear_generated_icon_backgrounds()
     end
 
     local function apply_livara_theme()
@@ -368,6 +396,13 @@
           pcall(apply_livara_theme)
           vim.cmd("redraw!")
         end)
+      end,
+    })
+    vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
+      group = livara_autocmd_group,
+      callback = function()
+        -- Both plugins create file-icon groups during their first render.
+        vim.schedule(clear_generated_icon_backgrounds)
       end,
     })
     vim.api.nvim_create_autocmd("User", {
