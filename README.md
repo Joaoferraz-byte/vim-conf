@@ -70,7 +70,21 @@ A criação avançada de arquivos, o picker de projetos e o Spring Boot wizard u
 
 A configuração inclui LSP para Lua, Nix, Bash, Docker, C/C++, Python, Markdown, Angular, TypeScript, ESLint, HTML, CSS, JSON, YAML, Emmet e Tailwind. Também inclui CMake Tools, OpenOCD, Cppcheck e Competitest.
 
+A cobertura solicitada fica organizada da seguinte forma:
+
+| Ecossistema | Suporte | Owner do LSP/completion |
+|---|---|---|
+| Java, Spring Boot, Swing/JFrame | Workflow Java dedicado com IntelliJ LSP, JDK 21, Lombok, Maven, Gradle e Neotest | `nvim-intellij-lsp` + `nvim-cmp` |
+| HTML, CSS, JavaScript/TypeScript | Angular, TypeScript, ESLint, HTML, CSS, Emmet e Tailwind | servidores declarativos do NixVim + `nvim-cmp` |
+| PHP | PHP e projetos Composer | `phpactor` + `nvim-cmp` |
+| C/C++ | C e C++ com toolchain clang/gcc | `clangd` + `nvim-cmp` |
+| Python e Manim | Python; Manim é uma biblioteca/workflow Python e usa o mesmo servidor | `pyright` + `nvim-cmp` |
+| SQL/PostgreSQL | SQL com análise específica de PostgreSQL/PLpgSQL | `postgres_lsp` + `nvim-cmp` |
+| XML | XML, XSD, XSLT, SVG | `lemminx` + `nvim-cmp` |
+
 Java é tratado como workflow próprio. A configuração atual mantém `jdtls` desabilitado e usa o `nvim-intellij-lsp` versionado, `neotest-java`, JDK21, Lombok, Maven e Gradle. Essa escolha não será trocada especulativamente por JDTLS sem validar inicialização, workspace, imports, code lens, testes e DAP attach.
+
+O completion não depende de um servidor separado por linguagem. `plugins.cmp` habilita as fontes `nvim_lsp`, `luasnip`, `path` e `buffer`; como `autoEnableSources = true`, o NixVim habilita `cmp-nvim-lsp` e injeta `default_capabilities()` nos servidores declarados pela API legada `plugins.lsp`. Assim, cada servidor desta tabela participa do mesmo menu de completion, enquanto o Pyright fornece a base para scripts Manim dentro do ambiente Python do projeto.
 
 A formatação é declarada pelo Conform com fallback LSP e executáveis Nix para Java, C/C++, web, Nix, Lua e shell. Debugging usa LLDB para C/C++ e attach Java na porta 5005.
 
