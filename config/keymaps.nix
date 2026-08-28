@@ -59,6 +59,81 @@
       options = { silent = true; desc = "New Spring Boot Project"; };
     }
 
+    # Java/Spring owns the IntelliJ LSP commands and delegates test execution
+    # to Neotest, keeping one discoverable namespace for the workflow.
+    {
+      key = "<leader>jr";
+      action = "<cmd>IntellijRun<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Run Java Main Class"; };
+    }
+    {
+      key = "<leader>jd";
+      action = "<cmd>IntellijDebug<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Debug Java Main Class"; };
+    }
+    {
+      key = "<leader>jo";
+      action = "<cmd>IntellijOrganizeImports<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Organize Java Imports"; };
+    }
+    {
+      key = "<leader>jR";
+      action = "<cmd>IntellijRestart<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Restart IntelliJ LSP"; };
+    }
+    {
+      key = "<leader>ji";
+      action = "<cmd>IntellijStatus<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Show IntelliJ LSP Status"; };
+    }
+    {
+      key = "<leader>jl";
+      action = "<cmd>IntellijLog<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Open IntelliJ LSP Log"; };
+    }
+    {
+      key = "<leader>jw";
+      action = "<cmd>IntellijCleanWorkspace<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Clean IntelliJ Workspace"; };
+    }
+    {
+      key = "<leader>jh";
+      action = "<cmd>checkhealth intellij-lsp<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Check IntelliJ LSP Health"; };
+    }
+    {
+      key = "<leader>jt";
+      action.__raw = "function() require('neotest').run.run() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Run Nearest Java Test"; };
+    }
+    {
+      key = "<leader>jT";
+      action.__raw = "function() require('neotest').run.run({ strategy = 'dap' }) end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Debug Nearest Java Test"; };
+    }
+    {
+      key = "<leader>js";
+      action.__raw = "function() require('neotest').summary.toggle() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Toggle Java Test Summary"; };
+    }
+    {
+      key = "<leader>jx";
+      action.__raw = "function() require('neotest').run.stop() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Stop Java Test"; };
+    }
+
     {
       key = "-";
       action = "<cmd>Oil<CR>";

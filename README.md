@@ -61,6 +61,7 @@ Plugins especializados permanecem quando não existe paridade real: Aerial para 
 | `<leader>z` | Alternar Snacks Zen. |
 | `gd`, `gD`, `gi`, `gr`, `K` | Navegação e documentação LSP. |
 | `<leader>lr`, `<leader>la`, `<leader>lf` | Rename, code action e format. |
+| `<leader>j*` | Workflow Java: executar/depurar classe, organizar imports, controlar IntelliJ LSP e executar/debugar testes Neotest. |
 | `<leader>lx` | Alternar diagnósticos com Trouble. |
 | `<C-h/j/k/l>` | Navegar entre splits no Neovim; o remapeamento físico global continua sendo owner do keyd. |
 
