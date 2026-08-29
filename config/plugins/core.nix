@@ -44,6 +44,13 @@ in
     treesitter = {
       enable = true;
       nixGrammars = true;
+      grammarPackages = with config.plugins.treesitter.package.builtGrammars; [
+        markdown
+        markdown_inline
+        html
+        latex
+        yaml
+      ];
       settings = {
         highlight.enable = true;
         indent.enable = true;

@@ -371,7 +371,47 @@
 
     render-markdown = {
       enable = true;
-      settings.preset = "minimal";
+      settings = {
+        preset = "obsidian";
+        max_file_size = 16.0;
+        render_modes = [ "n" "c" "t" ];
+        completions.lsp.enabled = true;
+        latex = {
+          enabled = true;
+          inline = true;
+          block = true;
+          converter = [ "utftex" "latex2text" ];
+        };
+        heading = {
+          enabled = true;
+          position = "overlay";
+          width = "full";
+        };
+        code = {
+          enabled = true;
+          border = "hide";
+          width = "full";
+          language = true;
+          language_icon = true;
+        };
+        bullet = {
+          enabled = true;
+          icons = [ "● " "○ " "◆ " ];
+        };
+        checkbox = {
+          enabled = true;
+          unchecked = { icon = "󰄱 "; highlight = "RenderMarkdownUnchecked"; };
+          checked = { icon = "󰱒 "; highlight = "RenderMarkdownChecked"; };
+        };
+        pipe_table = {
+          enabled = true;
+          preset = "round";
+        };
+        quote.enabled = true;
+        callout.enabled = true;
+        link.enabled = true;
+        sign.enabled = false;
+      };
     };
     aerial = {
       enable = true;
