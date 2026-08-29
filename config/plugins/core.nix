@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 let
   mermaid-plugin = pkgs.vimUtils.buildVimPlugin {
     pname = "mermaid.nvim";
