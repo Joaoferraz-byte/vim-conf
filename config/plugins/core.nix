@@ -119,6 +119,7 @@ in
     gradle
     chafa
     imagemagick
+    python3Packages.pylatexenc
     ffmpeg
     wl-clipboard
   ];
