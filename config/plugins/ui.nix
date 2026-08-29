@@ -144,7 +144,12 @@
         delete_to_trash = true;
         constrain_cursor = "editable";
         view_options = {
+          # Keep dotfiles available through Oil's `g.` toggle, but do not
+          # expose repository plumbing in the normal Vault workflow.
           show_hidden = true;
+          is_always_hidden.__raw = ''function(name, bufnr)
+            return name == ".git" or name == ".gitignore"
+          end'';
           natural_order = "fast";
           case_insensitive = false;
         };
