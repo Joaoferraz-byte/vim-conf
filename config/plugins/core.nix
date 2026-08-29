@@ -81,7 +81,19 @@ in
     mini = {
       enable = true;
       modules = {
-        icons.mockDevIcons = true;
+        icons = {
+          mockDevIcons = true;
+          directory = {
+            "Black Box" = { glyph = "󰮂"; hl = "MiniIconsBlue"; };
+            "Source Notes" = { glyph = "󰧮"; hl = "MiniIconsCyan"; };
+            "Xournal++" = { glyph = "󰻂"; hl = "MiniIconsGreen"; };
+            "Projects" = { glyph = "󰏗"; hl = "MiniIconsOrange"; };
+            "Daily Notes" = { glyph = "󰃭"; hl = "MiniIconsYellow"; };
+            "Thoughts" = { glyph = "󰗞"; hl = "MiniIconsPurple"; };
+            "References" = { glyph = "󰈙"; hl = "MiniIconsAzure"; };
+            "Config" = { glyph = "󰒓"; hl = "MiniIconsGrey"; };
+          };
+        };
         surround = {};
         ai = {};
         bracketed = {};
