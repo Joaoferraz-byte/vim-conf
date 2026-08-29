@@ -109,12 +109,19 @@
         { "FloatBorder", colors.primary, "NONE", 0 },
         -- Completion and active selections retain a readable surface; all
         -- structural/plugin containers reveal the terminal canvas.
-        { "Pmenu", colors.text, colors.surface1, 22 },
-        { "PmenuSel", colors.on_primary, colors.primary, 8 },
-        { "CmpNormal", colors.text, colors.surface1, 22 },
-        { "CmpDocNormal", colors.text, colors.surface0 or colors.surface1, 12 },
+        { "Pmenu", colors.text, "NONE", 0 },
+        { "PmenuSel", colors.on_primary, colors.primary, 0 },
+        { "CmpNormal", colors.text, "NONE", 0 },
+        { "CmpDocNormal", colors.text, "NONE", 0 },
         { "CmpBorder", colors.primary, "NONE", 0 },
-        { "CmpDocSel", colors.on_primary, colors.primary, 8 },
+        { "CmpDocSel", colors.on_primary, colors.primary, 0 },
+        { "CmpItemAbbr", colors.text, "NONE", 0 },
+        { "CmpItemAbbrMatch", colors.primary, "NONE", 0 },
+        { "CmpItemAbbrMatchFuzzy", colors.secondary, "NONE", 0 },
+        { "CmpItemAbbrDeprecated", colors.overlay1, "NONE", 0 },
+        { "CmpItemKind", colors.secondary, "NONE", 0 },
+        { "CmpItemKindIcon", colors.primary, "NONE", 0 },
+        { "CmpItemMenu", colors.subtext0, "NONE", 0 },
         { "SnacksPicker", colors.text, "NONE", 0 },
         { "SnacksPickerTitle", colors.text, "NONE", 0 },
         { "SnacksPickerBorder", colors.primary, "NONE", 0 },
@@ -369,6 +376,38 @@
           z = lualine_section(colors.subtext0, "NONE", true),
         },
       }
+
+      local cmp_kind_colors = {
+        Text = colors.text,
+        Method = colors.blue,
+        Function = colors.blue,
+        Constructor = colors.mauve,
+        Field = colors.teal,
+        Variable = colors.text,
+        Class = colors.yellow,
+        Interface = colors.yellow,
+        Module = colors.secondary,
+        Property = colors.teal,
+        Unit = colors.peach,
+        Value = colors.peach,
+        Enum = colors.yellow,
+        Keyword = colors.mauve,
+        Snippet = colors.green,
+        Color = colors.peach,
+        File = colors.primary,
+        Reference = colors.primary,
+        Folder = colors.primary,
+        EnumMember = colors.yellow,
+        Constant = colors.peach,
+        Struct = colors.yellow,
+        Event = colors.red,
+        Operator = colors.red,
+        TypeParameter = colors.teal,
+      }
+      for kind, color in pairs(cmp_kind_colors) do
+        set_livara_highlight("CmpItemKind" .. kind, color, "NONE", { bold = true })
+        set_livara_highlight("CmpItemKind" .. kind .. "Icon", color, "NONE", { bold = true })
+      end
 
       apply_transparency_policy(colors)
       -- The footer canvas stays transparent; only lualine's semantic mode
