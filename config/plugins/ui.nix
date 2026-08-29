@@ -374,7 +374,6 @@
     render-markdown = {
       enable = true;
       settings = {
-        preset = "obsidian";
         max_file_size = 16.0;
         render_modes = [ "n" "c" "t" ];
         completions.lsp.enabled = true;

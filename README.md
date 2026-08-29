@@ -48,11 +48,11 @@ Plugins especializados permanecem quando não existe paridade real: Aerial para 
 
 ### Markdown pesado
 
-O workflow do Vault é centrado em Markdown portátil, sem depender de runtime Obsidian. `render-markdown.nvim` fornece renderização em buffer para headings, blocos de código, listas, checkboxes, callouts, tabelas, links e fórmulas LaTeX; Treesitter instala de forma reprodutível os parsers de Markdown, Markdown inline, HTML, YAML e LaTeX. O plugin `mermaid.nvim` permanece como ferramenta dedicada para diagramas Mermaid e preview no terminal. O limite de arquivo de 16 MiB evita transformar notas grandes em uma fonte de latência global, e a renderização preserva o texto-fonte para edição normal.
+O workflow do Vault é centrado em Markdown portátil, sem depender de runtime Obsidian. `render-markdown.nvim` fornece renderização em buffer por opções explícitas para headings, blocos de código, listas, checkboxes, callouts, tabelas, links e fórmulas LaTeX; Treesitter instala de forma reprodutível os parsers de Markdown, Markdown inline, HTML, YAML e LaTeX. O plugin `mermaid.nvim` permanece como ferramenta dedicada para diagramas Mermaid e preview no terminal. O limite de arquivo de 16 MiB evita transformar notas grandes em uma fonte de latência global, e a renderização preserva o texto-fonte para edição normal.
 
 | Recurso | Implementação | Dependência de runtime |
 |---|---|---|
-| Markdown estrutural | `render-markdown.nvim` com preset visual compatível e tabelas arredondadas | Nixvim + Treesitter |
+| Markdown estrutural | `render-markdown.nvim` com opções explícitas e tabelas arredondadas | Nixvim + Treesitter |
 | LaTeX inline/bloco | parser `latex` e conversor `utftex`/`latex2text` quando disponível | executável opcional no `PATH` |
 | Mermaid | plugin `mermaid.nvim` fixado no flake | `chafa` para fallback terminal quando suportado |
 | Frontmatter | parser `yaml` e LSP Marksman | Nixvim |
