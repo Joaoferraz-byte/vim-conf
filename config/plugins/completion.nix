@@ -13,6 +13,17 @@
     settings = {
       snippet.expand.__raw = "function(args) require('luasnip').lsp_expand(args.body) end";
       completion.completeopt = "menu,menuone,noselect";
+      window = {
+        completion = {
+          border = "rounded";
+          winhighlight = "Normal:CmpNormal,FloatBorder:CmpBorder,CursorLine:PmenuSel,Search:None";
+          scrollbar = false;
+        };
+        documentation = {
+          border = "rounded";
+          winhighlight = "Normal:CmpDocNormal,FloatBorder:CmpBorder,CursorLine:CmpDocSel,Search:None";
+        };
+      };
       sources = [
         { name = "nvim_lsp"; }
         { name = "luasnip"; }

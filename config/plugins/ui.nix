@@ -325,9 +325,12 @@
           # Keep the statusline canvas transparent; use the documented
           # powerline transition only around the mode accents and avoid noisy
           # separators between transparent content components.
+          # Do not draw contrasting powerline half-circles between the mode
+          # and location components. Mode/location backgrounds remain semantic,
+          # while the footer canvas stays continuous and transparent.
           section_separators = {
-            left = "";
-            right = "";
+            left = "";
+            right = "";
           };
           component_separators = "";
           # Keep the global footer visible on the dashboard; only transient
@@ -374,7 +377,7 @@
       enable = true;
       settings = {
         max_file_size = 16.0;
-        render_modes = [ "n" "c" "t" ];
+        render_modes = [ "n" "v" "V" "c" "t" ];
         completions.lsp.enabled = true;
         latex = {
           enabled = true;
@@ -407,10 +410,13 @@
           enabled = true;
           preset = "round";
         };
-        quote.enabled = true;
-        callout.enabled = true;
-        link.enabled = true;
-        sign.enabled = false;
+        # quote, link and sign are option tables in the pinned plugin API.
+        # Callouts intentionally use the plugin's built-in definition table;
+        # assigning callout.enabled would pass a boolean to resolved.lua and
+        # reproduce the `attempt to index a boolean value` crash.
+        quote = { enabled = true; };
+        link = { enabled = true; };
+        sign = { enabled = false; };
       };
     };
     aerial = {
