@@ -351,21 +351,14 @@
               symbols = { error = " "; warn = " "; info = " "; hint = "󰌵 "; };
             }
           ];
+          # The buffer and winbar already identify the file. The footer should
+          # answer "how is this buffer doing?" rather than repeat its name/type.
           lualine_c = [
-            {
-              __unkeyed-1 = "filename";
-              path = 1;
-              shorting_target = 48;
-              symbols = { modified = " ●"; readonly = " "; unnamed = " [No Name]"; };
-            }
+            { __unkeyed-1 = "searchcount"; icon = "󰍉"; }
+            { __unkeyed-1 = "selectioncount"; icon = "󰒆"; }
           ];
           lualine_x = [
-            { __unkeyed-1 = "filetype"; colored = true; }
-            "encoding"
-            {
-              __unkeyed-1 = "fileformat";
-              symbols = { unix = "󰌽"; dos = ""; mac = ""; };
-            }
+            { __unkeyed-1 = "lsp_progress"; icon = "󰒓"; }
           ];
           lualine_y = [ { __unkeyed-1 = "progress"; icon = "󰯷"; } ];
           lualine_z = [ { __unkeyed-1 = "location"; icon = "󰍒"; } ];
