@@ -123,5 +123,22 @@
     vim.api.nvim_create_user_command("LivaraVaultConcept", function() make_note("concept") end, {})
     vim.api.nvim_create_user_command("LivaraVaultBook", function() make_note("book") end, {})
     vim.api.nvim_create_user_command("LivaraVaultCapture", function() make_note("quick_capture") end, {})
+
+    vim.api.nvim_create_autocmd("BufReadCmd", {
+      pattern = "*.xopp",
+      callback = function(args)
+        if vim.fn.executable("xournalpp") ~= 1 then
+          notify("Cannot open .xopp: xournalpp is not installed", vim.log.levels.ERROR)
+          return
+        end
+        local file = vim.fn.fnamemodify(args.file, ":p")
+        vim.fn.jobstart({ "xournalpp", file }, { detach = true })
+        vim.schedule(function()
+          if vim.api.nvim_buf_is_valid(args.buf) then
+            vim.api.nvim_buf_delete(args.buf, { force = true })
+          end
+        end)
+      end,
+    })
   '';
 }
