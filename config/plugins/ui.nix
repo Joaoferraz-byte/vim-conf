@@ -70,14 +70,8 @@
               {
                 icon = "󰈙 ";
                 key = "v";
-                desc = "Open Vault";
-                action = ":Oil ~/Vault";
-              }
-              {
-                icon = "󰋤 ";
-                key = "?";
-                desc = "Browse Keymaps";
-                action = ":lua Snacks.picker.keymaps()";
+                desc = "Sync and Open Vault";
+                action = ":lua _G.open_livara_vault()";
               }
               {
                 icon = " ";
@@ -198,7 +192,6 @@
           { __unkeyed-1 = "<leader>x"; group = "Debug"; icon = " "; }
           { __unkeyed-1 = "<leader>z"; desc = "Toggle Zen Mode"; icon = "󰒲 "; }
           { __unkeyed-1 = "<leader>?"; desc = "Browse All Keymaps"; icon = "󰋤 "; }
-          { __unkeyed-1 = "<leader><leader>"; desc = "Show Leader Keymaps"; icon = " 󰌌 "; }
           { __unkeyed-1 = "<leader>t"; group = "Test"; icon = " "; }
         ];
       };

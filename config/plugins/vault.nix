@@ -7,19 +7,52 @@
       vim.notify(message, level or vim.log.levels.INFO)
     end
 
-    local function vault_area(name)
-      local direct = vault_root .. "/" .. name
-      if vim.fn.isdirectory(direct) == 1 then
+    local function resolve_vault_segment(parent, segment)
+      local direct = parent .. "/" .. segment
+      if vim.fn.isdirectory(direct) == 1 or vim.fn.filereadable(direct) == 1 then
         return direct
       end
-      for _, path in ipairs(vim.fn.glob(vault_root .. "/*", false, true)) do
+      for _, path in ipairs(vim.fn.glob(parent .. "/*", false, true)) do
         local basename = vim.fn.fnamemodify(path, ":t")
-        if basename:match("^%d%d%s*%-%s*" .. vim.pesc(name) .. "$") then
+        if basename:match("^%d%d%s*%-%s*" .. vim.pesc(segment) .. "$") then
           return path
         end
       end
       return direct
     end
+
+    local function vault_area(relative)
+      local current = vault_root
+      for segment in relative:gmatch("[^/]+") do
+        current = resolve_vault_segment(current, segment)
+      end
+      return current
+    end
+
+    local function sync_vault()
+      if vim.fn.executable("livara-vault-sync") ~= 1 then
+        notify("Vault sync helper is not installed", vim.log.levels.ERROR)
+        return false
+      end
+      vim.fn.system({ "livara-vault-sync" })
+      if vim.v.shell_error ~= 0 then
+        notify("Vault sync failed; local checkout opened", vim.log.levels.WARN)
+        return false
+      end
+      return true
+    end
+
+    local function open_vault()
+      sync_vault()
+      if vim.fn.isdirectory(vault_root) == 0 then
+        notify("Vault not found: " .. vault_root, vim.log.levels.ERROR)
+        return
+      end
+      vim.cmd("Oil " .. vim.fn.fnameescape(vault_root))
+    end
+
+    _G.sync_livara_vault = sync_vault
+    _G.open_livara_vault = open_vault
 
     local function slugify(value)
       value = value:lower():gsub("[^%w%s%-]", ""):gsub("%s+", "-"):gsub("%-+", "-")
@@ -60,7 +93,7 @@
 
       local definitions = {
         daily = {
-          area = "Daily Notes",
+          area = "03 - Daily Notes",
           filename = today .. ".md",
           lines = {
             "---", "title: " .. title, "tags:", "  - daily", "area: daily", "status: active",
@@ -70,7 +103,7 @@
           },
         },
         source = {
-          area = "Source Notes",
+          area = "01 - Source Notes",
           filename = slugify(title) .. ".md",
           lines = {
             "---", "title: " .. title, "tags:", "  - source-note", "area: source-notes",
@@ -80,7 +113,7 @@
           },
         },
         concept = {
-          area = "Source Notes",
+          area = "01 - Source Notes",
           filename = slugify(title) .. ".md",
           lines = {
             "---", "title: " .. title, "tags:", "  - concept", "area: source-notes",
@@ -90,7 +123,7 @@
           },
         },
         book = {
-          area = "References/Books",
+          area = "05 - References/Books",
           filename = slugify(title) .. ".md",
           lines = {
             "---", "title: " .. title, "type: book", "tags:", "  - reference", "  - book",
@@ -100,7 +133,7 @@
           },
         },
         quick_capture = {
-          area = "Black Box/Quick Capture",
+          area = "00 - Black Box/Quick Capture",
           filename = "Inbox.md",
           lines = { "---", "title: Quick Capture Inbox", "tags:", "  - inbox", "  - quick-capture", "area: black-box/quick-capture", "status: active", "source_status: needs-review", "---", "# Quick Capture Inbox", "", "## Inbox", "- " .. title, "", },
         },
@@ -132,6 +165,7 @@
       notify("Created: " .. path)
     end
 
+    vim.api.nvim_create_user_command("LivaraVaultSync", function() sync_vault() end, {})
     vim.api.nvim_create_user_command("LivaraVaultDaily", function() make_note("daily") end, {})
     vim.api.nvim_create_user_command("LivaraVaultSource", function() make_note("source") end, {})
     vim.api.nvim_create_user_command("LivaraVaultConcept", function() make_note("concept") end, {})

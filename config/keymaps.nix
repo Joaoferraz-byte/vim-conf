@@ -3,6 +3,33 @@
   globals.maplocalleader = " ";
 
   extraConfigLua = ''
+    local keymap_docs = {
+      { label = "Niri — atalhos do compositor", file = "Niri - Keybinds e Comandos.md" },
+      { label = "NixVim — atalhos do leader", file = "NixVim - Keybinds Leader.md" },
+      { label = "NixVim — atalhos de buffer", file = "NixVim - Keybinds Buffer.md" },
+      { label = "NixVim — atalhos de janela", file = "NixVim - Keybinds Janela.md" },
+      { label = "NixVim — atalhos normais e modos", file = "NixVim - Keybinds Normais.md" },
+    }
+
+    _G.browse_livara_keymaps = function()
+      local root = vim.fn.expand("$HOME/Vault/00 - Black Box")
+      local choices = {}
+      for _, item in ipairs(keymap_docs) do
+        local path = root .. "/" .. item.file
+        if vim.fn.filereadable(path) == 1 then
+          table.insert(choices, { label = item.label, path = path })
+        end
+      end
+      vim.ui.select(choices, {
+        prompt = "Abrir referência de atalhos",
+        format_item = function(item) return item.label end,
+      }, function(choice)
+        if choice then
+          vim.cmd("edit " .. vim.fn.fnameescape(choice.path))
+        end
+      end)
+    end
+
     local function java_command(command)
       if vim.bo.filetype ~= "java" then
         vim.notify("Java workflow requires a Java buffer", vim.log.levels.WARN)
@@ -75,21 +102,9 @@
     }
     {
       key = "<leader>?";
-      action = "<cmd>lua require('which-key').show({ global = true })<CR>";
+      action = "<cmd>lua _G.browse_livara_keymaps()<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Browse All Keymaps"; };
-    }
-    {
-      key = "<leader>kb";
-      action = "<cmd>lua require('which-key').show({ global = true })<CR>";
-      mode = [ "n" ];
-      options = { silent = true; desc = "Browse Keymaps by Category"; };
-    }
-    {
-      key = "<leader><leader>";
-      action = "<cmd>lua require('which-key').show()<CR>";
-      mode = [ "n" ];
-      options = { silent = true; desc = "Show Leader Keymaps"; };
+      options = { silent = true; desc = "Browse Keymap References"; };
     }
 
     {
