@@ -32,6 +32,20 @@
     end
 
     local function make_note(kind)
+      if kind == "daily" then
+        local output = vim.fn.system({ "livara-daily-note", "--no-open" })
+        if vim.v.shell_error ~= 0 then
+          notify("Could not create today's Daily Note", vim.log.levels.ERROR)
+          return
+        end
+        local path = vim.trim(output)
+        if path ~= "" then
+          vim.cmd("edit " .. vim.fn.fnameescape(path))
+          notify("Opened: " .. path)
+        end
+        return
+      end
+
       if vim.fn.isdirectory(vault_root) == 0 then
         notify("Vault not found: " .. vault_root, vim.log.levels.ERROR)
         return

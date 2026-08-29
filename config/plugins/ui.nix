@@ -68,6 +68,12 @@
                 action = ":Oil ~/.config/nixos";
               }
               {
+                icon = "󰈙 ";
+                key = "v";
+                desc = "Open Vault";
+                action = ":Oil ~/Vault";
+              }
+              {
                 icon = "󰋤 ";
                 key = "?";
                 desc = "Browse Keymaps";

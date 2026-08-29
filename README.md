@@ -66,6 +66,7 @@ O workflow do Vault é centrado em Markdown portátil, sem depender de runtime O
 | `-` | Abrir Oil no diretório pai. |
 | `<leader>cn` / `<leader>cs` | Abrir a configuração do Neovim / sistema no Oil. |
 | `<leader>d` | Abrir o dashboard Snacks. |
+| `v` no Dashboard | Abrir o Vault em `~/Vault` usando Oil. |
 | `<leader>ff` / `<leader>fg` | Encontrar arquivos / pesquisar conteúdo com Snacks Picker. |
 | `<leader>fi` | Encontrar arquivos de imagem/documentos com preview Snacks quando suportado pelo terminal. |
 | `<leader>fr` / `<leader>fp` | Arquivos recentes / projetos. |
