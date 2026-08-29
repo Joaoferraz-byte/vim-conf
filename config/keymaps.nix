@@ -2,6 +2,52 @@
   globals.mapleader = " ";
   globals.maplocalleader = " ";
 
+  extraConfigLua = ''
+    local function java_command(command)
+      if vim.bo.filetype ~= "java" then
+        vim.notify("Java workflow requires a Java buffer", vim.log.levels.WARN)
+        return
+      end
+      if vim.fn.exists(":" .. command) ~= 2 then
+        vim.notify("Java command is unavailable: " .. command, vim.log.levels.ERROR)
+        return
+      end
+      vim.cmd(command)
+    end
+
+    local function java_test(strategy)
+      if vim.bo.filetype ~= "java" then
+        vim.notify("Java test workflow requires a Java buffer", vim.log.levels.WARN)
+        return
+      end
+      local ok, neotest = pcall(require, "neotest")
+      if not ok then
+        vim.notify("Neotest is unavailable", vim.log.levels.ERROR)
+        return
+      end
+      neotest.run.run(strategy and { strategy = strategy } or nil)
+    end
+
+    _G.livara_java_command = java_command
+    _G.livara_java_test = java_test
+    _G.livara_java_summary = function()
+      local ok, neotest = pcall(require, "neotest")
+      if not ok then
+        vim.notify("Neotest is unavailable", vim.log.levels.ERROR)
+        return
+      end
+      neotest.summary.toggle()
+    end
+    _G.livara_java_stop = function()
+      local ok, neotest = pcall(require, "neotest")
+      if not ok then
+        vim.notify("Neotest is unavailable", vim.log.levels.ERROR)
+        return
+      end
+      neotest.run.stop()
+    end
+  '';
+
   keymaps = [
     {
       key = "<Esc>";
@@ -41,7 +87,7 @@
     }
     {
       key = "<leader><leader>";
-      action = "<cmd>lua require('which-key').show() <CR>";
+      action = "<cmd>lua require('which-key').show()<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Show Leader Keymaps"; };
     }
@@ -63,43 +109,43 @@
     # to Neotest, keeping one discoverable namespace for the workflow.
     {
       key = "<leader>jr";
-      action = "<cmd>IntellijRun<CR>";
+      action = "<cmd>lua _G.livara_java_command('IntellijRun')<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Run Java Main Class"; };
     }
     {
       key = "<leader>jd";
-      action = "<cmd>IntellijDebug<CR>";
+      action = "<cmd>lua _G.livara_java_command('IntellijDebug')<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Debug Java Main Class"; };
     }
     {
       key = "<leader>jo";
-      action = "<cmd>IntellijOrganizeImports<CR>";
+      action = "<cmd>lua _G.livara_java_command('IntellijOrganizeImports')<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Organize Java Imports"; };
     }
     {
       key = "<leader>jR";
-      action = "<cmd>IntellijRestart<CR>";
+      action = "<cmd>lua _G.livara_java_command('IntellijRestart')<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Restart IntelliJ LSP"; };
     }
     {
       key = "<leader>ji";
-      action = "<cmd>IntellijStatus<CR>";
+      action = "<cmd>lua _G.livara_java_command('IntellijStatus')<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Show IntelliJ LSP Status"; };
     }
     {
       key = "<leader>jl";
-      action = "<cmd>IntellijLog<CR>";
+      action = "<cmd>lua _G.livara_java_command('IntellijLog')<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Open IntelliJ LSP Log"; };
     }
     {
       key = "<leader>jw";
-      action = "<cmd>IntellijCleanWorkspace<CR>";
+      action = "<cmd>lua _G.livara_java_command('IntellijCleanWorkspace')<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Clean IntelliJ Workspace"; };
     }
@@ -111,25 +157,25 @@
     }
     {
       key = "<leader>jt";
-      action.__raw = "function() require('neotest').run.run() end";
+      action.__raw = "function() _G.livara_java_test() end";
       mode = [ "n" ];
       options = { silent = true; desc = "Run Nearest Java Test"; };
     }
     {
       key = "<leader>jT";
-      action.__raw = "function() require('neotest').run.run({ strategy = 'dap' }) end";
+      action.__raw = "function() _G.livara_java_test('dap') end";
       mode = [ "n" ];
       options = { silent = true; desc = "Debug Nearest Java Test"; };
     }
     {
       key = "<leader>js";
-      action.__raw = "function() require('neotest').summary.toggle() end";
+      action.__raw = "function() _G.livara_java_summary() end";
       mode = [ "n" ];
       options = { silent = true; desc = "Toggle Java Test Summary"; };
     }
     {
       key = "<leader>jx";
-      action.__raw = "function() require('neotest').run.stop() end";
+      action.__raw = "function() _G.livara_java_stop() end";
       mode = [ "n" ];
       options = { silent = true; desc = "Stop Java Test"; };
     }
@@ -596,7 +642,7 @@
       key = "<leader>mf";
       action = "<cmd>lua Snacks.explorer()<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "Open Mini Files"; };
+      options = { silent = true; desc = "Open File Explorer"; };
     }
 
   ];

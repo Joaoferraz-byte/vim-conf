@@ -184,13 +184,14 @@
           { __unkeyed-1 = "<leader>g"; group = "Git"; icon = " "; }
           { __unkeyed-1 = "<leader>h"; group = "Harpoon"; icon = "󰛢 "; }
           { __unkeyed-1 = "<leader>k"; group = "Keymaps"; icon = "󰌌 "; }
-          { __unkeyed-1 = "<leader>m"; group = "Explorer"; icon = "󰙅 "; }
+          { __unkeyed-1 = "<leader>e"; desc = "Toggle File Explorer"; icon = "󰙅 "; }
+          { __unkeyed-1 = "<leader>m"; group = "Explorer Actions"; icon = "󰙅 "; }
           { __unkeyed-1 = "<leader>o"; desc = "Toggle Symbol Outline"; icon = "󰆧 "; }
           { __unkeyed-1 = "<leader>d"; desc = "Open Dashboard"; icon = "󰋜 "; }
           { __unkeyed-1 = "<leader>x"; group = "Debug"; icon = " "; }
           { __unkeyed-1 = "<leader>z"; desc = "Toggle Zen Mode"; icon = "󰒲 "; }
           { __unkeyed-1 = "<leader>?"; desc = "Browse All Keymaps"; icon = "󰋤 "; }
-          { __unkeyed-1 = "<leader><leader>"; desc = "Show Leader Keymaps"; icon = "󰋜 "; }
+          { __unkeyed-1 = "<leader><leader>"; desc = "Show Leader Keymaps"; icon = " 󰌌 "; }
           { __unkeyed-1 = "<leader>t"; group = "Test"; icon = " "; }
         ];
       };

@@ -367,24 +367,19 @@
       }
 
       apply_transparency_policy(colors)
-      -- Keep only the footer canvas opaque. The editor canvas, tabs and winbar
-      -- remain transparent; this removes the apparent left/right margin while
-      -- the mode and location sections keep their own rounded colors.
-      set_livara_highlight("StatusLine", colors.text, colors.base)
-      set_livara_highlight("StatusLineNC", theme_color(colors, "subtext1", "subtext0"), colors.base)
-      set_livara_highlight("StatusLineTerm", colors.text, colors.base)
-      set_livara_highlight("StatusLineTermNC", theme_color(colors, "subtext1", "subtext0"), colors.base)
+      -- The footer canvas stays transparent; only lualine's semantic mode
+      -- segments carry color, so the statusline reveals the terminal surface.
       pcall(function()
         local lualine = require("lualine")
         lualine.setup({ options = { theme = lualine_theme } })
         lualine.refresh({ force = true })
       end)
-      -- lualine may recreate StatusLine after the theme setup; restate the
-      -- solid footer canvas so the statusline has no outer transparent gaps.
-      vim.api.nvim_set_hl(0, "StatusLine", { fg = colors.text, bg = colors.base })
-      vim.api.nvim_set_hl(0, "StatusLineNC", { fg = theme_color(colors, "subtext1", "subtext0"), bg = colors.base })
-      vim.api.nvim_set_hl(0, "StatusLineTerm", { fg = colors.text, bg = colors.base })
-      vim.api.nvim_set_hl(0, "StatusLineTermNC", { fg = theme_color(colors, "subtext1", "subtext0"), bg = colors.base })
+      -- Keep the canvas transparent after lualine refresh as well. The mode
+      -- and location sections remain colored through their own lualine groups.
+      set_transparent_group("StatusLine", colors.text)
+      set_transparent_group("StatusLineNC", theme_color(colors, "subtext1", "subtext0"))
+      set_transparent_group("StatusLineTerm", colors.text)
+      set_transparent_group("StatusLineTermNC", theme_color(colors, "subtext1", "subtext0"))
       vim.g.colors_name = "livara-matugen"
       pcall(function() require("lualine").refresh() end)
       return true
