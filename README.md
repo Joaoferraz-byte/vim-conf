@@ -61,6 +61,8 @@ O workflow do Vault é centrado em Markdown portátil, sem depender de runtime O
 | Mapping | Ação |
 |---|---|
 | `<leader>e` / `<leader>mf` | Abrir Snacks Explorer. |
+| `<leader>vd` / `<leader>vs` / `<leader>vc` | Criar nota diária / fonte / conceito no Vault, com frontmatter estático. |
+| `<leader>vb` / `<leader>vq` | Criar referência de livro / capturar texto no inbox do Vault. |
 | `-` | Abrir Oil no diretório pai. |
 | `<leader>cn` / `<leader>cs` | Abrir a configuração do Neovim / sistema no Oil. |
 | `<leader>d` | Abrir o dashboard Snacks. |

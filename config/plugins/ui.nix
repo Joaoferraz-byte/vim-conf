@@ -180,6 +180,7 @@
           { __unkeyed-1 = "<leader>l"; group = "Language"; icon = "󰘦 "; }
           { __unkeyed-1 = "<leader>j"; group = "Java"; icon = " "; }
           { __unkeyed-1 = "<leader>n"; group = "New"; icon = " "; }
+          { __unkeyed-1 = "<leader>v"; group = "Vault"; icon = "󰈙 "; }
           { __unkeyed-1 = "<leader>b"; group = "Buffers"; icon = "󰓩 "; }
           { __unkeyed-1 = "<leader>g"; group = "Git"; icon = " "; }
           { __unkeyed-1 = "<leader>h"; group = "Harpoon"; icon = "󰛢 "; }

@@ -104,6 +104,36 @@
       mode = [ "n" ];
       options = { silent = true; desc = "New Spring Boot Project"; };
     }
+    {
+      key = "<leader>vd";
+      action = "<cmd>LivaraVaultDaily<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Create Daily Note"; };
+    }
+    {
+      key = "<leader>vs";
+      action = "<cmd>LivaraVaultSource<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Create Source Note"; };
+    }
+    {
+      key = "<leader>vc";
+      action = "<cmd>LivaraVaultConcept<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Create Concept Note"; };
+    }
+    {
+      key = "<leader>vb";
+      action = "<cmd>LivaraVaultBook<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Create Book Reference"; };
+    }
+    {
+      key = "<leader>vq";
+      action = "<cmd>LivaraVaultCapture<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Capture in Inbox"; };
+    }
 
     # Java/Spring owns the IntelliJ LSP commands and delegates test execution
     # to Neotest, keeping one discoverable namespace for the workflow.
