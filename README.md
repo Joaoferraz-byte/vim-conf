@@ -14,6 +14,25 @@ Este repositório fornece um ambiente NixVim declarativo e reproduzível para Ja
 
 O flake publica somente sistemas Linux porque a configuração inclui ferramentas Wayland como `wl-clipboard`, além de imagem, terminal e integrações próprias do desktop Livara. O input NixVim upstream pode suportar outros sistemas, mas esta configuração não promete compatibilidade que não foi avaliada.
 
+## Atualização controlada
+
+A versão do editor e dos plugins é determinada pelo `flake.lock`. Inicialização, `nix flake check`, `nix eval`, `nix build` e o rebuild do sistema usam os inputs já bloqueados; nenhum desses caminhos deve atualizar o lockfile ou buscar uma revisão mais nova implicitamente. O `lazy.nvim` também mantém o checker de atualizações desabilitado, pois a instalação de plugins é responsabilidade declarativa do NixVim.
+
+Para atualizar sob demanda, altere o lockfile em uma operação explícita e revise o diff antes de comitar:
+
+```bash
+# Dentro deste repositório: atualizar apenas a dependência upstream do NixVim.
+nix flake update nixvim
+git diff --check
+git diff -- flake.lock
+git add flake.lock && git commit -m "chore: update nixvim input"
+
+# No sistema consumidor: atualizar os inputs selecionados do desktop.
+NIX_CONF_UPDATE_FLAKE=1 NIX_CONF_UPDATE_INPUTS="vim-conf nixvim" ./install.sh
+```
+
+O primeiro fluxo publica uma nova revisão de `vim-conf`; o segundo atualiza explicitamente o lockfile do `nix-conf`. Se a revisão for rejeitada, basta descartar o commit do lockfile ou usar a cópia de segurança criada pelo installer. Assim, atualizar o editor se comporta como uma ação administrativa semelhante a atualizar Flatpaks, e não como efeito colateral de iniciar o Neovim.
+
 ## Arquitetura
 
 A configuração usa uma arquitetura híbrida de **camadas e workflows**, não um padrão dendrítico imposto:
