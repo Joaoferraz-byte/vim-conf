@@ -48,6 +48,7 @@ in
         markdown
         markdown_inline
         html
+        xml
         latex
         yaml
       ];
@@ -105,6 +106,20 @@ in
     mermaid-plugin
     vim-sleuth
   ];
+
+  extraConfigLua = ''
+    -- SVG is XML with a graphics vocabulary. Reuse the maintained XML
+    -- grammar so tags, attributes and embedded text receive structural
+    -- highlighting without pretending Snacks supports SVG preview directly.
+    pcall(vim.filetype.add, { extension = { svg = "svg" } })
+    pcall(vim.treesitter.language.register, "xml", { "svg" })
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "svg",
+      callback = function(args)
+        pcall(vim.treesitter.start, args.buf, "xml")
+      end,
+    })
+  '';
 
   # Runtime tools are explicit closure members. chafa/ImageMagick support
   # dashboard and image workflows; ffmpeg supports Snacks image formats.
