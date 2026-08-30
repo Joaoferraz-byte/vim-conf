@@ -226,7 +226,15 @@
       };
     };
 
-    barbecue.enable = true;
+    barbecue = {
+      enable = true;
+      settings = {
+        # nvim-navic supports one LSP client per buffer; attach it from the
+        # guarded LspAttach callback in extraConfigLua instead of letting the
+        # archived plugin attach every overlapping web server.
+        attach_navic = false;
+      };
+    };
     treesitter-context.enable = true;
     fidget.enable = true;
 
@@ -342,12 +350,14 @@
             left = 1;
             right = 1;
           };
-          # Keep the global footer visible on the dashboard; only transient
-          # picker/file-manager buffers hide it to avoid duplicate chrome.
-          disabled_filetypes.statusline = [ "snacks_picker_list" "oil" ];
+          # The dashboard already owns its visual landing page; hiding the
+          # global footer there prevents a second context bar at the bottom.
+          disabled_filetypes.statusline = [ "snacks_dashboard" "snacks_picker_list" "oil" ];
         };
         sections = {
-          lualine_a = [ { __unkeyed-1 = "mode"; icon = "󰘧"; } ];
+          # Keep the lambda marker compact; the solid A segment makes mode
+          # and its icon opaque instead of inheriting the transparent canvas.
+          lualine_a = [ { __unkeyed-1 = "mode"; icon = "λ"; } ];
           lualine_b = [
             { __unkeyed-1 = "branch"; icon = ""; color = "LivaraLualineAccent"; }
             {
@@ -362,20 +372,17 @@
               color = "LivaraLualineMuted";
             }
           ];
-          # The footer combines file context with editing state without adding
-          # a second opaque panel: branch and filetype identify the context,
-          # while progress, total lines and location describe the buffer.
+          # File name and type already live in the top window context. Keep
+          # this footer about repository/editor state instead of repeating them.
           lualine_c = [
-            { __unkeyed-1 = "filename"; path = 1; icon = "󰈔"; color = "LivaraLualineAccent"; }
             { __unkeyed-1 = "searchcount"; icon = "󰍉"; color = "LivaraLualineMuted"; }
             { __unkeyed-1 = "selectioncount"; icon = "󰒆"; color = "LivaraLualineMuted"; }
           ];
           lualine_x = [
-            { __unkeyed-1 = "filetype"; icon = "󰈔"; color = "LivaraLualineMuted"; }
             { __unkeyed-1 = "lsp_progress"; icon = "󰒓"; color = "LivaraLualineAccent"; }
+            { __unkeyed-1 = "progress"; icon = "󰯷"; color = "LivaraLualineAccent"; }
           ];
           lualine_y = [
-            { __unkeyed-1 = "progress"; icon = "󰯷"; color = "LivaraLualineAccent"; }
             {
               __unkeyed-1.__raw = ''function()
                 return string.format("%d lines", vim.api.nvim_buf_line_count(0))
@@ -448,6 +455,25 @@
   };
 
   extraConfigLua = ''
+    local navic_attach_group = vim.api.nvim_create_augroup("LivaraNavicAttach", { clear = true })
+    vim.api.nvim_create_autocmd("LspAttach", {
+      group = navic_attach_group,
+      callback = function(args)
+        local client = vim.lsp.get_client_by_id(args.data.client_id)
+        if not client or not client.server_capabilities.documentSymbolProvider then
+          return
+        end
+        if vim.b[args.buf].livara_navic_client_id then
+          return
+        end
+        local ok, navic = pcall(require, "nvim-navic")
+        if ok then
+          navic.attach(client, args.buf)
+          vim.b[args.buf].livara_navic_client_id = client.id
+        end
+      end,
+    })
+
     local function notify(message, level)
       vim.notify(message, level or vim.log.levels.INFO)
     end
