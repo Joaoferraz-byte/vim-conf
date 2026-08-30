@@ -180,9 +180,17 @@
           return
         end
         local file = vim.fn.fnamemodify(args.file, ":p")
+        local launched_as_file = vim.fn.argc() == 1
+          and vim.fn.fnamemodify(vim.fn.argv(0), ":p") == file
         vim.fn.jobstart({ "xournalpp", file }, { detach = true })
         vim.schedule(function()
-          if vim.api.nvim_buf_is_valid(args.buf) then
+          if launched_as_file then
+            -- When `nvim note.xopp` starts a new editor, leaving an empty Nvim
+            -- window open is the reported double-open. Keep only Xournal++.
+            vim.cmd("silent! qa!")
+          elseif vim.api.nvim_buf_is_valid(args.buf) then
+            -- Opening from an existing Nvim session should preserve that
+            -- session, but the binary must never become an editable buffer.
             vim.api.nvim_buf_delete(args.buf, { force = true })
           end
         end)
