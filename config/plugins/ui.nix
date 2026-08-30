@@ -327,23 +327,27 @@
           globalstatus = true;
           icons_enabled = true;
           always_divide_middle = true;
-          # Keep the statusline canvas transparent; use the documented
-          # powerline transition only around the mode accents and avoid noisy
-          # separators between transparent content components.
-          # Do not draw contrasting powerline half-circles between the mode
-          # and location components. Mode/location backgrounds remain semantic,
-          # while the footer canvas stays continuous and transparent.
+          # Keep the statusline canvas transparent. The angled separators
+          # only bridge the colored semantic mode/location segments into the
+          # transparent surface; they do not add a solid footer background.
           section_separators = {
-            left = "";
-            right = "";
+            left = "";
+            right = "";
           };
-          component_separators = "";
+          component_separators = {
+            left = "·";
+            right = "·";
+          };
+          padding = {
+            left = 1;
+            right = 1;
+          };
           # Keep the global footer visible on the dashboard; only transient
           # picker/file-manager buffers hide it to avoid duplicate chrome.
           disabled_filetypes.statusline = [ "snacks_picker_list" "oil" ];
         };
         sections = {
-          lualine_a = [ "mode" ];
+          lualine_a = [ { __unkeyed-1 = "mode"; icon = "󰘧"; } ];
           lualine_b = [
             { __unkeyed-1 = "branch"; icon = ""; }
             {
