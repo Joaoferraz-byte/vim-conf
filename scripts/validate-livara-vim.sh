@@ -27,7 +27,8 @@ forbidden() {
 
 require 'disabled_filetypes\.statusline = \[[^]]*"snacks_dashboard"' "$ui"
 require 'attach_navic = false' "$ui"
-require 'icon = "λ"' "$ui"
+require 'icon = " "' "$ui"
+forbidden 'icon = "λ"' "$ui"
 forbidden '__unkeyed-1 = "filename"' "$ui"
 forbidden '__unkeyed-1 = "filetype"' "$ui"
 require 'LspAttach' "$ui"

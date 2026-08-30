@@ -355,9 +355,11 @@
           disabled_filetypes.statusline = [ "snacks_dashboard" "snacks_picker_list" "oil" ];
         };
         sections = {
-          # Keep the lambda marker compact; the solid A segment makes mode
+          # Keep the Neovim mark compact; the solid A segment makes mode
           # and its icon opaque instead of inheriting the transparent canvas.
-          lualine_a = [ { __unkeyed-1 = "mode"; icon = "λ"; } ];
+          # The icon is intentionally a subtle companion to the mode label,
+          # following fancyline's semantic component treatment.
+          lualine_a = [ { __unkeyed-1 = "mode"; icon = " "; } ];
           lualine_b = [
             { __unkeyed-1 = "branch"; icon = ""; color = "LivaraLualineAccent"; }
             {
