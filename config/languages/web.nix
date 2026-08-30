@@ -11,7 +11,27 @@
       cssls.enable = true;
       jsonls.enable = true;
       yamlls.enable = true;
-      emmet_language_server.enable = true;
+      emmet_language_server = {
+        enable = true;
+        filetypes = [
+          "html"
+          "php"
+          "css"
+          "scss"
+          "javascriptreact"
+          "typescriptreact"
+          "vue"
+          "svelte"
+        ];
+        extraOptions = {
+          init_options = {
+            includeLanguages = { php = "html"; };
+            showAbbreviationSuggestions = true;
+            showExpandedAbbreviation = "always";
+            showSuggestionsAsSnippets = true;
+          };
+        };
+      };
       tailwindcss.enable = true;
     };
   };

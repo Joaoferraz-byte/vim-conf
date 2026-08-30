@@ -93,9 +93,14 @@
     end
 
     vim.keymap.set("i", "<Tab>", function()
+      -- Keep the most useful VS Code behavior: a standalone `!` expands
+      -- immediately, while any other visible Emmet/LSP item is accepted.
+      if expand_html_bang() then
+        return
+      end
       local ok_cmp, cmp = pcall(require, "cmp")
       if ok_cmp and cmp.visible() then
-        cmp.select_next_item()
+        cmp.confirm({ select = true })
         return
       end
       local ok_snip, luasnip = pcall(require, "luasnip")
@@ -103,10 +108,7 @@
         luasnip.expand_or_jump()
         return
       end
-      if expand_html_bang() then
-        return
-      end
       feed_tab()
-    end, { desc = "Expand HTML boilerplate or continue completion" })
+    end, { desc = "Expand Emmet, snippets, or continue indentation" })
   '';
 }
