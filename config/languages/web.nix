@@ -4,7 +4,8 @@
     servers = {
       # Angular language service is intentionally not enabled globally: its
       # default filetypes overlap plain HTML and compete with html-language-server
-      # for nvim-navic. Angular projects can opt in locally with :LspStart angularls.
+      # for nvim-navic. Angular projects should enable it in a project-specific
+      # module where its root/filetypes can be scoped deliberately.
       ts_ls.enable = true;
       eslint.enable = true;
       html.enable = true;
