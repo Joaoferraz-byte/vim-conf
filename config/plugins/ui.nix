@@ -349,28 +349,44 @@
         sections = {
           lualine_a = [ { __unkeyed-1 = "mode"; icon = "󰘧"; } ];
           lualine_b = [
-            { __unkeyed-1 = "branch"; icon = ""; }
+            { __unkeyed-1 = "branch"; icon = ""; color = "LivaraLualineAccent"; }
             {
               __unkeyed-1 = "diff";
               symbols = { added = " "; modified = " "; removed = " "; };
+              color = "LivaraLualineMuted";
             }
             {
               __unkeyed-1 = "diagnostics";
               sources = [ "nvim_lsp" ];
               symbols = { error = " "; warn = " "; info = " "; hint = "󰌵 "; };
+              color = "LivaraLualineMuted";
             }
           ];
-          # The buffer and winbar already identify the file. The footer should
-          # answer "how is this buffer doing?" rather than repeat its name/type.
+          # The footer combines file context with editing state without adding
+          # a second opaque panel: branch and filetype identify the context,
+          # while progress, total lines and location describe the buffer.
           lualine_c = [
-            { __unkeyed-1 = "searchcount"; icon = "󰍉"; }
-            { __unkeyed-1 = "selectioncount"; icon = "󰒆"; }
+            { __unkeyed-1 = "filename"; path = 1; icon = "󰈔"; color = "LivaraLualineAccent"; }
+            { __unkeyed-1 = "searchcount"; icon = "󰍉"; color = "LivaraLualineMuted"; }
+            { __unkeyed-1 = "selectioncount"; icon = "󰒆"; color = "LivaraLualineMuted"; }
           ];
           lualine_x = [
-            { __unkeyed-1 = "lsp_progress"; icon = "󰒓"; }
+            { __unkeyed-1 = "filetype"; icon = "󰈔"; color = "LivaraLualineMuted"; }
+            { __unkeyed-1 = "lsp_progress"; icon = "󰒓"; color = "LivaraLualineAccent"; }
           ];
-          lualine_y = [ { __unkeyed-1 = "progress"; icon = "󰯷"; } ];
-          lualine_z = [ { __unkeyed-1 = "location"; icon = "󰍒"; } ];
+          lualine_y = [
+            { __unkeyed-1 = "progress"; icon = "󰯷"; color = "LivaraLualineAccent"; }
+            {
+              __unkeyed-1.__raw = ''function()
+                return string.format("%d lines", vim.api.nvim_buf_line_count(0))
+              end'';
+              icon = "󰔚";
+              color = "LivaraLualineMuted";
+            }
+          ];
+          lualine_z = [
+            { __unkeyed-1 = "location"; icon = "󰍒"; color = "LivaraLualineAccent"; }
+          ];
         };
       };
     };

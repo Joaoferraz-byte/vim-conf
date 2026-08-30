@@ -318,6 +318,8 @@
       set_lualine_group("LivaraLualineInactiveA", theme_color(colors, "subtext1", "subtext0"), "NONE", 0, true)
       set_lualine_group("LivaraLualineInactiveB", colors.subtext0, "NONE", 0, false)
       set_lualine_group("LivaraLualineInactiveC", colors.subtext0, "NONE", 0, false)
+      set_lualine_group("LivaraLualineAccent", colors.primary, "NONE", 0, true)
+      set_lualine_group("LivaraLualineMuted", colors.subtext0, "NONE", 0, false)
 
       -- lualine owns its generated lualine_* highlight groups. Supplying
       -- concrete colors here is more reliable than linking a section to a
