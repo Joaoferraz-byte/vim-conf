@@ -355,46 +355,37 @@
           disabled_filetypes.statusline = [ "snacks_dashboard" "snacks_picker_list" "oil" ];
         };
         sections = {
-          # Keep the Neovim mark compact; the solid A segment makes mode
-          # and its icon opaque instead of inheriting the transparent canvas.
-          # The icon is intentionally a subtle companion to the mode label,
-          # following fancyline's semantic component treatment.
+          # Fancyline's default hierarchy: mode, file identity and Git on the
+          # left; change summary in the middle; diagnostics and editor context
+          # on the right. The diagonal section borders keep the canvas light
+          # while making each semantic island visually legible.
           lualine_a = [ { __unkeyed-1 = "mode"; icon = " "; } ];
           lualine_b = [
-            { __unkeyed-1 = "branch"; icon = ""; color = "LivaraLualineAccent"; }
+            { __unkeyed-1 = "branch"; icon = " "; color = "LivaraLualineAccent"; }
+            { __unkeyed-1 = "filetype"; icon = "󰈮 "; color = "LivaraLualineMuted"; }
+          ];
+          lualine_c = [
             {
               __unkeyed-1 = "diff";
               symbols = { added = " "; modified = " "; removed = " "; };
               color = "LivaraLualineMuted";
             }
+          ];
+          lualine_x = [
             {
               __unkeyed-1 = "diagnostics";
               sources = [ "nvim_lsp" ];
               symbols = { error = " "; warn = " "; info = " "; hint = "󰌵 "; };
               color = "LivaraLualineMuted";
             }
-          ];
-          # File name and type already live in the top window context. Keep
-          # this footer about repository/editor state instead of repeating them.
-          lualine_c = [
-            { __unkeyed-1 = "searchcount"; icon = "󰍉"; color = "LivaraLualineMuted"; }
-            { __unkeyed-1 = "selectioncount"; icon = "󰒆"; color = "LivaraLualineMuted"; }
-          ];
-          lualine_x = [
-            { __unkeyed-1 = "lsp_progress"; icon = "󰒓"; color = "LivaraLualineAccent"; }
-            { __unkeyed-1 = "progress"; icon = "󰯷"; color = "LivaraLualineAccent"; }
+            { __unkeyed-1 = "lsp_progress"; icon = "󰒓 "; color = "LivaraLualineAccent"; }
           ];
           lualine_y = [
-            {
-              __unkeyed-1.__raw = ''function()
-                return string.format("%d lines", vim.api.nvim_buf_line_count(0))
-              end'';
-              icon = "󰔚";
-              color = "LivaraLualineMuted";
-            }
+            { __unkeyed-1 = "progress"; icon = "󰯷 "; color = "LivaraLualineMuted"; }
+            { __unkeyed-1 = "searchcount"; icon = "󰍉 "; color = "LivaraLualineMuted"; }
           ];
           lualine_z = [
-            { __unkeyed-1 = "location"; icon = "󰍒"; color = "LivaraLualineAccent"; }
+            { __unkeyed-1 = "location"; icon = "󰍒 "; color = "LivaraLualineAccent"; }
           ];
         };
       };
