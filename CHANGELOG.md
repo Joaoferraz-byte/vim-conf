@@ -145,3 +145,10 @@ The validator now asserts the ordered mode → Git branch → filetype compositi
 The Java configuration used the NixVim-specific `plugins.jdtls` module correctly, but its project-boundary contract was implicit and the installed Java 8 runtime was not advertised to JDTLS. That could leave mixed Maven/Gradle workspaces with incomplete runtime selection and make root behavior harder to audit. The remaining language modules were also only partially covered by the static validator.
 
 JDTLS now declares the native `java` filetype and explicit Maven/Gradle root markers, enables automatic build-configuration updates, advertises both the installed JavaSE-1.8 and JavaSE-21 runtimes, and enables Maven/Gradle import with wrapper support. The command remains only `jdtls`; Lombok continues through the official `JDTLS_JVM_ARGS` path, avoiding the previously rejected `--jvm-arg` placement and duplicate server activation. The validator now covers every active general, web and specialized LSP declaration.
+
+
+## Stage 7 — Matugen loader path after clean NixVim regeneration (2026-08-31)
+
+A clean Home Manager activation generated the palette at `~/.config/nvim/lua/matugen_colors.lua`, while the NixVim theme loader still checked only `~/.config/nvim/matugen_colors.lua`. Deleting the local configuration exposed this mismatch because no stale root-level file remained to mask it.
+
+The loader now prefers the generated `lua/matugen_colors.lua` module and retains an explicit fallback for legacy/manual installations. The validator rejects the old-only lookup and requires the canonical path. The shell producer was already aligned in `shell-conf` commit `2646bd8`; the remaining defect was the consumer in `vim-conf`.

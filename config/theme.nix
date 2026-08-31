@@ -1,7 +1,20 @@
 { ... }:
 {
   extraConfigLua = ''
-    local livara_theme_path = vim.fn.stdpath("config") .. "/matugen_colors.lua"
+    local livara_config_dir = vim.fn.stdpath("config")
+    local livara_theme_candidates = {
+      livara_config_dir .. "/lua/matugen_colors.lua",
+      livara_config_dir .. "/matugen_colors.lua", -- legacy/manual install fallback
+    }
+
+    local function find_livara_theme_path()
+      for _, path in ipairs(livara_theme_candidates) do
+        if vim.fn.filereadable(path) == 1 then
+          return path
+        end
+      end
+      return livara_theme_candidates[1]
+    end
 
     local function set_livara_highlight(name, fg, bg, opts)
       local spec = vim.tbl_extend("force", opts or {}, {})
@@ -193,6 +206,7 @@
     end
 
     local function apply_livara_theme()
+      local livara_theme_path = find_livara_theme_path()
       if vim.fn.filereadable(livara_theme_path) ~= 1 then
         vim.notify("Livara Matugen palette not found: " .. livara_theme_path, vim.log.levels.WARN)
         return false
