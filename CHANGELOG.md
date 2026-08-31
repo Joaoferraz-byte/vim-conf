@@ -63,6 +63,12 @@
 - Which-Key modern keymap discovery
 - Snacks.nvim for enhanced UI experience
 
+## Stage 8 — JDTLS Lombok JVM argument (2026-08-31)
+
+The host log showed JDTLS starting successfully but aborting with `Unrecognized option: -javaagent=.../lombok.jar`. The launcher command had placed `--jvm-arg=-javaagent=...` in the server command list, so the wrapper did not consume it as a JVM option and Eclipse JDTLS rejected it.
+
+The configuration now sets the official `JDTLS_JVM_ARGS` environment variable during Neovim startup and keeps `cmd` as only `[ "jdtls" ]`. The jdtls wrapper converts that environment value into the JVM argument form it understands, while the Nix-packaged Lombok path remains reproducible. The validator now rejects JVM arguments embedded in `cmd` and correctly uses `grep --` for option-like patterns.
+
 ## Stage 1 follow-up — Java module scope (2026-08-31)
 
 The first integrated Java module used `pkgs.jdt-language-server`, `pkgs.lombok` and `pkgs.jdk21` but was declared as a plain attrset instead of a Nix module function. During host evaluation this produced `undefined variable 'pkgs'` at `extraPackages`. The module header is now `{ pkgs, ... }:` like the other language modules, so all package references resolve through the NixVim module argument set.

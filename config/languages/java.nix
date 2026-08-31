@@ -1,5 +1,12 @@
 { pkgs, ... }:
 {
+  # The jdtls launcher parses JDTLS_JVM_ARGS into --jvm-arg parameters.
+  # Passing --jvm-arg=-javaagent directly in cmd makes the server itself
+  # reject it as "Unrecognized option", as seen in the host LSP log.
+  extraConfigLua = ''
+    vim.env.JDTLS_JVM_ARGS = "-javaagent:${pkgs.lombok}/share/java/lombok.jar"
+  '';
+
   # Keep Java on the declarative, NixOS-native JDTLS path. A downloaded
   # preview launcher would place a generic ELF into $XDG_DATA_HOME and fail
   # before the LSP handshake on NixOS because it is not patched for the
@@ -8,10 +15,7 @@
     enable = true;
     jdtLanguageServerPackage = pkgs.jdt-language-server;
     settings = {
-      cmd = [
-        "jdtls"
-        "--jvm-arg=-javaagent=${pkgs.lombok}/share/java/lombok.jar"
-      ];
+      cmd = [ "jdtls" ];
       root_dir.__raw = ''
         require("jdtls.setup").find_root({
           ".git",
