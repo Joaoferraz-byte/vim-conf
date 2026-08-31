@@ -103,3 +103,9 @@ The editor-side `BufReadCmd` handler launched Xournal++ but did not cover new-fi
 The handler is now shared by `BufReadCmd` and `BufNewFile`, marks the buffer as routed, launches Xournal++ exactly once and closes the editor buffer after both successful and failed launches. The desktop owner adds a Yazi `.xopp` opener with an absolute packaged binary; Oil and Neo-tree continue to enter through Neovim, where the same external-only handler applies. The Xournal++ profile keeps native `forceZoomToFitOnLoad=true`, so zoom behavior is not duplicated in the launchers.
 
 Validation passed with the cross-repository `.xopp` contract checker and both repository validators.
+
+## Stage 10 — Explicit completion selection (2026-08-31)
+
+The completion menu was navigable only through Ctrl-N/Ctrl-P while Enter and the custom Tab handler could confirm the first item implicitly. The root cause was `cmp.mapping.confirm({ select = true })` on `<CR>` combined with no Shift+Arrow selection contract.
+
+The NixVim completion mapping now keeps `noselect`, uses Shift+Right/Shift+Left to select the next/previous visible item with normal fallback outside the popup, and changes Enter to `confirm({ select = false })`. Tab retains its existing accept/expand behavior. The validator checks the two navigation mappings and explicit confirmation policy.

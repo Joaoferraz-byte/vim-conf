@@ -35,7 +35,23 @@
         "<C-e>" = "cmp.mapping.abort()";
         "<C-n>" = "cmp.mapping.select_next_item()";
         "<C-p>" = "cmp.mapping.select_prev_item()";
-        "<CR>" = "cmp.mapping.confirm({ select = true })";
+        # Keep completion selection explicit: Shift+Arrow changes the highlighted
+        # item, while Enter confirms only an item the user selected.
+        "<S-Right>" = ''cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+          else
+            fallback()
+          end
+        end, { "i", "s" })'';
+        "<S-Left>" = ''cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
+          else
+            fallback()
+          end
+        end, { "i", "s" })'';
+        "<CR>" = "cmp.mapping.confirm({ select = false })";
       };
     };
     cmdline = {

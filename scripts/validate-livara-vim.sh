@@ -17,6 +17,12 @@ require() {
   grep -Eq -- "$pattern" "$file" || fail "missing '$pattern' in ${file#$repo_root/}"
 }
 
+require_literal() {
+  local pattern="$1"
+  local file="$2"
+  grep -Fq -- "$pattern" "$file" || fail "missing literal '$pattern' in ${file#$repo_root/}"
+}
+
 forbidden() {
   local pattern="$1"
   local file="$2"
@@ -36,6 +42,9 @@ require 'suppress_on_insert = true' "$ui"
 forbidden 'icon = "λ"' "$ui"
 forbidden '__unkeyed-1 = "filename"' "$ui"
 require 'filetype_component' "$ui"
+require '"<S-Right>"' "$repo_root/config/plugins/completion.nix"
+require '"<S-Left>"' "$repo_root/config/plugins/completion.nix"
+require_literal 'cmp.mapping.confirm({ select = false })' "$repo_root/config/plugins/completion.nix"
 require 'LspAttach' "$ui"
 require 'documentSymbolProvider' "$ui"
 require 'LivaraStatusline\.render' "$ui"
