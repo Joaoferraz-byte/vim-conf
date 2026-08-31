@@ -62,3 +62,10 @@
 - dashboard-nvim with Doom theme
 - Which-Key modern keymap discovery
 - Snacks.nvim for enhanced UI experience
+
+## Stage 1 — LSP e completion (2026-08-31)
+
+- **Causa raiz:** o IntelliJ LSP era baixado como um executável ELF genérico em `~/.local/share/nvim/intellij-lsp`; no NixOS o launcher falhava no dynamic linker antes do handshake. A configuração também não tornava explícita a aplicação de `cmp_nvim_lsp.default_capabilities()` ao conjunto global de servidores.
+- **Decisão:** JDTLS foi escolhido como caminho padrão por ser o servidor Java open source maduro, empacotável pelo Nix e compatível com Maven, Gradle, Java 21, Lombok, Neotest e DAP. A integração declarativa usa `nvim-jdtls`, workspace/root por projeto, runtime JavaSE-21, downloads de sources/Javadocs, code lens e organize-imports no save.
+- **Escopo preservado:** a criação avançada de `.java` já gera o package a partir do diretório e o template da classe; os atalhos Java foram remapeados para comandos reais do JDTLS e a capability global do nvim-cmp agora é aplicada pelo owner LSP.
+- **Validação:** `bash scripts/validate-livara-vim.sh` e `git diff --check` passaram. Não foi executado `nix flake check` porque o sandbox não possui o binário `nix`; também não foi feito switch/rebuild do sistema.

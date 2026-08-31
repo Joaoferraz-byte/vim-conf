@@ -1,19 +1,89 @@
-{ pkgs, ... }:
-let
-  intellij-lsp-plugin = pkgs.vimUtils.buildVimPlugin {
-    pname = "nvim-intellij-lsp";
-    version = "unstable";
-    src = pkgs.fetchFromGitHub {
-      owner = "gipo355";
-      repo = "nvim-intellij-lsp";
-      rev = "4f51c0270b5e1369569c5a7b00d3831d3ec05616";
-      hash = "sha256-5/ZAOUCEYGM9bqMQFfVbM6wzZI5exLAciPQXYjEDcj4=";
-    };
-    doCheck = false;
-  };
-in
 {
-  plugins.jdtls.enable = false;
+  # Keep Java on the declarative, NixOS-native JDTLS path. A downloaded
+  # preview launcher would place a generic ELF into $XDG_DATA_HOME and fail
+  # before the LSP handshake on NixOS because it is not patched for the
+  # system dynamic linker.
+  plugins.jdtls = {
+    enable = true;
+    jdtLanguageServerPackage = pkgs.jdt-language-server;
+    settings = {
+      cmd = [
+        "jdtls"
+        "--jvm-arg=-javaagent=${pkgs.lombok}/share/java/lombok.jar"
+      ];
+      root_dir.__raw = ''
+        require("jdtls.setup").find_root({
+          ".git",
+          "mvnw",
+          "pom.xml",
+          "gradlew",
+          "build.gradle",
+          "build.gradle.kts",
+          "settings.gradle",
+          "settings.gradle.kts",
+        })
+      '';
+      settings = {
+        java = {
+          configuration = {
+            runtimes = [
+              {
+                name = "JavaSE-21";
+                path = "${pkgs.jdk21}";
+                default = true;
+              }
+            ];
+          };
+          eclipse = {
+            downloadSources = true;
+            downloadJavadocs = true;
+          };
+          maven = {
+            downloadSources = true;
+            updateSnapshots = true;
+          };
+          references = {
+            includeDecompiledSources = true;
+          };
+          signatureHelp = {
+            enabled = true;
+          };
+          implementationsCodeLens = {
+            enabled = true;
+          };
+          referencesCodeLens = {
+            enabled = true;
+          };
+          format = {
+            enabled = true;
+          };
+          saveActions = {
+            organizeImports = true;
+          };
+          completion = {
+            favoriteStaticMembers = [
+              "org.junit.Assert.*"
+              "org.junit.Assume.*"
+              "org.junit.jupiter.api.Assertions.*"
+              "org.junit.jupiter.api.Assumptions.*"
+              "org.mockito.Mockito.*"
+              "org.mockito.ArgumentMatchers.*"
+            ];
+            importOrder = [
+              "java"
+              "javax"
+              "org"
+              "com"
+              ""
+            ];
+          };
+        };
+      };
+      init_options = {
+        bundles = [ ];
+      };
+    };
+  };
 
   plugins.neotest = {
     enable = true;
@@ -25,7 +95,6 @@ in
   };
 
   extraPlugins = [
-    intellij-lsp-plugin
     pkgs.vimPlugins.neotest-java
   ];
 
@@ -35,38 +104,5 @@ in
     lombok
     maven
     gradle
-    curl
   ];
-
-  extraConfigLua = ''
-    local ok = pcall(require, "intellij-lsp")
-    if not ok then
-      return
-    end
-    -- The plugin validates the configured JDK by checking <dir>/bin/javac,
-    -- so the path must be the JDK ROOT directory, NOT the java binary.
-    -- nixpkgs jdk21 already exposes bin/javac at its root, so `${pkgs.jdk21}`
-    -- is the correct value (previously `/bin/java` was rejected with
-    -- "configured jdk is not a JDK").
-    vim.api.nvim_create_autocmd("FileType", {
-      pattern = "java",
-      once = true,
-      callback = function()
-        pcall(vim.lsp.config, "intellij", {
-          init_options = { defaultSdk = "${pkgs.jdk21}" },
-          cmd_env = { JDK_HOME = "${pkgs.jdk21}" },
-        })
-        pcall(vim.lsp.enable, "intellij")
-      end,
-    })
-    require("intellij-lsp").setup({
-      jdk = "${pkgs.jdk21}",
-      accept_eula = true,
-      inlay_hints = true,
-      codelens = true,
-      organize_imports_on_save = true,
-      workspace_dir = vim.fn.stdpath("cache") .. "/intellij-lsp",
-      isolate_index = true,
-    })
-  '';
 }
