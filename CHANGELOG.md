@@ -63,6 +63,12 @@
 - Which-Key modern keymap discovery
 - Snacks.nvim for enhanced UI experience
 
+## Stage 1 follow-up — Java module scope (2026-08-31)
+
+The first integrated Java module used `pkgs.jdt-language-server`, `pkgs.lombok` and `pkgs.jdk21` but was declared as a plain attrset instead of a Nix module function. During host evaluation this produced `undefined variable 'pkgs'` at `extraPackages`. The module header is now `{ pkgs, ... }:` like the other language modules, so all package references resolve through the NixVim module argument set.
+
+Validation passed with `bash scripts/validate-livara-vim.sh` and `git diff --check`. The sandbox does not provide the `nix` executable, so host-side `nix eval`/`nix flake check` remains the final verification step.
+
 ## Stage 1 — LSP e completion (2026-08-31)
 
 - **Causa raiz:** o IntelliJ LSP era baixado como um executável ELF genérico em `~/.local/share/nvim/intellij-lsp`; no NixOS o launcher falhava no dynamic linker antes do handshake. A configuração também não tornava explícita a aplicação de `cmp_nvim_lsp.default_capabilities()` ao conjunto global de servidores.

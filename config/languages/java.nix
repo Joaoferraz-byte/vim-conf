@@ -1,3 +1,4 @@
+{ pkgs, ... }:
 {
   # Keep Java on the declarative, NixOS-native JDTLS path. A downloaded
   # preview launcher would place a generic ELF into $XDG_DATA_HOME and fail
