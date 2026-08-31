@@ -108,7 +108,7 @@
     }
     {
       key = "<leader>d";
-      action = "<cmd>Dashboard<CR>";
+      action = "<cmd>lua Snacks.dashboard()<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Open Dashboard"; };
     }

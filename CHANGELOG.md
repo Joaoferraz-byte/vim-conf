@@ -115,3 +115,9 @@ The NixVim completion mapping now keeps `noselect`, uses Shift+Right/Shift+Left 
 The existing template logic only ran as a side effect of creating a new file, so there was no leader action for applying a reusable scaffold to an already-open buffer. The root cause was the absence of a public buffer-template entrypoint and keymap.
 
 The configuration now exposes `<leader>nt`, presents the supported code/document templates, derives names from the current file, and asks for confirmation before replacing a non-empty buffer. New-file creation reuses the same template renderer so both workflows stay consistent.
+
+## Stage 12 — Snacks dashboard keymap (2026-08-31)
+
+The dashboard keymap called the `Dashboard` Ex command, but the active UI owner is Snacks.nvim, which exposes the dashboard as `Snacks.dashboard()`. The stale command caused `E492: Not an editor command: Dashboard`.
+
+The `<leader>d` mapping now invokes `<cmd>lua Snacks.dashboard()<CR>`, and the validator rejects the obsolete Ex command.
