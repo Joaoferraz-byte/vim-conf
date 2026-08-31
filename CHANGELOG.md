@@ -138,3 +138,10 @@ The NixVim Vault note commands now generate leaner annotation pages. Source Note
 The runtime implementation already matched the requested reference layout, but the validator only proved that a statusline existed and that Lualine was absent. That left the visual contract vulnerable to a future reintroduction of file-path content into the footer or to loss of the rounded mode/branch islands.
 
 The validator now asserts the ordered mode → Git branch → filetype composition, the right-side alignment marker, the Neovim glyph, and the separate winbar path renderer. No runtime renderer was duplicated or changed; this commit makes the approved visual/content adaptation enforceable during static checks.
+
+
+## Stage 3 — Enterprise-oriented LSP roots and Java runtimes (2026-08-31)
+
+The Java configuration used the NixVim-specific `plugins.jdtls` module correctly, but its project-boundary contract was implicit and the installed Java 8 runtime was not advertised to JDTLS. That could leave mixed Maven/Gradle workspaces with incomplete runtime selection and make root behavior harder to audit. The remaining language modules were also only partially covered by the static validator.
+
+JDTLS now declares the native `java` filetype and explicit Maven/Gradle root markers, enables automatic build-configuration updates, advertises both the installed JavaSE-1.8 and JavaSE-21 runtimes, and enables Maven/Gradle import with wrapper support. The command remains only `jdtls`; Lombok continues through the official `JDTLS_JVM_ARGS` path, avoiding the previously rejected `--jvm-arg` placement and duplicate server activation. The validator now covers every active general, web and specialized LSP declaration.

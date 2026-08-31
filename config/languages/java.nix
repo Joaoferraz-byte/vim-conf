@@ -16,28 +16,28 @@
     jdtLanguageServerPackage = pkgs.jdt-language-server;
     settings = {
       cmd = [ "jdtls" ];
-      root_dir.__raw = ''
-        require("jdtls.setup").find_root({
-          ".git",
-          "mvnw",
-          "pom.xml",
-          "gradlew",
-          "build.gradle",
-          "build.gradle.kts",
-          "settings.gradle",
-          "settings.gradle.kts",
-        })
-      '';
       settings = {
         java = {
           configuration = {
+            updateBuildConfiguration = "automatic";
             runtimes = [
+              {
+                name = "JavaSE-1.8";
+                path = "${pkgs.jdk8}";
+              }
               {
                 name = "JavaSE-21";
                 path = "${pkgs.jdk21}";
                 default = true;
               }
             ];
+          };
+          "import" = {
+            maven.enabled = true;
+            gradle = {
+              enabled = true;
+              wrapper.enabled = true;
+            };
           };
           eclipse = {
             downloadSources = true;
@@ -88,6 +88,22 @@
         bundles = [ ];
       };
     };
+  };
+
+  # Native LSP root markers keep one JDTLS workspace per project root and
+  # prevent a Java buffer from attaching to an unrelated parent workspace.
+  plugins.lsp.servers.jdtls = {
+    filetypes = [ "java" ];
+    rootMarkers = [
+      "pom.xml"
+      "mvnw"
+      "build.gradle"
+      "build.gradle.kts"
+      "gradlew"
+      "settings.gradle"
+      "settings.gradle.kts"
+      ".git"
+    ];
   };
 
   plugins.neotest = {
