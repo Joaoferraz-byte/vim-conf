@@ -312,6 +312,8 @@
       -- section groups, so they survive palette reloads deterministically.
       set_status_mode("LivaraStatusNormalMode", colors.on_primary, colors.primary)
       set_status_mode("LivaraStatusInsertMode", colors.base, colors.green)
+      set_livara_highlight("LivaraStatusGit", colors.on_secondary, colors.secondary, { bold = true })
+      set_livara_highlight("LivaraStatusGitSep", colors.secondary, "NONE")
       set_status_mode("LivaraStatusVisualMode", colors.base, colors.mauve)
       set_status_mode("LivaraStatusReplaceMode", colors.base, colors.red)
       set_status_mode("LivaraStatusCommandMode", colors.base, colors.peach)

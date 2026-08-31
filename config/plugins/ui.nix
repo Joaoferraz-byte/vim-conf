@@ -419,7 +419,15 @@
 
     local function git_component()
       local head = vim.b.gitsigns_head
-      return head and ("%#LivaraStatusAccent# " .. head) or ""
+      if not head or head == "" then return "" end
+      -- Keep the branch as the second rounded island, matching the reference
+      -- visual language while escaping statusline control characters in names.
+      local escaped = head:gsub("%%", "%%%%")
+      return table.concat({
+        "%#LivaraStatusGitSep#",
+        "%#LivaraStatusGit# " .. escaped,
+        "%#LivaraStatusGitSep#",
+      })
     end
 
     local function diagnostics_component()

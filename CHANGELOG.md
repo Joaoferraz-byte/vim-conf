@@ -121,3 +121,9 @@ The configuration now exposes `<leader>nt`, presents the supported code/document
 The dashboard keymap called the `Dashboard` Ex command, but the active UI owner is Snacks.nvim, which exposes the dashboard as `Snacks.dashboard()`. The stale command caused `E492: Not an editor command: Dashboard`.
 
 The `<leader>d` mapping now invokes `<cmd>lua Snacks.dashboard()<CR>`, and the validator rejects the obsolete Ex command.
+
+## Stage 13 — Reference-inspired statusline (2026-08-31)
+
+The existing statusline had the requested mode, branch and filetype information, but the branch was plain text and did not share the reference configuration's rounded visual islands. The root cause was an incomplete visual adaptation rather than missing data.
+
+The mode remains the first island with the Neovim glyph, the current Git branch is now the second rounded island with its own dynamic theme groups, and the filetype remains third. The right side keeps diagnostics, LSP and position metadata; the path and filename stay in the transparent winbar so the requested footer content is not reintroduced. Branch names are escaped before being inserted into the statusline format string.
