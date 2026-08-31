@@ -172,29 +172,42 @@
     vim.api.nvim_create_user_command("LivaraVaultBook", function() make_note("book") end, {})
     vim.api.nvim_create_user_command("LivaraVaultCapture", function() make_note("quick_capture") end, {})
 
-    vim.api.nvim_create_autocmd("BufReadCmd", {
-      pattern = "*.xopp",
-      callback = function(args)
-        if vim.fn.executable("xournalpp") ~= 1 then
-          notify("Cannot open .xopp: xournalpp is not installed", vim.log.levels.ERROR)
-          return
+    local function route_xopp(args)
+      if vim.b[args.buf].livara_xopp_routed then return end
+      vim.b[args.buf].livara_xopp_routed = true
+
+      local file = vim.fn.fnamemodify(args.file, ":p")
+      local launched_as_file = vim.fn.argc() == 1
+        and vim.fn.fnamemodify(vim.fn.argv(0), ":p") == file
+
+      local function close_editor_buffer()
+        if launched_as_file then
+          -- When `nvim note.xopp` starts a new editor, leaving an empty Nvim
+          -- window open is the reported double-open. Keep only Xournal++.
+          vim.cmd("silent! qa!")
+        elseif vim.api.nvim_buf_is_valid(args.buf) then
+          -- Oil/Neo-tree and other explorers may edit through Nvim. Preserve
+          -- that session, but never leave the journal as a text buffer.
+          vim.api.nvim_buf_delete(args.buf, { force = true })
         end
-        local file = vim.fn.fnamemodify(args.file, ":p")
-        local launched_as_file = vim.fn.argc() == 1
-          and vim.fn.fnamemodify(vim.fn.argv(0), ":p") == file
-        vim.fn.jobstart({ "xournalpp", file }, { detach = true })
-        vim.schedule(function()
-          if launched_as_file then
-            -- When `nvim note.xopp` starts a new editor, leaving an empty Nvim
-            -- window open is the reported double-open. Keep only Xournal++.
-            vim.cmd("silent! qa!")
-          elseif vim.api.nvim_buf_is_valid(args.buf) then
-            -- Opening from an existing Nvim session should preserve that
-            -- session, but the binary must never become an editable buffer.
-            vim.api.nvim_buf_delete(args.buf, { force = true })
-          end
-        end)
-      end,
+      end
+
+      if vim.fn.executable("xournalpp") ~= 1 then
+        notify("Cannot open .xopp: xournalpp is not installed", vim.log.levels.ERROR)
+        vim.schedule(close_editor_buffer)
+        return
+      end
+
+      local job = vim.fn.jobstart({ "xournalpp", file }, { detach = true })
+      if job <= 0 then
+        notify("Cannot open .xopp: failed to launch xournalpp", vim.log.levels.ERROR)
+      end
+      vim.schedule(close_editor_buffer)
+    end
+
+    vim.api.nvim_create_autocmd({ "BufReadCmd", "BufNewFile" }, {
+      pattern = "*.xopp",
+      callback = route_xopp,
     })
   '';
 }

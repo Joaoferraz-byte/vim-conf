@@ -62,3 +62,11 @@
 - dashboard-nvim with Doom theme
 - Which-Key modern keymap discovery
 - Snacks.nvim for enhanced UI experience
+
+## Stage 6 — Exclusive Xournal++ routing for `.xopp` (2026-08-31)
+
+The editor-side `BufReadCmd` handler launched Xournal++ but did not cover new-file routes and could leave the temporary Neovim buffer visible in explorer-driven opens. The desktop/Yazi side also had no explicit extension rule, so MIME detection could select a generic text/archive opener first.
+
+The handler is now shared by `BufReadCmd` and `BufNewFile`, marks the buffer as routed, launches Xournal++ exactly once and closes the editor buffer after both successful and failed launches. The desktop owner adds a Yazi `.xopp` opener with an absolute packaged binary; Oil and Neo-tree continue to enter through Neovim, where the same external-only handler applies. The Xournal++ profile keeps native `forceZoomToFitOnLoad=true`, so zoom behavior is not duplicated in the launchers.
+
+Validation passed with the cross-repository `.xopp` contract checker and both repository validators.
