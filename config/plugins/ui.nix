@@ -278,119 +278,6 @@
       };
     };
 
-    lualine = {
-      enable = true;
-      settings = {
-        options = {
-          theme = {
-            normal = {
-              a = "LivaraLualineNormalA";
-              b = "LivaraLualineNormalB";
-              c = "LivaraLualineNormalC";
-              x = "LivaraLualineNormalB";
-              y = "LivaraLualineNormalB";
-              z = "LivaraLualineNormalA";
-            };
-            insert = {
-              a = "LivaraLualineInsertA";
-              b = "LivaraLualineInsertB";
-              c = "LivaraLualineInsertC";
-              x = "LivaraLualineInsertB";
-              y = "LivaraLualineInsertB";
-              z = "LivaraLualineInsertA";
-            };
-            visual = {
-              a = "LivaraLualineVisualA";
-              b = "LivaraLualineVisualB";
-              c = "LivaraLualineVisualC";
-              x = "LivaraLualineVisualB";
-              y = "LivaraLualineVisualB";
-              z = "LivaraLualineVisualA";
-            };
-            replace = {
-              a = "LivaraLualineReplaceA";
-              b = "LivaraLualineReplaceB";
-              c = "LivaraLualineReplaceC";
-              x = "LivaraLualineReplaceB";
-              y = "LivaraLualineReplaceB";
-              z = "LivaraLualineReplaceA";
-            };
-            command = {
-              a = "LivaraLualineCommandA";
-              b = "LivaraLualineCommandB";
-              c = "LivaraLualineCommandC";
-              x = "LivaraLualineCommandB";
-              y = "LivaraLualineCommandB";
-              z = "LivaraLualineCommandA";
-            };
-            inactive = {
-              a = "LivaraLualineInactiveA";
-              b = "LivaraLualineInactiveB";
-              c = "LivaraLualineInactiveC";
-              x = "LivaraLualineInactiveB";
-              y = "LivaraLualineInactiveB";
-              z = "LivaraLualineInactiveA";
-            };
-          };
-          globalstatus = true;
-          icons_enabled = true;
-          always_divide_middle = true;
-          # Keep the statusline canvas transparent. The angled separators
-          # only bridge the colored semantic mode/location segments into the
-          # transparent surface; they do not add a solid footer background.
-          section_separators = {
-            left = "";
-            right = "";
-          };
-          component_separators = {
-            left = "·";
-            right = "·";
-          };
-          padding = {
-            left = 1;
-            right = 1;
-          };
-          # The dashboard already owns its visual landing page; hiding the
-          # global footer there prevents a second context bar at the bottom.
-          disabled_filetypes.statusline = [ "snacks_dashboard" "snacks_picker_list" "oil" ];
-        };
-        sections = {
-          # Fancyline's default hierarchy: mode, file identity and Git on the
-          # left; change summary in the middle; diagnostics and editor context
-          # on the right. The diagonal section borders keep the canvas light
-          # while making each semantic island visually legible.
-          lualine_a = [ { __unkeyed-1 = "mode"; icon = " "; } ];
-          lualine_b = [
-            { __unkeyed-1 = "branch"; icon = " "; color = "LivaraLualineAccent"; }
-            { __unkeyed-1 = "filetype"; icon = "󰈮 "; color = "LivaraLualineMuted"; }
-          ];
-          lualine_c = [
-            {
-              __unkeyed-1 = "diff";
-              symbols = { added = " "; modified = " "; removed = " "; };
-              color = "LivaraLualineMuted";
-            }
-          ];
-          lualine_x = [
-            {
-              __unkeyed-1 = "diagnostics";
-              sources = [ "nvim_lsp" ];
-              symbols = { error = " "; warn = " "; info = " "; hint = "󰌵 "; };
-              color = "LivaraLualineMuted";
-            }
-            { __unkeyed-1 = "lsp_progress"; icon = "󰒓 "; color = "LivaraLualineAccent"; }
-          ];
-          lualine_y = [
-            { __unkeyed-1 = "progress"; icon = "󰯷 "; color = "LivaraLualineMuted"; }
-            { __unkeyed-1 = "searchcount"; icon = "󰍉 "; color = "LivaraLualineMuted"; }
-          ];
-          lualine_z = [
-            { __unkeyed-1 = "location"; icon = "󰍒 "; color = "LivaraLualineAccent"; }
-          ];
-        };
-      };
-    };
-
     render-markdown = {
       enable = true;
       settings = {
@@ -454,16 +341,22 @@
     -- so Matugen reloads and an optional Tokyo Night palette are reflected
     -- without rebuilding the component layout.
     local LivaraStatusline = {}
+    local disabled_statusline_filetypes = {
+      snacks_dashboard = true,
+      snacks_picker_list = true,
+      oil = true,
+    }
+
     local statusline_mode = {
-      n = { label = "NORMAL", group = "LivaraLualineNormalA" },
-      no = { label = "OP-PENDING", group = "LivaraLualineNormalA" },
-      i = { label = "INSERT", group = "LivaraLualineInsertA" },
-      v = { label = "VISUAL", group = "LivaraLualineVisualA" },
-      V = { label = "VISUAL", group = "LivaraLualineVisualA" },
-      [vim.api.nvim_replace_termcodes("<C-v>", true, false, true)] = { label = "VISUAL", group = "LivaraLualineVisualA" },
-      R = { label = "REPLACE", group = "LivaraLualineReplaceA" },
-      c = { label = "COMMAND", group = "LivaraLualineCommandA" },
-      t = { label = "TERMINAL", group = "LivaraLualineCommandA" },
+      n = { label = "NORMAL", group = "LivaraStatusNormalMode" },
+      no = { label = "OP-PENDING", group = "LivaraStatusNormalMode" },
+      i = { label = "INSERT", group = "LivaraStatusInsertMode" },
+      v = { label = "VISUAL", group = "LivaraStatusVisualMode" },
+      V = { label = "VISUAL", group = "LivaraStatusVisualMode" },
+      [vim.api.nvim_replace_termcodes("<C-v>", true, false, true)] = { label = "VISUAL", group = "LivaraStatusVisualMode" },
+      R = { label = "REPLACE", group = "LivaraStatusReplaceMode" },
+      c = { label = "COMMAND", group = "LivaraStatusCommandMode" },
+      t = { label = "TERMINAL", group = "LivaraStatusCommandMode" },
     }
 
     local function rgb(value, fallback)
@@ -483,9 +376,9 @@
 
     local function prepare_highlights(mode_group)
       local mode_fg, mode_bg = group_colors(mode_group, "#111318", "#c3adff")
-      local text_fg = group_colors("LivaraLualineNormalB", "#e1e2e8", "NONE")
-      local muted_fg = group_colors("LivaraLualineMuted", "#a6a8b3", "NONE")
-      local accent_fg = group_colors("LivaraLualineAccent", "#c3adff", "NONE")
+      local text_fg = group_colors("Normal", "#e1e2e8", "NONE")
+      local muted_fg = group_colors("Comment", "#a6a8b3", "NONE")
+      local accent_fg = group_colors("Directory", "#c3adff", "NONE")
       highlight("LivaraStatusMode", mode_fg, mode_bg, { bold = true })
       highlight("LivaraStatusModeSep", mode_bg, "NONE")
       highlight("LivaraStatusText", text_fg, "NONE")
@@ -553,12 +446,14 @@
     end
 
     function LivaraStatusline.render()
+      if disabled_statusline_filetypes[vim.bo.filetype] then return "" end
       local left = table.concat({ mode_component(), git_component(), filetype_component() }, "  ")
       local right = table.concat({ diagnostics_component(), lsp_component(), "%#LivaraStatusMuted#󰍒 " .. vim.fn.line(".") .. ":" .. vim.fn.virtcol(".") }, "  ")
       return left .. "%=" .. right .. " "
     end
 
     function LivaraStatusline.winbar()
+      if disabled_statusline_filetypes[vim.bo.filetype] then return "" end
       local path = vim.api.nvim_buf_get_name(0)
       if path == "" then return "" end
       local display = vim.fn.fnamemodify(path, ":~:.")

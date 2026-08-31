@@ -69,3 +69,11 @@
 - **Decisão:** JDTLS foi escolhido como caminho padrão por ser o servidor Java open source maduro, empacotável pelo Nix e compatível com Maven, Gradle, Java 21, Lombok, Neotest e DAP. A integração declarativa usa `nvim-jdtls`, workspace/root por projeto, runtime JavaSE-21, downloads de sources/Javadocs, code lens e organize-imports no save.
 - **Escopo preservado:** a criação avançada de `.java` já gera o package a partir do diretório e o template da classe; os atalhos Java foram remapeados para comandos reais do JDTLS e a capability global do nvim-cmp agora é aplicada pelo owner LSP.
 - **Validação:** `bash scripts/validate-livara-vim.sh` e `git diff --check` passaram. Não foi executado `nix flake check` porque o sandbox não possui o binário `nix`; também não foi feito switch/rebuild do sistema.
+
+## Stage 5 — Single-owner Neovim statusline (2026-08-31)
+
+The statusline was configured twice: Lualine declared a full six-section layout while a later global renderer overwrote `vim.o.statusline` and `vim.o.winbar`. The visible result therefore depended on initialization order and theme reloads, even though the intended mode/branch/diagnostics composition was already implemented in the renderer.
+
+The Lualine owner and its theme-refresh hooks were removed. `LivaraStatusline` now owns the footer and winbar exclusively, with the Neovim icon and mode first, Git branch immediately after it, filetype and diagnostics/LSP context retained, and cursor position on the right. Mode highlights are named `LivaraStatus*` and are regenerated from Matugen colors on palette reload. Dashboard, picker-list and Oil filetypes retain their intentionally hidden footer behavior.
+
+Validation passed with `bash scripts/validate-livara-vim.sh`, `git diff --check`, embedded Lua syntax checks where available, and a scan confirming no active configuration references to Lualine remain.
