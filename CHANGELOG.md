@@ -63,6 +63,12 @@
 - Which-Key modern keymap discovery
 - Snacks.nvim for enhanced UI experience
 
+## Stage 9 — Fidget and dynamic transparency (2026-08-31)
+
+Fidget was enabled with its default progress polling, causing LSP progress messages to appear repeatedly in the lower-right corner while editing. Progress polling is now disabled and insertion-mode suppression is enabled; the LSP clients continue to run normally.
+
+The transparency policy now clears generated icon highlight groups for Bufferline, Barbecue, Neo-tree, NvimTree, Oil and MiniIcons, including after `BufWinEnter` and other lazy-render events. The theme watcher and palette reload path reapply these rules and redraw the editor so wallpaper changes do not leave stale opaque backgrounds behind after a reload or restart.
+
 ## Stage 8 — JDTLS Lombok JVM argument (2026-08-31)
 
 The host log showed JDTLS starting successfully but aborting with `Unrecognized option: -javaagent=.../lombok.jar`. The launcher command had placed `--jvm-arg=-javaagent=...` in the server command list, so the wrapper did not consume it as a JVM option and Eclipse JDTLS rejected it.

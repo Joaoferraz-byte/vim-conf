@@ -236,7 +236,20 @@
       };
     };
     treesitter-context.enable = true;
-    fidget.enable = true;
+    fidget = {
+      enable = true;
+      settings = {
+        # Keep LSP progress handling enabled but do not render every progress
+        # update while typing. This avoids the bottom-right notification spam.
+        progress = {
+          poll_rate = false;
+          suppress_on_insert = true;
+        };
+        notification = {
+          override_vim_notify = false;
+        };
+      };
+    };
 
     bufferline = {
       enable = true;

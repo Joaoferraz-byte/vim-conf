@@ -37,6 +37,12 @@
         "BufferLineTabClose",
         "BufferLineTabCloseVisible",
         "BufferLineTabCloseSelected",
+        "BufferLineDevIcon",
+        "NeoTreeFileIcon",
+        "NeoTreeFolderIcon",
+        "NvimTreeFileIcon",
+        "NvimTreeFolderIcon",
+        "OilFileIcon",
       }
       for _, group in ipairs(static_groups) do
         set_transparent_group(group)
@@ -46,6 +52,12 @@
         "BufferLineDevIcon",
         "BufferLineCloseButton",
         "barbecue_fileicon_",
+        "NeoTreeFileIcon",
+        "NeoTreeFolderIcon",
+        "NvimTreeFileIcon",
+        "NvimTreeFolderIcon",
+        "OilFileIcon",
+        "MiniIcons",
       }
       for _, prefix in ipairs(generated_prefixes) do
         for _, group in ipairs(vim.fn.getcompletion(prefix, "highlight")) do
@@ -91,7 +103,7 @@
         "BufferLineCloseButton", "BufferLineCloseButtonVisible", "BufferLineModified", "BufferLineModifiedSelected",
         "BufferLineSeparator", "BufferLineSeparatorSelected", "BufferLineIndicatorSelected",
         "AerialNormal", "AerialLine", "AerialGuide", "TroubleNormal", "TroubleText",
-        "TroubleCount", "TroubleIndent", "FidgetNormal", "RenderMarkdownCode", "RenderMarkdownCodeInfo",
+        "TroubleCount", "TroubleIndent", "FidgetNormal", "FidgetBorder", "RenderMarkdownCode", "RenderMarkdownCodeInfo",
         "LazyNormal", "MasonNormal",
         "SnacksDashboardHeader", "SnacksDashboardTitle", "SnacksDashboardDesc", "SnacksDashboardKey",
         "SnacksDashboardIcon", "SnacksDashboardFile", "SnacksDashboardDir", "SnacksDashboardSpecial",
@@ -374,11 +386,14 @@
         end)
       end,
     })
-    vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
+    vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter", "WinEnter" }, {
       group = livara_autocmd_group,
       callback = function()
         -- Both plugins create file-icon groups during their first render.
-        vim.schedule(clear_generated_icon_backgrounds)
+        vim.schedule(function()
+          clear_generated_icon_backgrounds()
+          vim.cmd("redraw!")
+        end)
       end,
     })
     vim.api.nvim_create_autocmd("User", {
