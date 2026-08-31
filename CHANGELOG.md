@@ -131,3 +131,10 @@ The mode remains the first island with the Neovim glyph, the current Git branch 
 ## Stage 14 — Simpler note templates (2026-08-31)
 
 The NixVim Vault note commands now generate leaner annotation pages. Source Notes replace the separate Claim, Evidence and Interpretation headings with one `## Content` section, while retaining Open questions and Sources. Daily Notes retain Focus, Tasks and Notes but no longer add the unused Log heading or the Handwritten page callout. Frontmatter, paths, duplicate-file protection and the existing commands remain unchanged.
+
+
+## Stage 1 — Reference statusline regression contract (2026-08-31)
+
+The runtime implementation already matched the requested reference layout, but the validator only proved that a statusline existed and that Lualine was absent. That left the visual contract vulnerable to a future reintroduction of file-path content into the footer or to loss of the rounded mode/branch islands.
+
+The validator now asserts the ordered mode → Git branch → filetype composition, the right-side alignment marker, the Neovim glyph, and the separate winbar path renderer. No runtime renderer was duplicated or changed; this commit makes the approved visual/content adaptation enforceable during static checks.
