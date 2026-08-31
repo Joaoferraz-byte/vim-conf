@@ -419,6 +419,14 @@
         lualine.setup({ options = { theme = lualine_theme } })
         lualine.refresh({ force = true })
       end)
+      -- lualine remains installed for plugin compatibility, but the visible
+      -- footer belongs to LivaraStatusline. Re-apply it after every palette
+      -- reload because lualine.setup may reset vim.o.statusline/winbar.
+      pcall(function()
+        if _G.livara_statusline_activate then
+          _G.livara_statusline_activate()
+        end
+      end)
       -- Keep the canvas transparent after lualine refresh as well. The mode
       -- and location sections remain colored through their own lualine groups.
       set_transparent_group("StatusLine", colors.text)

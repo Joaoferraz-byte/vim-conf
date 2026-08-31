@@ -448,6 +448,134 @@
   };
 
   extraConfigLua = ''
+    -- MariaSolOs-style statusline/winbar: semantic components are rendered
+    -- as small colored islands, while the canvas itself remains transparent.
+    -- Colors are read from Livara's dynamic highlight groups on every render,
+    -- so Matugen reloads and an optional Tokyo Night palette are reflected
+    -- without rebuilding the component layout.
+    local LivaraStatusline = {}
+    local statusline_mode = {
+      n = { label = "NORMAL", group = "LivaraLualineNormalA" },
+      no = { label = "OP-PENDING", group = "LivaraLualineNormalA" },
+      i = { label = "INSERT", group = "LivaraLualineInsertA" },
+      v = { label = "VISUAL", group = "LivaraLualineVisualA" },
+      V = { label = "VISUAL", group = "LivaraLualineVisualA" },
+      [vim.api.nvim_replace_termcodes("<C-v>", true, false, true)] = { label = "VISUAL", group = "LivaraLualineVisualA" },
+      R = { label = "REPLACE", group = "LivaraLualineReplaceA" },
+      c = { label = "COMMAND", group = "LivaraLualineCommandA" },
+      t = { label = "TERMINAL", group = "LivaraLualineCommandA" },
+    }
+
+    local function rgb(value, fallback)
+      return value and string.format("#%06x", value) or fallback
+    end
+
+    local function highlight(name, fg, bg, opts)
+      local spec = vim.tbl_extend("force", opts or {}, { fg = fg, bg = bg })
+      vim.api.nvim_set_hl(0, name, spec)
+      return name
+    end
+
+    local function group_colors(group, fallback_fg, fallback_bg)
+      local spec = vim.api.nvim_get_hl(0, { name = group, link = false })
+      return rgb(spec.fg, fallback_fg), rgb(spec.bg, fallback_bg)
+    end
+
+    local function prepare_highlights(mode_group)
+      local mode_fg, mode_bg = group_colors(mode_group, "#111318", "#c3adff")
+      local text_fg = group_colors("LivaraLualineNormalB", "#e1e2e8", "NONE")
+      local muted_fg = group_colors("LivaraLualineMuted", "#a6a8b3", "NONE")
+      local accent_fg = group_colors("LivaraLualineAccent", "#c3adff", "NONE")
+      highlight("LivaraStatusMode", mode_fg, mode_bg, { bold = true })
+      highlight("LivaraStatusModeSep", mode_bg, "NONE")
+      highlight("LivaraStatusText", text_fg, "NONE")
+      highlight("LivaraStatusMuted", muted_fg, "NONE")
+      highlight("LivaraStatusAccent", accent_fg, "NONE", { bold = true })
+      highlight("LivaraStatusError", group_colors("DiagnosticError", "#ff7a90", "NONE"), "NONE")
+      highlight("LivaraStatusWarn", group_colors("DiagnosticWarn", "#f5d782", "NONE"), "NONE")
+      highlight("LivaraStatusInfo", group_colors("DiagnosticInfo", "#8fc7ff", "NONE"), "NONE")
+      highlight("LivaraStatusHint", group_colors("DiagnosticHint", "#8ee6b0", "NONE"), "NONE")
+      highlight("LivaraWinbarText", text_fg, "NONE")
+      highlight("LivaraWinbarMuted", muted_fg, "NONE")
+      return mode_fg, mode_bg
+    end
+
+    local function mode_component()
+      local current = vim.api.nvim_get_mode().mode
+      local mode = statusline_mode[current] or statusline_mode[current:sub(1, 1)] or statusline_mode.n
+      prepare_highlights(mode.group)
+      return table.concat({
+        "%#LivaraStatusModeSep#",
+        "%#LivaraStatusMode#  " .. mode.label,
+        "%#LivaraStatusModeSep#",
+      })
+    end
+
+    local function git_component()
+      local head = vim.b.gitsigns_head
+      return head and ("%#LivaraStatusAccent# " .. head) or ""
+    end
+
+    local function diagnostics_component()
+      local counts = { 0, 0, 0, 0 }
+      for _, diagnostic in ipairs(vim.diagnostic.get(0)) do
+        counts[diagnostic.severity] = counts[diagnostic.severity] + 1
+      end
+      local parts = {}
+      local symbols = { "", "", "󰌵", "" }
+      local groups = { "LivaraStatusError", "LivaraStatusWarn", "LivaraStatusHint", "LivaraStatusInfo" }
+      for severity = 1, 4 do
+        if counts[severity] > 0 then
+          parts[#parts + 1] = string.format("%%#%s#%s %d", groups[severity], symbols[severity], counts[severity])
+        end
+      end
+      return table.concat(parts, " ")
+    end
+
+    local function filetype_component()
+      local filetype = vim.bo.filetype ~= "" and vim.bo.filetype or "no filetype"
+      local icon = "󰈮"
+      local ok, devicons = pcall(require, "nvim-web-devicons")
+      if ok then
+        local name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":t")
+        icon = devicons.get_icon(name, vim.bo.filetype, { default = true }) or icon
+      end
+      return "%#LivaraStatusAccent#" .. icon .. " %#LivaraStatusText#" .. filetype
+    end
+
+    local function lsp_component()
+      local clients = vim.lsp.get_clients({ bufnr = 0 })
+      if #clients == 0 then return "" end
+      local names = {}
+      for _, client in ipairs(clients) do names[#names + 1] = client.name end
+      table.sort(names)
+      return "%#LivaraStatusAccent#󰒓 %#LivaraStatusMuted#" .. table.concat(names, ",")
+    end
+
+    function LivaraStatusline.render()
+      local left = table.concat({ mode_component(), git_component(), filetype_component() }, "  ")
+      local right = table.concat({ diagnostics_component(), lsp_component(), "%#LivaraStatusMuted#󰍒 " .. vim.fn.line(".") .. ":" .. vim.fn.virtcol(".") }, "  ")
+      return left .. "%=" .. right .. " "
+    end
+
+    function LivaraStatusline.winbar()
+      local path = vim.api.nvim_buf_get_name(0)
+      if path == "" then return "" end
+      local display = vim.fn.fnamemodify(path, ":~:.")
+      local directory = vim.fn.fnamemodify(display, ":h")
+      local basename = vim.fn.fnamemodify(display, ":t")
+      return "%#LivaraWinbarMuted#󰉋 " .. directory .. " %#LivaraWinbarText#› " .. basename
+    end
+
+    _G.LivaraStatusline = LivaraStatusline
+    _G.livara_statusline_activate = function()
+      vim.o.showmode = false
+      vim.o.statusline = "%!v:lua.LivaraStatusline.render()"
+      vim.o.winbar = "%!v:lua.LivaraStatusline.winbar()"
+      vim.cmd("redrawstatus")
+    end
+    _G.livara_statusline_activate()
+
     local navic_attach_group = vim.api.nvim_create_augroup("LivaraNavicAttach", { clear = true })
     vim.api.nvim_create_autocmd("LspAttach", {
       group = navic_attach_group,
