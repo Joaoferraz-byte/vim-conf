@@ -3,6 +3,7 @@ set -Eeuo pipefail
 
 repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 ui="$repo_root/config/plugins/ui.nix"
+keymaps="$repo_root/config/keymaps.nix"
 web="$repo_root/config/languages/web.nix"
 vault="$repo_root/config/plugins/vault.nix"
 
@@ -42,6 +43,8 @@ require 'suppress_on_insert = true' "$ui"
 forbidden 'icon = "λ"' "$ui"
 forbidden '__unkeyed-1 = "filename"' "$ui"
 require 'filetype_component' "$ui"
+require '_G\.load_current_template' "$ui"
+require 'key = "<leader>nt"' "$keymaps"
 require '"<S-Right>"' "$repo_root/config/plugins/completion.nix"
 require '"<S-Left>"' "$repo_root/config/plugins/completion.nix"
 require_literal 'cmp.mapping.confirm({ select = false })' "$repo_root/config/plugins/completion.nix"

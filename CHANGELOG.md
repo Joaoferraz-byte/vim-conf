@@ -109,3 +109,9 @@ Validation passed with the cross-repository `.xopp` contract checker and both re
 The completion menu was navigable only through Ctrl-N/Ctrl-P while Enter and the custom Tab handler could confirm the first item implicitly. The root cause was `cmp.mapping.confirm({ select = true })` on `<CR>` combined with no Shift+Arrow selection contract.
 
 The NixVim completion mapping now keeps `noselect`, uses Shift+Right/Shift+Left to select the next/previous visible item with normal fallback outside the popup, and changes Enter to `confirm({ select = false })`. Tab retains its existing accept/expand behavior. The validator checks the two navigation mappings and explicit confirmation policy.
+
+## Stage 11 — Current-buffer templates (2026-08-31)
+
+The existing template logic only ran as a side effect of creating a new file, so there was no leader action for applying a reusable scaffold to an already-open buffer. The root cause was the absence of a public buffer-template entrypoint and keymap.
+
+The configuration now exposes `<leader>nt`, presents the supported code/document templates, derives names from the current file, and asks for confirmation before replacing a non-empty buffer. New-file creation reuses the same template renderer so both workflows stay consistent.

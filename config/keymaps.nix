@@ -126,6 +126,12 @@
       options = { silent = true; desc = "New File (Advanced)"; };
     }
     {
+      key = "<leader>nt";
+      action = "<cmd>lua _G.load_current_template()<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Load Template into Current Buffer"; };
+    }
+    {
       key = "<leader>ns";
       action = "<cmd>lua _G.spring_boot_wizard()<CR>";
       mode = [ "n" ];

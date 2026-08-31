@@ -524,6 +524,68 @@
       go = 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello")\n}\n',
     }
 
+    local template_choices = {
+      { ext = "java", label = "Java class" },
+      { ext = "py", label = "Python module" },
+      { ext = "js", label = "JavaScript module" },
+      { ext = "ts", label = "TypeScript function" },
+      { ext = "tsx", label = "React TSX component" },
+      { ext = "nix", label = "Nix module" },
+      { ext = "md", label = "Markdown note" },
+      { ext = "sh", label = "Shell script" },
+      { ext = "json", label = "JSON document" },
+      { ext = "yaml", label = "YAML document" },
+      { ext = "c", label = "C program" },
+      { ext = "cpp", label = "C++ program" },
+      { ext = "rs", label = "Rust program" },
+      { ext = "go", label = "Go program" },
+    }
+
+    local function template_content(ext, name)
+      local template = templates[ext]
+      if not template then return nil end
+      local stem = name:gsub("%.[^.]+$", "")
+      local class_name = stem:gsub("^%l", string.upper):gsub("[^%w]", "")
+      local ok, content = pcall(string.format, template, class_name, class_name)
+      return ok and content or nil
+    end
+
+    local function apply_current_template(choice)
+      local name = vim.fn.expand("%:t")
+      if name == "" then name = "Main" end
+      local content = template_content(choice.ext, name)
+      if not content then
+        notify("Template unavailable: " .. choice.ext, vim.log.levels.ERROR)
+        return
+      end
+
+      local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+      local has_content = #lines > 1 or (lines[1] or "") ~= ""
+      local function replace_buffer()
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(content, "\n", { plain = true }))
+        vim.bo.modified = true
+        notify("Loaded " .. choice.label .. " into current buffer")
+      end
+      if has_content then
+        vim.ui.select({ "Replace buffer", "Cancel" }, {
+          prompt = "Current buffer is not empty: ",
+        }, function(action)
+          if action == "Replace buffer" then replace_buffer() end
+        end)
+      else
+        replace_buffer()
+      end
+    end
+
+    _G.load_current_template = function()
+      vim.ui.select(template_choices, {
+        prompt = "Load template into current buffer: ",
+        format_item = function(choice) return choice.label end,
+      }, function(choice)
+        if choice then apply_current_template(choice) end
+      end)
+    end
+
     local function create_file(path)
       path = vim.fn.expand(path)
       if path == "" or path == "/" then return end
@@ -531,15 +593,10 @@
       if vim.fn.isdirectory(dir) == 0 then vim.fn.mkdir(dir, "p") end
       local name = vim.fn.fnamemodify(path, ":t")
       local ext = name:match("%.([^.]+)$") or ""
-      local template = templates[ext]
       vim.cmd("edit " .. vim.fn.fnameescape(path))
-      if template then
-        local stem = name:gsub("%.[^.]+$", "")
-        local class_name = stem:gsub("^%l", string.upper):gsub("[^%w]", "")
-        local ok, content = pcall(string.format, template, class_name, class_name)
-        if ok then
-          vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(content, "\n", { plain = true }))
-        end
+      local content = template_content(ext, name)
+      if content then
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(content, "\n", { plain = true }))
       end
       vim.cmd("write")
       notify("Created: " .. path)
