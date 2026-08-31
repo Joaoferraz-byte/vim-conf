@@ -127,3 +127,7 @@ The `<leader>d` mapping now invokes `<cmd>lua Snacks.dashboard()<CR>`, and the v
 The existing statusline had the requested mode, branch and filetype information, but the branch was plain text and did not share the reference configuration's rounded visual islands. The root cause was an incomplete visual adaptation rather than missing data.
 
 The mode remains the first island with the Neovim glyph, the current Git branch is now the second rounded island with its own dynamic theme groups, and the filetype remains third. The right side keeps diagnostics, LSP and position metadata; the path and filename stay in the transparent winbar so the requested footer content is not reintroduced. Branch names are escaped before being inserted into the statusline format string.
+
+## Stage 14 — Simpler note templates (2026-08-31)
+
+The NixVim Vault note commands now generate leaner annotation pages. Source Notes replace the separate Claim, Evidence and Interpretation headings with one `## Content` section, while retaining Open questions and Sources. Daily Notes retain Focus, Tasks and Notes but no longer add the unused Log heading or the Handwritten page callout. Frontmatter, paths, duplicate-file protection and the existing commands remain unchanged.

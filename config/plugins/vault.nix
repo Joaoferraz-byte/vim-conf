@@ -98,8 +98,7 @@
           lines = {
             "---", "title: " .. title, "tags:", "  - daily", "area: daily", "status: active",
             "created: " .. now, "updated: " .. now, "---", "# " .. title, "",
-            "## Focus", "", "## Tasks", "- [ ] ", "", "## Log", "", "## Notes", "",
-            "> [!note]- Handwritten page", "> Open the matching .xopp file with Xournal++.", "",
+            "## Focus", "", "## Tasks", "- [ ] ", "", "## Notes", "",
           },
         },
         source = {
@@ -108,8 +107,7 @@
           lines = {
             "---", "title: " .. title, "tags:", "  - source-note", "area: source-notes",
             "status: draft", "source_status: needs-review", "source: ", "created: " .. now,
-            "updated: " .. now, "---", "# " .. title, "", "## Claim", "", "## Evidence", "",
-            "## Interpretation", "", "## Open questions", "", "## Sources", "- ",
+            "updated: " .. now, "---", "# " .. title, "", "## Content", "", "## Open questions", "", "## Sources", "- ",
           },
         },
         concept = {
