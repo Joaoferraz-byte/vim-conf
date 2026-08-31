@@ -2,6 +2,11 @@
 {
   plugins.lsp = {
     enable = true;
+    # nvim-cmp adds snippet and completion-item capabilities that must be
+    # advertised before every server configuration is materialized.
+    capabilities = ''
+      capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
+    '';
     servers = {
       nil_ls = {
         enable = true;

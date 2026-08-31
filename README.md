@@ -95,7 +95,7 @@ O workflow do Vault é centrado em Markdown portátil, sem depender de runtime O
 | `<leader>z` | Alternar Snacks Zen. |
 | `gd`, `gD`, `gi`, `gr`, `K` | Navegação e documentação LSP. |
 | `<leader>lr`, `<leader>la`, `<leader>lf` | Rename, code action e format. |
-| `<leader>j*` | Workflow Java: executar/depurar classe, organizar imports, controlar IntelliJ LSP e executar/debugar testes Neotest. |
+| `<leader>j*` | Workflow Java: compilar, depurar via DAP, organizar imports, controlar JDTLS e executar/debugar testes Neotest. |
 | `<leader>lx` | Alternar diagnósticos com Trouble. |
 | `<C-h/j/k/l>` | Navegar entre splits no Neovim; o remapeamento físico global continua sendo owner do keyd. |
 
@@ -109,7 +109,7 @@ A cobertura solicitada fica organizada da seguinte forma:
 
 | Ecossistema | Suporte | Owner do LSP/completion |
 |---|---|---|
-| Java, Spring Boot, Swing/JFrame | Workflow Java dedicado com IntelliJ LSP, JDK 21, Lombok, Maven, Gradle e Neotest | `nvim-intellij-lsp` + `nvim-cmp` |
+| Java, Spring Boot, Swing/JFrame | Workflow Java dedicado com JDTLS, JDK 21, Lombok, Maven, Gradle e Neotest | `nvim-jdtls` + `jdt-language-server` + `nvim-cmp` |
 | HTML, CSS, JavaScript/TypeScript | Angular, TypeScript, ESLint, HTML, CSS, Emmet e Tailwind | servidores declarativos do NixVim + `nvim-cmp` |
 | PHP | PHP e projetos Composer | `phpactor` + `nvim-cmp` |
 | C/C++ | C e C++ com toolchain clang/gcc | `clangd` + `nvim-cmp` |
@@ -117,9 +117,9 @@ A cobertura solicitada fica organizada da seguinte forma:
 | SQL/PostgreSQL | SQL com análise específica de PostgreSQL/PLpgSQL | `postgres_lsp` + `nvim-cmp` |
 | XML | XML, XSD, XSLT, SVG | `lemminx` + `nvim-cmp` |
 
-Java é tratado como workflow próprio. A configuração atual mantém `jdtls` desabilitado e usa o `nvim-intellij-lsp` versionado, `neotest-java`, JDK21, Lombok, Maven e Gradle. Essa escolha não será trocada especulativamente por JDTLS sem validar inicialização, workspace, imports, code lens, testes e DAP attach.
+Java é tratado como workflow próprio. O caminho padrão usa `nvim-jdtls` com o `jdt-language-server` empacotado pelo Nix, JDK21, Lombok, Maven, Gradle e Neotest. O workspace do JDTLS é resolvido por projeto e o runtime Java 21 é declarado como default, evitando o launcher ELF baixado que falhava antes do handshake no NixOS.
 
-O completion não depende de um servidor separado por linguagem. `plugins.cmp` habilita as fontes `nvim_lsp`, `luasnip`, `path` e `buffer`; como `autoEnableSources = true`, o NixVim habilita `cmp-nvim-lsp` e injeta `default_capabilities()` nos servidores declarados pela API legada `plugins.lsp`. Assim, cada servidor desta tabela participa do mesmo menu de completion, enquanto o Pyright fornece a base para scripts Manim dentro do ambiente Python do projeto.
+O completion não depende de um servidor separado por linguagem. `plugins.cmp` habilita as fontes `nvim_lsp`, `luasnip`, `path` e `buffer`; como `autoEnableSources = true`, o NixVim instala as fontes e o owner global `plugins.lsp.capabilities` aplica `cmp_nvim_lsp.default_capabilities()` aos servidores. Assim, cada servidor desta tabela participa do mesmo menu de completion, enquanto o Pyright fornece a base para scripts Manim dentro do ambiente Python do projeto.
 
 Arquivos `.xopp` não são interpretados como texto pelo editor. O autocmd `BufReadCmd` inicia Xournal++ com o caminho absoluto e remove o buffer temporário; a associação XDG correspondente é declarada em `nix-conf` com o MIME `application/x-xopp`. Assim, abrir o arquivo pelo Oil, Snacks ou pelo gerenciador de arquivos converge para o mesmo owner do formato.
 
