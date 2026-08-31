@@ -14,13 +14,13 @@ fail() {
 require() {
   local pattern="$1"
   local file="$2"
-  grep -Eq "$pattern" "$file" || fail "missing '$pattern' in ${file#$repo_root/}"
+  grep -Eq -- "$pattern" "$file" || fail "missing '$pattern' in ${file#$repo_root/}"
 }
 
 forbidden() {
   local pattern="$1"
   local file="$2"
-  if grep -Eq "$pattern" "$file"; then
+  if grep -Eq -- "$pattern" "$file"; then
     fail "forbidden '$pattern' in ${file#$repo_root/}"
   fi
 }
@@ -49,6 +49,9 @@ require 'phpactor\.enable' "$repo_root/config/languages/specialized.nix"
 require 'plugins\.jdtls' "$repo_root/config/languages/java.nix"
 require 'jdtLanguageServerPackage = pkgs\.jdt-language-server' "$repo_root/config/languages/java.nix"
 require 'jdtls' "$repo_root/config/languages/java.nix"
+require 'JDTLS_JVM_ARGS' "$repo_root/config/languages/java.nix"
+require 'cmd = \[ "jdtls" \]' "$repo_root/config/languages/java.nix"
+forbidden 'cmd = \[[^]]*--jvm-arg' "$repo_root/config/languages/java.nix"
 require 'lombok' "$repo_root/config/languages/java.nix"
 require 'neotest-java' "$repo_root/config/languages/java.nix"
 forbidden 'intellij-lsp-plugin' "$repo_root/config/languages/java.nix"
