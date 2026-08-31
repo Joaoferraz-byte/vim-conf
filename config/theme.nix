@@ -291,93 +291,18 @@
       set_livara_highlight("barbecue_context_variable", colors.text, "NONE")
       set_livara_highlight("barbecue_context_constant", colors.peach, "NONE")
 
-      local function set_lualine_group(name, fg, bg, blend, bold)
-        vim.api.nvim_set_hl(0, name, {
-          fg = fg,
-          bg = bg,
-          blend = blend or 0,
-          bold = bold or false,
-        })
+      local function set_status_mode(name, fg, bg)
+        set_livara_highlight(name, fg, bg, { bold = true })
       end
 
-      set_lualine_group("LivaraLualineNormalA", colors.on_primary, colors.primary, 0, true)
-      set_lualine_group("LivaraLualineNormalB", colors.text, "NONE", 0, false)
-      set_lualine_group("LivaraLualineNormalC", colors.text, "NONE", 0, false)
-      set_lualine_group("LivaraLualineInsertA", colors.base, colors.green, 0, true)
-      set_lualine_group("LivaraLualineInsertB", colors.text, "NONE", 0, false)
-      set_lualine_group("LivaraLualineInsertC", colors.text, "NONE", 0, false)
-      set_lualine_group("LivaraLualineVisualA", colors.base, colors.mauve, 0, true)
-      set_lualine_group("LivaraLualineVisualB", colors.text, "NONE", 0, false)
-      set_lualine_group("LivaraLualineVisualC", colors.text, "NONE", 0, false)
-      set_lualine_group("LivaraLualineReplaceA", colors.base, colors.red, 0, true)
-      set_lualine_group("LivaraLualineReplaceB", colors.text, "NONE", 0, false)
-      set_lualine_group("LivaraLualineReplaceC", colors.text, "NONE", 0, false)
-      set_lualine_group("LivaraLualineCommandA", colors.base, colors.peach, 0, true)
-      set_lualine_group("LivaraLualineCommandB", colors.text, "NONE", 0, false)
-      set_lualine_group("LivaraLualineCommandC", colors.text, "NONE", 0, false)
-      set_lualine_group("LivaraLualineInactiveA", theme_color(colors, "subtext1", "subtext0"), "NONE", 0, true)
-      set_lualine_group("LivaraLualineInactiveB", colors.subtext0, "NONE", 0, false)
-      set_lualine_group("LivaraLualineInactiveC", colors.subtext0, "NONE", 0, false)
-      set_lualine_group("LivaraLualineAccent", colors.primary, "NONE", 0, true)
-      set_lualine_group("LivaraLualineMuted", colors.subtext0, "NONE", 0, false)
-
-      -- lualine owns its generated lualine_* highlight groups. Supplying
-      -- concrete colors here is more reliable than linking a section to a
-      -- group that may be created after lualine initializes. It also keeps
-      -- the footer transparent on every wallpaper reload.
-      local function lualine_section(fg, bg, bold)
-        return { fg = fg, bg = bg, gui = bold and "bold" or nil }
-      end
-      local lualine_theme = {
-        normal = {
-          a = lualine_section(colors.on_primary, colors.primary, true),
-          b = lualine_section(colors.text, "NONE", false),
-          c = lualine_section(colors.text, "NONE", false),
-          x = lualine_section(colors.text, "NONE", false),
-          y = lualine_section(colors.text, "NONE", false),
-          z = lualine_section(colors.on_primary, colors.primary, true),
-        },
-        insert = {
-          a = lualine_section(colors.base, colors.green, true),
-          b = lualine_section(colors.text, "NONE", false),
-          c = lualine_section(colors.text, "NONE", false),
-          x = lualine_section(colors.text, "NONE", false),
-          y = lualine_section(colors.text, "NONE", false),
-          z = lualine_section(colors.base, colors.green, true),
-        },
-        visual = {
-          a = lualine_section(colors.base, colors.mauve, true),
-          b = lualine_section(colors.text, "NONE", false),
-          c = lualine_section(colors.text, "NONE", false),
-          x = lualine_section(colors.text, "NONE", false),
-          y = lualine_section(colors.text, "NONE", false),
-          z = lualine_section(colors.base, colors.mauve, true),
-        },
-        replace = {
-          a = lualine_section(colors.base, colors.red, true),
-          b = lualine_section(colors.text, "NONE", false),
-          c = lualine_section(colors.text, "NONE", false),
-          x = lualine_section(colors.text, "NONE", false),
-          y = lualine_section(colors.text, "NONE", false),
-          z = lualine_section(colors.base, colors.red, true),
-        },
-        command = {
-          a = lualine_section(colors.base, colors.peach, true),
-          b = lualine_section(colors.text, "NONE", false),
-          c = lualine_section(colors.text, "NONE", false),
-          x = lualine_section(colors.text, "NONE", false),
-          y = lualine_section(colors.text, "NONE", false),
-          z = lualine_section(colors.base, colors.peach, true),
-        },
-        inactive = {
-          a = lualine_section(colors.subtext0, "NONE", true),
-          b = lualine_section(colors.subtext0, "NONE", false),
-          c = lualine_section(colors.subtext0, "NONE", false),
-          x = lualine_section(colors.subtext0, "NONE", false),
-          y = lualine_section(colors.subtext0, "NONE", false),
-          z = lualine_section(colors.subtext0, "NONE", true),
-        },
-      }
+      -- LivaraStatusline is the only footer owner. These groups are the
+      -- semantic mode islands used by the renderer, not plugin-generated
+      -- section groups, so they survive palette reloads deterministically.
+      set_status_mode("LivaraStatusNormalMode", colors.on_primary, colors.primary)
+      set_status_mode("LivaraStatusInsertMode", colors.base, colors.green)
+      set_status_mode("LivaraStatusVisualMode", colors.base, colors.mauve)
+      set_status_mode("LivaraStatusReplaceMode", colors.base, colors.red)
+      set_status_mode("LivaraStatusCommandMode", colors.base, colors.peach)
 
       local cmp_kind_colors = {
         Text = colors.text,
@@ -412,29 +337,17 @@
       end
 
       apply_transparency_policy(colors)
-      -- The footer canvas stays transparent; only lualine's semantic mode
-      -- segments carry color, so the statusline reveals the terminal surface.
-      pcall(function()
-        local lualine = require("lualine")
-        lualine.setup({ options = { theme = lualine_theme } })
-        lualine.refresh({ force = true })
-      end)
-      -- lualine remains installed for plugin compatibility, but the visible
-      -- footer belongs to LivaraStatusline. Re-apply it after every palette
-      -- reload because lualine.setup may reset vim.o.statusline/winbar.
+      -- Re-apply the single footer renderer after every palette reload.
       pcall(function()
         if _G.livara_statusline_activate then
           _G.livara_statusline_activate()
         end
       end)
-      -- Keep the canvas transparent after lualine refresh as well. The mode
-      -- and location sections remain colored through their own lualine groups.
       set_transparent_group("StatusLine", colors.text)
       set_transparent_group("StatusLineNC", theme_color(colors, "subtext1", "subtext0"))
       set_transparent_group("StatusLineTerm", colors.text)
       set_transparent_group("StatusLineTermNC", theme_color(colors, "subtext1", "subtext0"))
       vim.g.colors_name = "livara-matugen"
-      pcall(function() require("lualine").refresh() end)
       return true
     end
 

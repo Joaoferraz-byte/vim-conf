@@ -62,3 +62,11 @@
 - dashboard-nvim with Doom theme
 - Which-Key modern keymap discovery
 - Snacks.nvim for enhanced UI experience
+
+## Stage 5 — Single-owner Neovim statusline (2026-08-31)
+
+The statusline was configured twice: Lualine declared a full six-section layout while a later global renderer overwrote `vim.o.statusline` and `vim.o.winbar`. The visible result therefore depended on initialization order and theme reloads, even though the intended mode/branch/diagnostics composition was already implemented in the renderer.
+
+The Lualine owner and its theme-refresh hooks were removed. `LivaraStatusline` now owns the footer and winbar exclusively, with the Neovim icon and mode first, Git branch immediately after it, filetype and diagnostics/LSP context retained, and cursor position on the right. Mode highlights are named `LivaraStatus*` and are regenerated from Matugen colors on palette reload. Dashboard, picker-list and Oil filetypes retain their intentionally hidden footer behavior.
+
+Validation passed with `bash scripts/validate-livara-vim.sh`, `git diff --check`, embedded Lua syntax checks where available, and a scan confirming no active configuration references to Lualine remain.
