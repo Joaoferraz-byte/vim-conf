@@ -77,3 +77,11 @@ The statusline was configured twice: Lualine declared a full six-section layout 
 The Lualine owner and its theme-refresh hooks were removed. `LivaraStatusline` now owns the footer and winbar exclusively, with the Neovim icon and mode first, Git branch immediately after it, filetype and diagnostics/LSP context retained, and cursor position on the right. Mode highlights are named `LivaraStatus*` and are regenerated from Matugen colors on palette reload. Dashboard, picker-list and Oil filetypes retain their intentionally hidden footer behavior.
 
 Validation passed with `bash scripts/validate-livara-vim.sh`, `git diff --check`, embedded Lua syntax checks where available, and a scan confirming no active configuration references to Lualine remain.
+
+## Stage 6 — Exclusive Xournal++ routing for `.xopp` (2026-08-31)
+
+The editor-side `BufReadCmd` handler launched Xournal++ but did not cover new-file routes and could leave the temporary Neovim buffer visible in explorer-driven opens. The desktop/Yazi side also had no explicit extension rule, so MIME detection could select a generic text/archive opener first.
+
+The handler is now shared by `BufReadCmd` and `BufNewFile`, marks the buffer as routed, launches Xournal++ exactly once and closes the editor buffer after both successful and failed launches. The desktop owner adds a Yazi `.xopp` opener with an absolute packaged binary; Oil and Neo-tree continue to enter through Neovim, where the same external-only handler applies. The Xournal++ profile keeps native `forceZoomToFitOnLoad=true`, so zoom behavior is not duplicated in the launchers.
+
+Validation passed with the cross-repository `.xopp` contract checker and both repository validators.
