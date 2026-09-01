@@ -36,9 +36,9 @@
       return colors[key] or (fallback and colors[fallback]) or colors.text or "#e1e2e8"
     end
 
-    -- bufferline and barbecue create per-icon groups lazily. Clear only those
-    -- generated groups, plus the ordinal-number groups, instead of flattening
-    -- every plugin surface into the terminal background.
+    -- Bufferline and file-tree plugins create per-icon groups lazily. Clear
+    -- only those generated groups instead of flattening every plugin surface
+    -- into the terminal background.
     local function clear_generated_icon_backgrounds()
       local static_groups = {
         "BufferLineNumbers",
@@ -64,7 +64,6 @@
       local generated_prefixes = {
         "BufferLineDevIcon",
         "BufferLineCloseButton",
-        "barbecue_fileicon_",
         "NeoTreeFileIcon",
         "NeoTreeFolderIcon",
         "NvimTreeFileIcon",
@@ -105,8 +104,6 @@
         "WhichKeyGroup", "WhichKeyDesc", "WhichKeySeparator", "WhichKeyValue",
         "NoiceCmdlinePopup", "NoicePopup", "NoicePopupmenu", "NoiceMini",
         "NoiceFormatProgressDone", "NoiceFormatProgressTodo", "LspFloatWinNormal",
-        "barbecue_normal", "barbecue_context", "barbecue_dirname", "barbecue_basename",
-        "barbecue_separator", "barbecue_ellipsis", "barbecue_modified",
         "NeoTreeNormal", "NeoTreeNormalNC", "NeoTreeEndOfBuffer", "NeoTreeWinSeparator",
         "NeoTreeFloatNormal", "NeoTreeFloatBorder", "NeoTreeTabInactive", "NeoTreeTabActive",
         "NeoTreeDirectoryName", "NeoTreeFileName", "NeoTreeRootName", "NeoTreeGitModified",
@@ -297,40 +294,17 @@
       set_livara_highlight("NeoTreeNormalNC", colors.subtext0, "NONE")
       set_livara_highlight("BufferLineBackground", colors.subtext0, "NONE")
       set_livara_highlight("BufferLineBufferSelected", colors.text, "NONE", { bold = true })
-      -- barbecue.nvim owns the winbar with lowercase highlight names. The
-      -- previous Barbecue* names were never created by the plugin, so the
-      -- path row kept the default style after every palette reload.
-      set_livara_highlight("barbecue_normal", colors.text, "NONE")
-      set_livara_highlight("barbecue_ellipsis", colors.subtext0, "NONE")
-      set_livara_highlight("barbecue_separator", colors.overlay1, "NONE")
-      set_livara_highlight("barbecue_modified", colors.tertiary, "NONE", { bold = true })
-      set_livara_highlight("barbecue_dirname", colors.subtext0, "NONE")
-      set_livara_highlight("barbecue_basename", colors.text, "NONE", { bold = true })
-      set_livara_highlight("barbecue_context", colors.text, "NONE")
-      set_livara_highlight("barbecue_context_file", colors.primary, "NONE")
-      set_livara_highlight("barbecue_context_module", colors.secondary, "NONE")
-      set_livara_highlight("barbecue_context_namespace", colors.secondary, "NONE")
-      set_livara_highlight("barbecue_context_package", colors.tertiary, "NONE")
-      set_livara_highlight("barbecue_context_class", colors.yellow, "NONE")
-      set_livara_highlight("barbecue_context_method", colors.blue, "NONE")
-      set_livara_highlight("barbecue_context_function", colors.blue, "NONE")
-      set_livara_highlight("barbecue_context_variable", colors.text, "NONE")
-      set_livara_highlight("barbecue_context_constant", colors.peach, "NONE")
-
-      local function set_status_mode(name, fg, bg)
-        set_livara_highlight(name, fg, bg, { bold = true })
-      end
-
-      -- LivaraStatusline is the only footer owner. These groups are the
-      -- semantic mode islands used by the renderer, not plugin-generated
-      -- section groups, so they survive palette reloads deterministically.
-      set_status_mode("LivaraStatusNormalMode", colors.on_primary, colors.primary)
-      set_status_mode("LivaraStatusInsertMode", colors.base, colors.green)
-      set_livara_highlight("LivaraStatusGit", colors.on_secondary, colors.secondary, { bold = true })
-      set_livara_highlight("LivaraStatusGitSep", colors.secondary, "NONE")
-      set_status_mode("LivaraStatusVisualMode", colors.base, colors.mauve)
-      set_status_mode("LivaraStatusReplaceMode", colors.base, colors.red)
-      set_status_mode("LivaraStatusCommandMode", colors.base, colors.peach)
+      -- LivaraStatusline owns the global footer and every status group is
+      -- transparent. Color only the text, never the canvas behind the bar.
+      set_livara_highlight("LivaraStatusText", colors.text, "NONE")
+      set_livara_highlight("LivaraStatusMuted", theme_color(colors, "subtext1", "subtext0"), "NONE", { italic = true })
+      set_livara_highlight("LivaraStatusAccent", colors.primary, "NONE", { bold = true })
+      set_livara_highlight("LivaraStatusError", colors.red, "NONE")
+      set_livara_highlight("LivaraStatusWarn", colors.yellow, "NONE")
+      set_livara_highlight("LivaraStatusInfo", colors.blue, "NONE")
+      set_livara_highlight("LivaraStatusHint", colors.teal, "NONE")
+      set_livara_highlight("LivaraStatusGit", colors.secondary, "NONE")
+      set_livara_highlight("LivaraStatusLocation", theme_color(colors, "subtext1", "subtext0"), "NONE")
 
       local cmp_kind_colors = {
         Text = colors.text,

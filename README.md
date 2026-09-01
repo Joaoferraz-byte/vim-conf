@@ -55,7 +55,7 @@ A decisão arquitetural completa, incluindo comparação com dendritic, camadas,
 
 O editor mantém `habamax` como fallback durante a primeira inicialização e força `background = "dark"`. Quando `~/.config/nvim/lua/matugen_colors.lua` existe, `config/theme.nix` carrega a tabela Lua produzida pelo adapter Livara e aplica a paleta derivada do wallpaper.
 
-O loader usa um único contrato `_G.reload_livara_theme`, grupos de modo `LivaraStatus*` e um watcher `vim.uv.new_fs_event`. `LivaraStatusline` é o único owner de `vim.o.statusline` e `vim.o.winbar`: o lado esquerdo mostra o ícone do Neovim, modo e branch; o lado direito mantém diagnósticos, clientes LSP e posição. A transparência é limitada ao canvas e às superfícies estruturais. Menus, floats, completion e segmentos legíveis do statusline mantêm superfícies com contraste; portanto, o tema não apaga indiscriminadamente todos os backgrounds.
+O loader usa um único contrato `_G.reload_livara_theme` e um watcher `vim.uv.new_fs_event`. `LivaraStatusline` é o único owner de `vim.o.statusline`: o footer global usa uma composição linear com informações do arquivo, Git, diagnósticos, clientes LSP, filetype, posição e scrollbar. `vim.o.winbar` fica intencionalmente vazio, impedindo que um plugin de breadcrumbs herde ou redesenhe a barra. O canvas e os grupos da statusline são transparentes; menus, floats e completion mantêm superfícies com contraste.
 
 Matugen é o owner da paleta dinâmica. O NixVim apenas consome o arquivo gerado e não inicia compositor, shell visual, QuickShell, Hyprland ou Serpantinum.
 
