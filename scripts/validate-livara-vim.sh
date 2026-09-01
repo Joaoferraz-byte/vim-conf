@@ -65,9 +65,15 @@ forbidden 'local livara_theme_path = vim\.fn\.stdpath\("config"\) .. "/matugen_c
 require 'vim\.o\.statusline' "$ui"
 require 'LivaraStatusNormalMode' "$repo_root/config/theme.nix"
 require 'LivaraStatusGit' "$repo_root/config/theme.nix"
+require 'LivaraStatusLocation' "$ui"
+require 'location_component' "$ui"
 require 'git_component' "$ui"
 require 'mode_component\(\), git_component\(\), filetype_component\(\)' "$ui"
+require 'location_component\(\)' "$ui"
 require 'return left .. "%=" .. right' "$ui"
+for group in warning warning_visible warning_selected warning_diagnostic warning_diagnostic_visible warning_diagnostic_selected error error_visible error_selected error_diagnostic error_diagnostic_visible error_diagnostic_selected; do
+  require_literal "${group} = { bg = \"NONE\"; };" "$ui"
+done
 require '  " .. mode.label' "$ui"
 require 'winbar\(\)' "$ui"
 require 'local path = vim.api.nvim_buf_get_name\(0\)' "$ui"

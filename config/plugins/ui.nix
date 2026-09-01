@@ -287,6 +287,18 @@
           separator_visible = { bg = "NONE"; };
           separator_selected = { bg = "NONE"; };
           indicator_selected = { bg = "NONE"; };
+          warning = { bg = "NONE"; };
+          warning_visible = { bg = "NONE"; };
+          warning_selected = { bg = "NONE"; };
+          warning_diagnostic = { bg = "NONE"; };
+          warning_diagnostic_visible = { bg = "NONE"; };
+          warning_diagnostic_selected = { bg = "NONE"; };
+          error = { bg = "NONE"; };
+          error_visible = { bg = "NONE"; };
+          error_selected = { bg = "NONE"; };
+          error_diagnostic = { bg = "NONE"; };
+          error_diagnostic_visible = { bg = "NONE"; };
+          error_diagnostic_selected = { bg = "NONE"; };
         };
       };
     };
@@ -392,8 +404,14 @@
       local text_fg = group_colors("Normal", "#e1e2e8", "NONE")
       local muted_fg = group_colors("Comment", "#a6a8b3", "NONE")
       local accent_fg = group_colors("Directory", "#c3adff", "NONE")
+      local git_fg, git_bg = group_colors("Directory", "#c3adff", "#303446")
+      local location_fg, location_bg = group_colors("LineNr", "#a6a8b3", "#24283b")
       highlight("LivaraStatusMode", mode_fg, mode_bg, { bold = true })
       highlight("LivaraStatusModeSep", mode_bg, "NONE")
+      highlight("LivaraStatusGit", git_fg, git_bg, { bold = true })
+      highlight("LivaraStatusGitSep", git_bg, "NONE")
+      highlight("LivaraStatusLocation", location_fg, location_bg, { bold = true })
+      highlight("LivaraStatusLocationSep", location_bg, "NONE")
       highlight("LivaraStatusText", text_fg, "NONE")
       highlight("LivaraStatusMuted", muted_fg, "NONE")
       highlight("LivaraStatusAccent", accent_fg, "NONE", { bold = true })
@@ -412,7 +430,7 @@
       prepare_highlights(mode.group)
       return table.concat({
         "%#LivaraStatusModeSep#",
-        "%#LivaraStatusMode#  " .. mode.label,
+        "%#LivaraStatusMode#    " .. mode.label .. "  ",
         "%#LivaraStatusModeSep#",
       })
     end
@@ -425,7 +443,7 @@
       local escaped = head:gsub("%%", "%%%%")
       return table.concat({
         "%#LivaraStatusGitSep#",
-        "%#LivaraStatusGit# " .. escaped,
+        "%#LivaraStatusGit#   " .. escaped .. "  ",
         "%#LivaraStatusGitSep#",
       })
     end
@@ -457,6 +475,15 @@
       return "%#LivaraStatusAccent#" .. icon .. " %#LivaraStatusText#" .. filetype
     end
 
+    local function location_component()
+      local position = vim.fn.line(".") .. ":" .. vim.fn.virtcol(".")
+      return table.concat({
+        "%#LivaraStatusLocationSep#",
+        "%#LivaraStatusLocation#  󰍒 " .. position .. "  ",
+        "%#LivaraStatusLocationSep#",
+      })
+    end
+
     local function lsp_component()
       local clients = vim.lsp.get_clients({ bufnr = 0 })
       if #clients == 0 then return "" end
@@ -469,7 +496,7 @@
     function LivaraStatusline.render()
       if disabled_statusline_filetypes[vim.bo.filetype] then return "" end
       local left = table.concat({ mode_component(), git_component(), filetype_component() }, "  ")
-      local right = table.concat({ diagnostics_component(), lsp_component(), "%#LivaraStatusMuted#󰍒 " .. vim.fn.line(".") .. ":" .. vim.fn.virtcol(".") }, "  ")
+      local right = table.concat({ diagnostics_component(), lsp_component(), location_component() }, "  ")
       return left .. "%=" .. right .. " "
     end
 

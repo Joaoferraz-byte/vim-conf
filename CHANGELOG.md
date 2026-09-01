@@ -152,3 +152,9 @@ JDTLS now declares the native `java` filetype and explicit Maven/Gradle root mar
 A clean Home Manager activation generated the palette at `~/.config/nvim/lua/matugen_colors.lua`, while the NixVim theme loader still checked only `~/.config/nvim/matugen_colors.lua`. Deleting the local configuration exposed this mismatch because no stale root-level file remained to mask it.
 
 The loader now prefers the generated `lua/matugen_colors.lua` module and retains an explicit fallback for legacy/manual installations. The validator rejects the old-only lookup and requires the canonical path. The shell producer was already aligned in `shell-conf` commit `2646bd8`; the remaining defect was the consumer in `vim-conf`.
+
+## Stage 15 — Statusline location island and transparent diagnostic buffers (2026-09-01)
+
+The statusline exposed cursor position only as plain text and its Git highlight groups were not initialized by the renderer. Bufferline's generic transparent groups did not cover the warning/error diagnostic variants used with `diagnostics = "nvim_lsp"`.
+
+The renderer now keeps `%=` alignment and adds a third rounded location island with its own dynamic highlight groups, while preserving mode, Git, filetype, diagnostics, LSP and winbar behavior. Bufferline explicitly sets warning/error, visible, selected and diagnostic variants to `bg = "NONE"`, preserving semantic foreground colors without opaque rectangles. The updated static contract validator passes on this branch.
