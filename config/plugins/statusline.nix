@@ -1,84 +1,68 @@
 { ... }:
 {
-  # Statusline and winbar intentionally live together: both are renderers for
-  # the same window state, and no other plugin is allowed to own either option.
+  # One owner for both bars. The footer is intentionally compact; the winbar
+  # provides only the current filename, never a duplicated full path.
   extraConfigLua = ''
-    local LivaraStatusline = {}
-    local LivaraWinbar = {}
-    local disabled_filetypes = {
+    local LivaraBar = {}
+    local hidden_filetypes = {
       snacks_dashboard = true,
       snacks_picker_list = true,
       oil = true,
       help = true,
     }
 
-    local function rgb(value, fallback)
-      return value and string.format("#%06x", value) or fallback
-    end
-
-    local function group_fg(group, fallback)
+    local function color(group, field, fallback)
       local spec = vim.api.nvim_get_hl(0, { name = group, link = false })
-      return rgb(spec.fg, fallback)
+      if spec[field] then return string.format("#%06x", spec[field]) end
+      return fallback
     end
 
-    local function highlight(name, fg, opts)
-      vim.api.nvim_set_hl(0, name, vim.tbl_extend("force", { bg = "NONE", fg = fg }, opts or {}))
+    local function set_bar_highlights()
+      local text_bg = color("NormalFloat", "bg", "#191b24")
+      local text_fg = color("Normal", "fg", "#e7e9ef")
+      local muted = color("Comment", "fg", "#9da3b4")
+      local vivid = color("Directory", "fg", "#ff6b9d")
+      local error = color("DiagnosticError", "fg", "#ff718d")
+      local warn = color("DiagnosticWarn", "fg", "#f4d36b")
+      local info = color("DiagnosticInfo", "fg", "#82c8ff")
+      local hint = color("DiagnosticHint", "fg", "#8ce6ad")
+
+      vim.api.nvim_set_hl(0, "LivaraBarCap", { fg = text_bg, bg = vivid, bold = true })
+      vim.api.nvim_set_hl(0, "LivaraBarBlock", { fg = text_fg, bg = text_bg, blend = 8 })
+      vim.api.nvim_set_hl(0, "LivaraBarMuted", { fg = muted, bg = text_bg, blend = 8 })
+      vim.api.nvim_set_hl(0, "LivaraBarAccent", { fg = vivid, bg = text_bg, bold = true, blend = 8 })
+      vim.api.nvim_set_hl(0, "LivaraBarMode", { fg = vivid, bg = text_bg, bold = true, blend = 8 })
+      vim.api.nvim_set_hl(0, "LivaraBarError", { fg = error, bg = text_bg, blend = 8 })
+      vim.api.nvim_set_hl(0, "LivaraBarWarn", { fg = warn, bg = text_bg, blend = 8 })
+      vim.api.nvim_set_hl(0, "LivaraBarInfo", { fg = info, bg = text_bg, blend = 8 })
+      vim.api.nvim_set_hl(0, "LivaraBarHint", { fg = hint, bg = text_bg, blend = 8 })
+      vim.api.nvim_set_hl(0, "LivaraBarWinbar", { fg = muted, bg = "NONE", italic = true })
+      vim.api.nvim_set_hl(0, "LivaraBarWinbarActive", { fg = text_fg, bg = "NONE", bold = true })
     end
 
-    local function prepare_highlights()
-      highlight("LivaraStatusText", group_fg("Normal", "#e1e2e8"))
-      highlight("LivaraStatusMuted", group_fg("Comment", "#a6a8b3"), { italic = true })
-      highlight("LivaraStatusAccent", group_fg("Directory", "#c3adff"), { bold = true })
-      highlight("LivaraStatusError", group_fg("DiagnosticError", "#ff7a90"))
-      highlight("LivaraStatusWarn", group_fg("DiagnosticWarn", "#f5d782"))
-      highlight("LivaraStatusInfo", group_fg("DiagnosticInfo", "#8fc7ff"))
-      highlight("LivaraStatusHint", group_fg("DiagnosticHint", "#8ee6b0"))
-      highlight("LivaraStatusGit", group_fg("Directory", "#c3adff"))
-      highlight("LivaraStatusLocation", group_fg("LineNr", "#a6a8b3"))
-      highlight("LivaraWinbarText", group_fg("Normal", "#e1e2e8"))
-      highlight("LivaraWinbarMuted", group_fg("Comment", "#a6a8b3"), { italic = true })
-      highlight("LivaraWinbarAccent", group_fg("Directory", "#c3adff"), { bold = true })
-    end
-
-    local function escape_statusline(value)
+    local function escape(value)
       return (value or ""):gsub("%%", "%%%%")
     end
 
-    local function current_buffer()
-      local winid = tonumber(vim.g.statusline_winid) or vim.api.nvim_get_current_win()
-      if not vim.api.nvim_win_is_valid(winid) then return 0 end
-      return vim.api.nvim_win_get_buf(winid)
+    local function current_name()
+      local name = vim.fn.expand("%:t")
+      if name == "" then return "[No Name]" end
+      return escape(name)
     end
 
-    local function fileinfo_component()
-      local buffer = current_buffer()
-      local name = vim.api.nvim_buf_get_name(buffer)
-      name = name ~= "" and vim.fn.fnamemodify(name, ":~:.") or "Empty"
-      local filetype = vim.bo[buffer].filetype
-      local icon = "󰈚"
-      local ok, devicons = pcall(require, "nvim-web-devicons")
-      if ok then
-        icon = devicons.get_icon(vim.fn.fnamemodify(name, ":t"), filetype, { default = true }) or icon
-      end
-      local flags = {}
-      if vim.bo[buffer].modified then flags[#flags + 1] = "[+]" end
-      if vim.bo[buffer].readonly or not vim.bo[buffer].modifiable then flags[#flags + 1] = "[RO]" end
-      return "%#LivaraStatusText# " .. icon .. " " .. escape_statusline(name) .. " " .. table.concat(flags, " ")
+    local function mode()
+      local names = {
+        n = "NORMAL", i = "INSERT", v = "VISUAL", V = "V-LINE", ["\22"] = "V-BLOCK",
+        c = "COMMAND", R = "REPLACE", t = "TERM", s = "SELECT", S = "S-LINE",
+      }
+      return names[vim.fn.mode()] or vim.fn.mode():upper()
     end
 
     local function git_component()
-      local status = vim.b.gitsigns_status_dict or {}
-      local parts = {}
-      if status.head and status.head ~= "" then
-        parts[#parts + 1] = " " .. escape_statusline(status.head)
-      end
-      local added = tonumber(status.added or 0) or 0
-      local changed = tonumber(status.changed or 0) or 0
-      local removed = tonumber(status.removed or 0) or 0
-      if added + changed + removed > 0 then
-        parts[#parts + 1] = string.format("+%d ~%d -%d", added, changed, removed)
-      end
-      return #parts > 0 and "%#LivaraStatusGit#" .. table.concat(parts, " ") or ""
+      local git = vim.b.gitsigns_status_dict or {}
+      if not git.head or git.head == "" then return "" end
+      local changed = (tonumber(git.added or 0) or 0) + (tonumber(git.changed or 0) or 0) + (tonumber(git.removed or 0) or 0)
+      return " " .. escape(git.head) .. (changed > 0 and " " .. changed or "")
     end
 
     local function diagnostics_component()
@@ -86,9 +70,9 @@
       for _, diagnostic in ipairs(vim.diagnostic.get(0)) do
         if diagnostic.severity then counts[diagnostic.severity] = counts[diagnostic.severity] + 1 end
       end
-      local symbols = { "", "", "", "󰌵" }
-      local groups = { "LivaraStatusError", "LivaraStatusWarn", "LivaraStatusInfo", "LivaraStatusHint" }
       local parts = {}
+      local symbols = { "", "", "", "󰌵" }
+      local groups = { "LivaraBarError", "LivaraBarWarn", "LivaraBarInfo", "LivaraBarHint" }
       for severity = 1, 4 do
         if counts[severity] > 0 then
           parts[#parts + 1] = string.format("%%#%s#%s %d", groups[severity], symbols[severity], counts[severity])
@@ -103,86 +87,44 @@
       local names = {}
       for _, client in ipairs(clients) do names[#names + 1] = client.name end
       table.sort(names)
-      return "%#LivaraStatusAccent#󰄭 %#LivaraStatusMuted#" .. table.concat(names, ",")
+      return "󰄭 " .. escape(names[1])
     end
 
-    local function mode_component()
-      local modes = {
-        n = "NORMAL", i = "INSERT", v = "VISUAL", V = "V-LINE", ["\22"] = "V-BLOCK",
-        c = "COMMAND", R = "REPLACE", t = "TERM", s = "SELECT", S = "S-LINE",
-      }
-      return "%#LivaraStatusAccent#" .. (modes[vim.fn.mode()] or vim.fn.mode():upper())
+    local function position_component()
+      return "%3l:%-2c"
     end
 
-    local function filetype_component()
-      local filetype = vim.bo.filetype ~= "" and vim.bo.filetype:upper() or "NO FILETYPE"
-      return "%#LivaraStatusMuted#" .. filetype
+    function LivaraBar.statusline()
+      if hidden_filetypes[vim.bo.filetype] then return "" end
+      set_bar_highlights()
+      local left = table.concat({ mode(), git_component() }, "  ")
+      local right = table.concat({ diagnostics_component(), lsp_component(), vim.bo.filetype ~= "" and vim.bo.filetype:upper() or "TEXT", position_component() }, "  ")
+      return "%#LivaraBarCap#%#LivaraBarBlock# "
+        .. "%#LivaraBarMode#" .. left .. "%#LivaraBarBlock# %=" .. right .. " "
     end
 
-    local function location_component()
-      return "%#LivaraStatusLocation#%3l:%-2c"
+    function LivaraBar.winbar()
+      if hidden_filetypes[vim.bo.filetype] then return "" end
+      set_bar_highlights()
+      local name = current_name()
+      return "%#LivaraBarWinbar# " .. name .. (vim.bo.modified and " [+]" or "") .. " %#LivaraBarWinbarActive#"
     end
 
-    local function scrollbar_component()
-      local chars = { "▔", "🮂", "🬂", "🮃", "▀", "▄", "▃", "🬭", "▂", "▁" }
-      local line = vim.fn.line(".")
-      local lines = math.max(vim.api.nvim_buf_line_count(0), 1)
-      local index = math.min(#chars, math.floor((line - 1) / lines * #chars) + 1)
-      return "%#LivaraStatusMuted#" .. chars[index]
-    end
-
-    function LivaraStatusline.render()
-      if disabled_filetypes[vim.bo.filetype] then return "" end
-      prepare_highlights()
-      local left = table.concat({ mode_component(), fileinfo_component(), git_component() }, "  ")
-      local right = table.concat({ diagnostics_component(), lsp_component(), filetype_component(), location_component(), scrollbar_component() }, "  ")
-      return left .. "%=" .. right .. " "
-    end
-
-    local function breadcrumb()
-      local path = vim.fn.expand("%:~:.")
-      if path == "" then return "" end
-      local pieces = vim.split(path, "/", { plain = true, trimempty = true })
-      if #pieces == 0 then return "" end
-      local rendered = {}
-      for index, piece in ipairs(pieces) do
-        local escaped = escape_statusline(piece)
-        rendered[#rendered + 1] = (index == #pieces and "%#LivaraWinbarAccent#" or "%#LivaraWinbarMuted#") .. escaped
-      end
-      return " %#LivaraWinbarText#" .. table.concat(rendered, " %#LivaraWinbarMuted#› ")
-    end
-
-    function LivaraWinbar.render()
-      if disabled_filetypes[vim.bo.filetype] then return "" end
-      prepare_highlights()
-      return breadcrumb() .. " "
-    end
-
-    _G.LivaraStatusline = LivaraStatusline
-    _G.LivaraWinbar = LivaraWinbar
-    _G.livara_statusline_activate = function()
-      vim.o.showmode = false
-      vim.o.laststatus = 3
-      vim.o.statusline = "%!v:lua.LivaraStatusline.render()"
-      vim.o.winbar = "%!v:lua.LivaraWinbar.render()"
-      vim.cmd("redrawstatus")
-      vim.cmd("redrawtabline")
-    end
-
-    local redraw_group = vim.api.nvim_create_augroup("LivaraStatuslineWinbar", { clear = true })
-    vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter", "BufFilePost", "WinEnter", "DirChanged", "DiagnosticChanged", "LspAttach", "LspDetach" }, {
-      group = redraw_group,
-      callback = function()
-        if vim.bo.buftype ~= "nofile" then vim.cmd("redrawstatus") end
-      end,
+    _G.LivaraBar = LivaraBar
+    local group = vim.api.nvim_create_augroup("LivaraMinimalBars", { clear = true })
+    vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter", "BufFilePost", "WinEnter", "DirChanged", "DiagnosticChanged", "LspAttach", "LspDetach", "ModeChanged" }, {
+      group = group,
+      callback = function() vim.cmd("redrawstatus") end,
     })
     vim.api.nvim_create_autocmd("ColorScheme", {
-      group = redraw_group,
-      callback = function()
-        prepare_highlights()
-        vim.cmd("redrawstatus")
-      end,
+      group = group,
+      callback = function() set_bar_highlights(); vim.cmd("redrawstatus") end,
     })
-    _G.livara_statusline_activate()
+
+    vim.o.showmode = false
+    vim.o.laststatus = 3
+    vim.o.statusline = "%!v:lua.LivaraBar.statusline()"
+    vim.o.winbar = "%!v:lua.LivaraBar.winbar()"
+    set_bar_highlights()
   '';
 }

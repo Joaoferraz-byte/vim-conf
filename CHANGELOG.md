@@ -176,3 +176,9 @@ The fix removes barbecue from the active plugin graph and removes its theme mach
 The UI module previously carried the entire statusline renderer together with unrelated template actions, making ownership and future changes harder to audit. The reference implementation uses a single global statusline function; the adapted configuration now follows that model while keeping the path context in a complementary winbar rather than duplicating it in the footer.
 
 The renderer moved to `config/plugins/statusline.nix`, and `config/plugins/default.nix` imports it explicitly. The module owns `laststatus=3`, the transparent linear statusline, the breadcrumb winbar, theme-derived highlights, and redraw hooks. It preserves mode, filename/devicon, modified/readonly state, Git branch/counts, diagnostics, LSP clients, filetype, cursor position and scrollbar. `ui.nix` retains only unrelated UI actions, so statusline/winbar ownership is now isolated and easy to validate.
+
+## 2026-09-01 — Minimal single-cap statusline
+
+The previous statusline carried too much context and repeated file information between the footer and winbar. It has been rebuilt as a compact renderer from scratch: one left-facing rounded cap carries the vivid accent, while the text body uses a slightly opaque theme-derived background and keeps the remaining edges square.
+
+The footer now contains only mode, Git branch/change count, diagnostics, the first active LSP client, filetype and cursor position. Full file paths, scrollbars and redundant filename context were removed from the footer. The winbar retains only the current filename and modified marker, without a directory path, so the two bars complement rather than duplicate each other.
