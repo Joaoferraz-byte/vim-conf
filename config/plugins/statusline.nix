@@ -63,8 +63,9 @@
     end
 
     local function set_statusline_highlights()
-      -- Mode geometry: a narrow left edge, a slightly padded body and one
-      -- rounded right separator. There is no background on any other section.
+      -- Mode geometry: rounded cap glyphs bound a slightly taller-looking
+      -- colored island. The padding is internal to this single statusline row;
+      -- text size stays unchanged and no other section receives a background.
       highlight("LivaraModeEdge", { fg = MODE_BG, bg = "NONE" })
       highlight("LivaraModeIcon", { fg = MODE_ICON, bg = MODE_BG, bold = true })
       highlight("LivaraModeText", { fg = MODE_FG, bg = MODE_BG, bold = true })
@@ -90,7 +91,7 @@
     end
 
     local function mode_segment()
-      return "%#LivaraModeEdge#▎%#LivaraModeIcon# "
+      return "%#LivaraModeEdge#%#LivaraModeIcon#  "
         .. current_mode_icon()
         .. "  %#LivaraModeText#"
         .. current_mode()

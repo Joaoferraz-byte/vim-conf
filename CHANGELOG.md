@@ -208,3 +208,7 @@ No speculative migration was made. JDTLS remains the owner until JetBrains publi
 The statusline still exposed the filetype as uppercase text (for example `NIX`) and used unevenly perceived glyph spacing on the right-hand metadata sections. The mode segment also had only one post-icon space in the rendered mode body.
 
 The mode renderer now reserves one additional space after the icon, producing the requested single visual gap before the mode label. The filetype section was replaced by a line-count section, so the right side no longer shows an uppercase extension/filetype indicator. Position, LSP and diagnostic glyphs now use the same padded icon envelope, reducing baseline and optical-centering differences between icons and their labels while preserving transparent sections and the single colored mode surface.
+
+## 2026-09-01 — Increase mode island vertical breathing room
+
+The previous adjustment interpreted the requested padding as horizontal spacing around the Insert icon. The visual requirement is instead a slightly taller colored mode island without increasing the text size. The mode segment now uses rounded cap glyphs on both sides, a continuous fixed-color background under the icon and label, and restrained internal padding. The right cap is kept proportional to the left cap so the island reads as one coherent shape; all other statusline sections remain transparent.
