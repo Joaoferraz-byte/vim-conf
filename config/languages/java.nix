@@ -18,6 +18,10 @@
       cmd = [ "jdtls" ];
       settings = {
         java = {
+          # The plain nvim-jdtls client has no vscode-java extension to add
+          # this preference implicitly. Keep JDTLS Lombok support explicit;
+          # the actual jar is still supplied once through JDTLS_JVM_ARGS above.
+          "jdt.ls.lombokSupport.enabled" = true;
           configuration = {
             updateBuildConfiguration = "automatic";
             runtimes = [

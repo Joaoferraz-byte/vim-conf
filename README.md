@@ -117,9 +117,11 @@ A cobertura solicitada fica organizada da seguinte forma:
 | SQL/PostgreSQL | SQL com análise específica de PostgreSQL/PLpgSQL | `postgres_lsp` + `nvim-cmp` |
 | XML | XML, XSD, XSLT, SVG | `lemminx` + `nvim-cmp` |
 
-Java é tratado como workflow próprio. O caminho padrão usa `nvim-jdtls` com o `jdt-language-server` empacotado pelo Nix, JDK21, Lombok, Maven, Gradle e Neotest. O workspace do JDTLS é resolvido por projeto e o runtime Java 21 é declarado como default, evitando o launcher ELF baixado que falhava antes do handshake no NixOS.
+Java é tratado como workflow próprio. O caminho padrão usa `nvim-jdtls` com o `jdt-language-server` empacotado pelo Nix, JDK21, Lombok, Maven, Gradle e Neotest. O workspace do JDTLS é resolvido por projeto e o runtime Java 21 é declarado como default, evitando o launcher ELF baixado que falhava antes do handshake no NixOS. Lombok é carregado uma única vez pelo `JDTLS_JVM_ARGS` com o `lombok.jar` empacotado, enquanto `java.jdt.ls.lombokSupport.enabled` permanece explícito no settings do servidor.
 
 O completion não depende de um servidor separado por linguagem. `plugins.cmp` habilita as fontes `nvim_lsp`, `luasnip`, `path` e `buffer`; como `autoEnableSources = true`, o NixVim instala as fontes e o owner global `plugins.lsp.capabilities` aplica `cmp_nvim_lsp.default_capabilities()` aos servidores. Assim, cada servidor desta tabela participa do mesmo menu de completion, enquanto o Pyright fornece a base para scripts Manim dentro do ambiente Python do projeto.
+
+Métodos gerados por Lombok, como getters, setters e construtores, só aparecem no completion quando o JDTLS indexa o projeto com a dependência Lombok e o agente JVM ativo; não existe um provider `cmp` separado para esses métodos. Após alterar a versão do agente ou o classpath, o workspace do JDTLS deve ser limpo/reiniciado para reconstruir o índice. A configuração não executa essa limpeza automaticamente, pois ela é uma ação destrutiva dependente do workspace selecionado.
 
 Arquivos `.xopp` não são interpretados como texto pelo editor. O autocmd `BufReadCmd` inicia Xournal++ com o caminho absoluto e remove o buffer temporário; a associação XDG correspondente é declarada em `nix-conf` com o MIME `application/x-xopp`. Assim, abrir o arquivo pelo Oil, Snacks ou pelo gerenciador de arquivos converge para o mesmo owner do formato.
 
