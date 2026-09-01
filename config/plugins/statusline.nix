@@ -149,7 +149,7 @@
 
     local function line_count_component()
       local count = vim.api.nvim_buf_line_count(0)
-      return "%#LivaraStatusAccent# ≡ %#LivaraStatusText#" .. count
+      return "%#LivaraStatusAccent# 󰧳 %#LivaraStatusText#" .. count
     end
 
     local function position_component()

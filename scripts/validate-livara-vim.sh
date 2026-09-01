@@ -94,7 +94,7 @@ forbidden 'filetype_component' "$statusline"
 require_literal '.. " %#LivaraModeText#"' "$statusline"
 require_literal '%#LivaraModeEdge#▎' "$statusline"
 require_literal '%#LivaraModeTail#' "$statusline"
-require_literal 'return "%#LivaraStatusAccent# ≡ %#LivaraStatusText#" .. count' "$statusline"
+require_literal 'return "%#LivaraStatusAccent# 󰧳 %#LivaraStatusText#" .. count' "$statusline"
 forbidden '' "$statusline"
 
 # Bufferline remains transparent for all background-bearing subcomponents.
