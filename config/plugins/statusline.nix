@@ -136,6 +136,14 @@
       return table.concat(parts, "%#LivaraStatusMuted# · ")
     end
 
+    -- Keep every right-side icon in the same one-space envelope. This is
+    -- intentionally shared instead of hand-spacing each component: Nerd Font
+    -- glyphs have different advance widths, but their statusline baseline and
+    -- optical breathing room must remain identical.
+    local function right_icon(glyph)
+      return "%#LivaraStatusAccent# " .. glyph .. " %#LivaraStatusText#"
+    end
+
     local function lsp_component()
       local clients = vim.lsp.get_clients({ bufnr = 0 })
       if #clients == 0 then return "" end
@@ -144,16 +152,16 @@
         names[#names + 1] = client.name
       end
       table.sort(names)
-      return "%#LivaraStatusAccent# 󰒋 %#LivaraStatusText#" .. escape(names[1])
+      return right_icon("󰒋") .. escape(names[1])
     end
 
     local function line_count_component()
       local count = vim.api.nvim_buf_line_count(0)
-      return "%#LivaraStatusAccent# 󰧳 %#LivaraStatusText#" .. count
+      return right_icon("󰧳") .. count
     end
 
     local function position_component()
-      return "%#LivaraStatusAccent# 󰆧 %#LivaraStatusText#%l:%c"
+      return right_icon("󰆧") .. "%l:%c"
     end
 
     local function file_icon()
