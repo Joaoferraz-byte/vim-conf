@@ -92,7 +92,7 @@
     local function mode_segment()
       return "%#LivaraModeEdge#▎%#LivaraModeIcon# "
         .. current_mode_icon()
-        .. " %#LivaraModeText#"
+        .. "  %#LivaraModeText#"
         .. current_mode()
         .. " %#LivaraModeTail#%#LivaraStatusText#"
     end
@@ -127,7 +127,7 @@
           parts[#parts + 1] = string.format(
             "%%#%s#%s %d",
             diagnostic_groups[severity],
-            diagnostic_icons[severity],
+            " " .. diagnostic_icons[severity] .. " ",
             counts[severity]
           )
         end
@@ -143,17 +143,16 @@
         names[#names + 1] = client.name
       end
       table.sort(names)
-      return "%#LivaraStatusAccent#󰒋%#LivaraStatusText# " .. escape(names[1])
+      return "%#LivaraStatusAccent# 󰒋 %#LivaraStatusText#" .. escape(names[1])
     end
 
-    local function filetype_component()
-      local filetype = vim.bo.filetype
-      if filetype == "" then filetype = "text" end
-      return "%#LivaraStatusMuted#%#LivaraStatusText# " .. filetype:upper()
+    local function line_count_component()
+      local count = vim.api.nvim_buf_line_count(0)
+      return "%#LivaraStatusAccent# 󰔶 %#LivaraStatusText#" .. count
     end
 
     local function position_component()
-      return "%#LivaraStatusAccent#󰆧%#LivaraStatusText# %l:%c"
+      return "%#LivaraStatusAccent# 󰆧 %#LivaraStatusText#%l:%c"
     end
 
     local function file_icon()
@@ -198,7 +197,7 @@
         local lsp = lsp_component()
         if lsp ~= "" then right[#right + 1] = lsp end
       end
-      if width >= 75 then right[#right + 1] = filetype_component() end
+      if width >= 75 then right[#right + 1] = line_count_component() end
       right[#right + 1] = position_component()
 
       return " " .. table.concat(left, "") .. "%=" .. table.concat(right, separator()) .. " "

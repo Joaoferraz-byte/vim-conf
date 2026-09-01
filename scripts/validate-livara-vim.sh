@@ -70,6 +70,7 @@ require 'git_component' "$statusline"
 require 'diagnostics_component' "$statusline"
 require 'lsp_component' "$statusline"
 require 'position_component' "$statusline"
+require 'line_count_component' "$statusline"
 require 'file_icon' "$statusline"
 require 'MiniIcons\.get' "$statusline"
 require 'narrow_statusline' "$statusline"
@@ -89,6 +90,8 @@ forbidden 'barbecue|nvim-navic' "$theme"
 forbidden 'lualine' "$ui"
 forbidden 'lualine' "$theme"
 forbidden 'vim\.fn\.expand\("%:~:\."\)' "$statusline"
+forbidden 'filetype_component' "$statusline"
+require_literal '.. "  %#LivaraModeText#"' "$statusline"
 
 # Bufferline remains transparent for all background-bearing subcomponents.
 for group in warning warning_visible warning_selected warning_diagnostic warning_diagnostic_visible warning_diagnostic_selected error error_visible error_selected error_diagnostic error_diagnostic_visible error_diagnostic_selected; do

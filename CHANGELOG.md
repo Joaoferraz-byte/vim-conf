@@ -202,3 +202,9 @@ The current Java workflow is tightly coupled to the Nix-packaged JDTLS contract:
 The JetBrains announcement currently describes a VS Code/Cursor/Open VSX extension in preview, with a 30-day evaluation renewed by builds and a future IntelliJ IDEA Ultimate requirement. The IntelliJ Platform documentation describes an LSP API for plugins inside commercial IntelliJ-based IDEs, not a standalone server command for Neovim. The separate Kotlin LSP is official and Apache 2.0, but remains Alpha and is a Kotlin-focused path. The repository now records these sources and the acceptance matrix for a future trial in `docs/intellij-lsp-assessment.md`.
 
 No speculative migration was made. JDTLS remains the owner until JetBrains publishes a standalone, documented and reproducibly packageable server whose handshake, Java/Spring support, Lombok symbols, organize-imports actions, Neotest integration, DAP behavior and licensing can be tested from Neovim.
+
+## 2026-09-01 — Statusline spacing, line count and icon baseline
+
+The statusline still exposed the filetype as uppercase text (for example `NIX`) and used unevenly perceived glyph spacing on the right-hand metadata sections. The mode segment also had only one post-icon space in the rendered mode body.
+
+The mode renderer now reserves one additional space after the icon, producing the requested single visual gap before the mode label. The filetype section was replaced by a line-count section, so the right side no longer shows an uppercase extension/filetype indicator. Position, LSP and diagnostic glyphs now use the same padded icon envelope, reducing baseline and optical-centering differences between icons and their labels while preserving transparent sections and the single colored mode surface.
