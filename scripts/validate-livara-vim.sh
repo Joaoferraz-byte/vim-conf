@@ -91,9 +91,11 @@ forbidden 'lualine' "$ui"
 forbidden 'lualine' "$theme"
 forbidden 'vim\.fn\.expand\("%:~:\."\)' "$statusline"
 forbidden 'filetype_component' "$statusline"
-require_literal '.. "  %#LivaraModeText#"' "$statusline"
-require_literal '%#LivaraModeEdge#' "$statusline"
+require_literal '.. " %#LivaraModeText#"' "$statusline"
+require_literal '%#LivaraModeEdge#▎' "$statusline"
 require_literal '%#LivaraModeTail#' "$statusline"
+require_literal 'return "%#LivaraStatusAccent# ≡ %#LivaraStatusText#" .. count' "$statusline"
+forbidden '' "$statusline"
 
 # Bufferline remains transparent for all background-bearing subcomponents.
 for group in warning warning_visible warning_selected warning_diagnostic warning_diagnostic_visible warning_diagnostic_selected error error_visible error_selected error_diagnostic error_diagnostic_visible error_diagnostic_selected; do

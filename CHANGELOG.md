@@ -212,3 +212,7 @@ The mode renderer now reserves one additional space after the icon, producing th
 ## 2026-09-01 — Increase mode island vertical breathing room
 
 The previous adjustment interpreted the requested padding as horizontal spacing around the Insert icon. The visual requirement is instead a slightly taller colored mode island without increasing the text size. The mode segment now uses rounded cap glyphs on both sides, a continuous fixed-color background under the icon and label, and restrained internal padding. The right cap is kept proportional to the left cap so the island reads as one coherent shape; all other statusline sections remain transparent.
+
+## 2026-09-01 — Revert unintended horizontal mode padding
+
+The prior mode-island adjustment added a left rounded cap and two horizontal spaces after the Neovim mode icon, which exceeded the requested change. The renderer now restores the original `▎` left edge and exactly one space after the mode icon. The right rounded tail remains the only geometry adjustment for the taller visual island, without changing text size. The line-count indicator also changed from the ambiguous Nerd Font glyph `󰔶`, which rendered as a triangle in the user's font, to the unambiguous horizontal-lines glyph `≡`.

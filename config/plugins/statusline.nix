@@ -63,13 +63,13 @@
     end
 
     local function set_statusline_highlights()
-      -- Mode geometry: rounded cap glyphs bound a slightly taller-looking
-      -- colored island. The padding is internal to this single statusline row;
-      -- text size stays unchanged and no other section receives a background.
+      -- Mode geometry keeps the original left edge and uses the right
+      -- rounded separator to give the colored island more vertical presence.
+      -- Text size and horizontal spacing remain unchanged.
       highlight("LivaraModeEdge", { fg = MODE_BG, bg = "NONE" })
       highlight("LivaraModeIcon", { fg = MODE_ICON, bg = MODE_BG, bold = true })
       highlight("LivaraModeText", { fg = MODE_FG, bg = MODE_BG, bold = true })
-      highlight("LivaraModeTail", { fg = MODE_BG, bg = "NONE" })
+      highlight("LivaraModeTail", { fg = MODE_BG, bg = "NONE", bold = true })
 
       highlight("StatusLine", { fg = "NONE", bg = "NONE" })
       highlight("StatusLineNC", { fg = "NONE", bg = "NONE" })
@@ -91,9 +91,9 @@
     end
 
     local function mode_segment()
-      return "%#LivaraModeEdge#%#LivaraModeIcon#  "
+      return "%#LivaraModeEdge#▎%#LivaraModeIcon# "
         .. current_mode_icon()
-        .. "  %#LivaraModeText#"
+        .. " %#LivaraModeText#"
         .. current_mode()
         .. " %#LivaraModeTail#%#LivaraStatusText#"
     end
@@ -149,7 +149,7 @@
 
     local function line_count_component()
       local count = vim.api.nvim_buf_line_count(0)
-      return "%#LivaraStatusAccent# 󰔶 %#LivaraStatusText#" .. count
+      return "%#LivaraStatusAccent# ≡ %#LivaraStatusText#" .. count
     end
 
     local function position_component()
