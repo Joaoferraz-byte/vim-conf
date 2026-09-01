@@ -1,179 +1,256 @@
-{ ... }:
 {
   extraConfigLua = ''
     local LivaraBar = {}
+
     local hidden_filetypes = {
       snacks_dashboard = true,
       snacks_picker_list = true,
+      snacks_picker_preview = true,
       oil = true,
       help = true,
+      qf = true,
     }
 
-    local CAP_LEFT = ""
-    local CAP_RIGHT = ""
+    -- The mode is the only colored surface. This is intentionally fixed rather
+    -- than palette-derived: it remains a stable visual anchor while Matugen
+    -- changes the rest of the editor's foregrounds.
+    local MODE_BG = "#ff6b9d"
+    local MODE_FG = "#17131b"
+    local MODE_ICON = "#fff2f7"
 
-    local function color(group, field, fallback)
-      local spec = vim.api.nvim_get_hl(0, { name = group, link = false })
-      if spec[field] then return string.format("#%06x", spec[field]) end
-      return fallback
+    local mode_icons = {
+      n = "",
+      i = "󰏫",
+      v = "󰈈",
+      V = "󰈈",
+      ["\22"] = "󰈈",
+      c = "",
+      R = "󰛔",
+      t = "",
+      s = "󰈈",
+      S = "󰈈",
+    }
+
+    local mode_names = {
+      n = "NORMAL",
+      i = "INSERT",
+      v = "VISUAL",
+      V = "V-LINE",
+      ["\22"] = "V-BLOCK",
+      c = "COMMAND",
+      R = "REPLACE",
+      t = "TERM",
+      s = "SELECT",
+      S = "S-LINE",
+    }
+
+    local diagnostic_icons = {
+      [vim.diagnostic.severity.ERROR] = "",
+      [vim.diagnostic.severity.WARN] = "",
+      [vim.diagnostic.severity.INFO] = "",
+      [vim.diagnostic.severity.HINT] = "󰌵",
+    }
+
+    local diagnostic_groups = {
+      [vim.diagnostic.severity.ERROR] = "LivaraStatusError",
+      [vim.diagnostic.severity.WARN] = "LivaraStatusWarn",
+      [vim.diagnostic.severity.INFO] = "LivaraStatusInfo",
+      [vim.diagnostic.severity.HINT] = "LivaraStatusHint",
+    }
+
+    local function highlight(name, spec)
+      vim.api.nvim_set_hl(0, name, spec)
     end
 
-    local function set_bar_highlights()
-      local base = color("Normal", "bg", "#191b24")
-      local surface = color("NormalFloat", "bg", "#20232f")
-      local text_fg = color("Normal", "fg", "#e7e9ef")
-      local muted = color("Comment", "fg", "#9da3b4")
-      local accent = color("Directory", "fg", "#ff6b9d")
-      local error = color("DiagnosticError", "fg", "#ff718d")
-      local warn = color("DiagnosticWarn", "fg", "#f4d36b")
-      local info = color("DiagnosticInfo", "fg", "#82c8ff")
-      local hint = color("DiagnosticHint", "fg", "#8ce6ad")
+    local function set_statusline_highlights()
+      -- Mode geometry: a narrow left edge, a slightly padded body and one
+      -- rounded right separator. There is no background on any other section.
+      highlight("LivaraModeEdge", { fg = MODE_BG, bg = "NONE" })
+      highlight("LivaraModeIcon", { fg = MODE_ICON, bg = MODE_BG, bold = true })
+      highlight("LivaraModeText", { fg = MODE_FG, bg = MODE_BG, bold = true })
+      highlight("LivaraModeTail", { fg = MODE_BG, bg = "NONE" })
 
-      -- Caps: fg = the pill's own background, bg = NONE (transparent),
-      -- so the rounded glyph draws the pill's color directly on the
-      -- editor background, creating the floating-capsule look.
-      vim.api.nvim_set_hl(0, "LivaraCapMode", { fg = accent, bg = "NONE" })
-      vim.api.nvim_set_hl(0, "LivaraCapSurface", { fg = surface, bg = "NONE" })
-
-      -- Mode pill (solid accent badge).
-      vim.api.nvim_set_hl(0, "LivaraModeText", { fg = base, bg = accent, bold = true })
-
-      -- Everything else lives on the neutral "surface" pill.
-      vim.api.nvim_set_hl(0, "LivaraText", { fg = text_fg, bg = surface })
-      vim.api.nvim_set_hl(0, "LivaraMuted", { fg = muted, bg = surface })
-      vim.api.nvim_set_hl(0, "LivaraDot", { fg = muted, bg = surface })
-      vim.api.nvim_set_hl(0, "LivaraGitIcon", { fg = hint, bg = surface, bold = true })
-      vim.api.nvim_set_hl(0, "LivaraAccentOnSurface", { fg = accent, bg = surface, bold = true })
-      vim.api.nvim_set_hl(0, "LivaraError", { fg = error, bg = surface, bold = true })
-      vim.api.nvim_set_hl(0, "LivaraWarn", { fg = warn, bg = surface, bold = true })
-      vim.api.nvim_set_hl(0, "LivaraInfo", { fg = info, bg = surface, bold = true })
-      vim.api.nvim_set_hl(0, "LivaraHint", { fg = hint, bg = surface, bold = true })
-
-      -- Winbar: no pill, just quiet, transparent text.
-      vim.api.nvim_set_hl(0, "LivaraWinbarMuted", { fg = muted, bg = "NONE", italic = true })
-      vim.api.nvim_set_hl(0, "LivaraWinbarName", { fg = text_fg, bg = "NONE" })
-      vim.api.nvim_set_hl(0, "LivaraWinbarDot", { fg = accent, bg = "NONE", bold = true })
-
-      -- Force both bars fully transparent so pills float on the editor bg.
-      vim.api.nvim_set_hl(0, "StatusLine", { bg = "NONE" })
-      vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "NONE" })
-      vim.api.nvim_set_hl(0, "WinBar", { bg = "NONE" })
-      vim.api.nvim_set_hl(0, "WinBarNC", { bg = "NONE" })
+      highlight("StatusLine", { fg = "NONE", bg = "NONE" })
+      highlight("StatusLineNC", { fg = "NONE", bg = "NONE" })
+      highlight("WinBar", { fg = "NONE", bg = "NONE" })
+      highlight("WinBarNC", { fg = "NONE", bg = "NONE" })
     end
 
     local function escape(value)
       return (value or ""):gsub("%%", "%%%%")
     end
 
-    local function current_name()
+    local function current_mode()
+      local raw = vim.fn.mode()
+      return mode_names[raw] or raw:upper()
+    end
+
+    local function current_mode_icon()
+      return mode_icons[vim.fn.mode()] or "󰘧"
+    end
+
+    local function mode_segment()
+      return "%#LivaraModeEdge#▎%#LivaraModeIcon# "
+        .. current_mode_icon()
+        .. " %#LivaraModeText#"
+        .. current_mode()
+        .. " %#LivaraModeTail#%#LivaraStatusText#"
+    end
+
+    local function separator()
+      return "%#LivaraStatusMuted#  ·  %#LivaraStatusText#"
+    end
+
+    local function git_component()
+      local git = vim.b.gitsigns_status_dict or {}
+      if not git.head or git.head == "" then return "" end
+      local changed = (tonumber(git.added or 0) or 0)
+        + (tonumber(git.changed or 0) or 0)
+        + (tonumber(git.removed or 0) or 0)
+      local result = "%#LivaraStatusGit#%#LivaraStatusText# " .. escape(git.head)
+      if changed > 0 then
+        result = result .. "%#LivaraStatusMuted#  " .. changed
+      end
+      return result
+    end
+
+    local function diagnostics_component()
+      local counts = {}
+      for _, diagnostic in ipairs(vim.diagnostic.get(0)) do
+        local severity = diagnostic.severity
+        if severity then counts[severity] = (counts[severity] or 0) + 1 end
+      end
+
+      local parts = {}
+      for severity = vim.diagnostic.severity.ERROR, vim.diagnostic.severity.HINT do
+        if counts[severity] then
+          parts[#parts + 1] = string.format(
+            "%%#%s#%s %d",
+            diagnostic_groups[severity],
+            diagnostic_icons[severity],
+            counts[severity]
+          )
+        end
+      end
+      return table.concat(parts, "%#LivaraStatusMuted# · ")
+    end
+
+    local function lsp_component()
+      local clients = vim.lsp.get_clients({ bufnr = 0 })
+      if #clients == 0 then return "" end
+      local names = {}
+      for _, client in ipairs(clients) do
+        names[#names + 1] = client.name
+      end
+      table.sort(names)
+      return "%#LivaraStatusAccent#󰒋%#LivaraStatusText# " .. escape(names[1])
+    end
+
+    local function filetype_component()
+      local filetype = vim.bo.filetype
+      if filetype == "" then filetype = "text" end
+      return "%#LivaraStatusMuted#%#LivaraStatusText# " .. filetype:upper()
+    end
+
+    local function position_component()
+      return "%#LivaraStatusAccent#󰆧%#LivaraStatusText# %l:%c"
+    end
+
+    local function file_icon()
       local name = vim.fn.expand("%:t")
-      if name == "" then return "[No Name]" end
+      local fallback = "%#LivaraStatusAccent#󰈙%#LivaraStatusText#"
+      if name == "" then return fallback end
+
+      local ok, MiniIcons = pcall(require, "mini.icons")
+      if not ok then return fallback end
+      local glyph, group = MiniIcons.get("file", name)
+      if not glyph then return fallback end
+      return "%#" .. (group or "LivaraStatusAccent") .. "#" .. glyph .. "%#LivaraStatusText#"
+    end
+
+    local function file_name()
+      local name = vim.fn.expand("%:t")
+      if name == "" then name = "[No Name]" end
       return escape(name)
     end
 
-    local function mode()
-      local names = {
-        n = "NORMAL", i = "INSERT", v = "VISUAL", V = "V-LINE", ["\22"] = "V-BLOCK",
-        c = "COMMAND", R = "REPLACE", t = "TERM", s = "SELECT", S = "S-LINE",
-      }
-      return names[vim.fn.mode()] or vim.fn.mode():upper()
+    local function file_directory()
+      local path = vim.fn.expand("%:p:h")
+      if path == "" then return "" end
+      path = vim.fn.fnamemodify(path, ":~:.")
+      return escape(path)
     end
 
-    -- Wrap `body` (a string that must open with its own "%#Group#" switch)
-    -- in rounded caps. Every highlight used inside `body` must share the
-    -- same background so the pill reads as one seamless capsule.
-    local function pill(cap_hl, body)
-      if body == "" then return "" end
-      return "%#" .. cap_hl .. "#" .. CAP_LEFT .. body .. "%#" .. cap_hl .. "#" .. CAP_RIGHT
+    local function modified_marker()
+      if not vim.bo.modified then return "" end
+      return "%#LivaraStatusWarn# ●%#LivaraStatusText#"
     end
 
-    local function join(parts)
-      local out = {}
-      for _, part in ipairs(parts) do
-        if part ~= "" then out[#out + 1] = part end
+    local function narrow_statusline(width)
+      local left = { mode_segment() }
+      local git = git_component()
+      if git ~= "" and width >= 90 then left[#left + 1] = separator() .. git end
+
+      local right = {}
+      local diagnostics = diagnostics_component()
+      if diagnostics ~= "" then right[#right + 1] = diagnostics end
+      if width >= 110 then
+        local lsp = lsp_component()
+        if lsp ~= "" then right[#right + 1] = lsp end
       end
-      return table.concat(out, " ")
-    end
+      if width >= 75 then right[#right + 1] = filetype_component() end
+      right[#right + 1] = position_component()
 
-    local function mode_pill()
-      return pill("LivaraCapMode", "%#LivaraModeText# " .. mode() .. " ")
-    end
-
-    local function git_pill()
-      local git = vim.b.gitsigns_status_dict or {}
-      if not git.head or git.head == "" then return "" end
-      local changed = (tonumber(git.added or 0) or 0) + (tonumber(git.changed or 0) or 0) + (tonumber(git.removed or 0) or 0)
-      local body = "%#LivaraGitIcon#  %#LivaraText#" .. escape(git.head)
-      if changed > 0 then
-        body = body .. "  %#LivaraMuted#" .. changed
-      end
-      return pill("LivaraCapSurface", body .. " ")
-    end
-
-    local function diagnostics_pill()
-      local counts = { 0, 0, 0, 0 }
-      for _, diagnostic in ipairs(vim.diagnostic.get(0)) do
-        if diagnostic.severity then counts[diagnostic.severity] = counts[diagnostic.severity] + 1 end
-      end
-      local symbols = { "", "", "", "󰌵" }
-      local groups = { "LivaraError", "LivaraWarn", "LivaraInfo", "LivaraHint" }
-      local parts = {}
-      for severity = 1, 4 do
-        if counts[severity] > 0 then
-          parts[#parts + 1] = string.format("%%#%s# %s %d", groups[severity], symbols[severity], counts[severity])
-        end
-      end
-      if #parts == 0 then return "" end
-      return pill("LivaraCapSurface", table.concat(parts, "%#LivaraDot# │") .. " ")
-    end
-
-    local function meta_pill()
-      local clients = vim.lsp.get_clients({ bufnr = 0 })
-      local lsp_name = "no lsp"
-      if #clients > 0 then
-        local names = {}
-        for _, client in ipairs(clients) do names[#names + 1] = client.name end
-        table.sort(names)
-        lsp_name = names[1]
-      end
-      local filetype = vim.bo.filetype ~= "" and vim.bo.filetype:upper() or "TEXT"
-      local body = "%#LivaraMuted# 󰄭 " .. escape(lsp_name)
-        .. " %#LivaraDot#│ %#LivaraMuted#" .. filetype
-        .. " %#LivaraDot#│ %#LivaraAccentOnSurface#%3l:%-2c "
-      return pill("LivaraCapSurface", body)
+      return " " .. table.concat(left, "") .. "%=" .. table.concat(right, separator()) .. " "
     end
 
     function LivaraBar.statusline()
       if hidden_filetypes[vim.bo.filetype] then return "" end
-      set_bar_highlights()
-      local left = join({ mode_pill(), git_pill() })
-      local right = join({ diagnostics_pill(), meta_pill() })
-      return " " .. left .. "%=" .. right .. " "
+      set_statusline_highlights()
+      return narrow_statusline(vim.api.nvim_win_get_width(0))
     end
 
     function LivaraBar.winbar()
       if hidden_filetypes[vim.bo.filetype] then return "" end
-      set_bar_highlights()
-      local name = current_name()
-      local dot = vim.bo.modified and " %#LivaraWinbarDot#●" or ""
-      return "%#LivaraWinbarMuted#  %#LivaraWinbarName#" .. name .. dot .. " "
+      set_statusline_highlights()
+      local directory = file_directory()
+      local context = directory ~= "" and (separator() .. directory) or ""
+      return " " .. file_icon() .. " " .. file_name() .. modified_marker() .. context .. " "
     end
 
+    -- Theme reloads call this stable public hook. It only restores fixed mode
+    -- geometry and transparent canvas groups; Matugen owns semantic text hues.
+    _G.livara_statusline_activate = set_statusline_highlights
     _G.LivaraBar = LivaraBar
+
     local group = vim.api.nvim_create_augroup("LivaraMinimalBars", { clear = true })
-    vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter", "BufFilePost", "WinEnter", "DirChanged", "DiagnosticChanged", "LspAttach", "LspDetach", "ModeChanged" }, {
+    vim.api.nvim_create_autocmd({
+      "BufEnter",
+      "BufWinEnter",
+      "BufFilePost",
+      "WinEnter",
+      "DirChanged",
+      "DiagnosticChanged",
+      "LspAttach",
+      "LspDetach",
+      "ModeChanged",
+      "BufModifiedSet",
+    }, {
       group = group,
       callback = function() vim.cmd("redrawstatus") end,
     })
     vim.api.nvim_create_autocmd("ColorScheme", {
       group = group,
-      callback = function() set_bar_highlights(); vim.cmd("redrawstatus") end,
+      callback = function()
+        set_statusline_highlights()
+        vim.cmd("redrawstatus")
+      end,
     })
 
     vim.o.showmode = false
     vim.o.laststatus = 3
     vim.o.statusline = "%!v:lua.LivaraBar.statusline()"
     vim.o.winbar = "%!v:lua.LivaraBar.winbar()"
-    set_bar_highlights()
+    set_statusline_highlights()
   '';
 }

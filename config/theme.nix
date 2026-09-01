@@ -171,7 +171,6 @@
         { "LspFloatWinBorder", colors.primary, "NONE", 0 },
         { "OilFloat", colors.text, "NONE", 0 },
         { "OilFloatBorder", colors.primary, "NONE", 0 },
-        { "BarbecueFilename", colors.text, "NONE", 0 },
         { "BufferLineIndicatorSelected", colors.primary, "NONE", 0 },
         { "NeoTreeFloatBorder", colors.primary, "NONE", 0 },
         { "NeoTreeRootName", colors.text, "NONE", 0 },
@@ -304,7 +303,6 @@
       set_livara_highlight("LivaraStatusInfo", colors.blue, "NONE")
       set_livara_highlight("LivaraStatusHint", colors.teal, "NONE")
       set_livara_highlight("LivaraStatusGit", colors.secondary, "NONE")
-      set_livara_highlight("LivaraStatusLocation", theme_color(colors, "subtext1", "subtext0"), "NONE")
 
       local cmp_kind_colors = {
         Text = colors.text,

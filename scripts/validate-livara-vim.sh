@@ -7,6 +7,7 @@ statusline="$repo_root/config/plugins/statusline.nix"
 keymaps="$repo_root/config/keymaps.nix"
 web="$repo_root/config/languages/web.nix"
 vault="$repo_root/config/plugins/vault.nix"
+theme="$repo_root/config/theme.nix"
 
 fail() {
   printf 'NixVim contract check failed: %s\n' "$1" >&2
@@ -33,9 +34,11 @@ forbidden() {
   fi
 }
 
+# The native renderer owns both bars and hides noisy/special buffers.
 require 'hidden_filetypes = \{' "$statusline"
 require 'snacks_dashboard = true' "$statusline"
 require 'snacks_picker_list = true' "$statusline"
+require 'snacks_picker_preview = true' "$statusline"
 require 'oil = true' "$statusline"
 require 'fidget' "$ui"
 require 'poll_rate = false' "$ui"
@@ -49,47 +52,58 @@ forbidden '<cmd>Dashboard<CR>' "$keymaps"
 require '"<S-Right>"' "$repo_root/config/plugins/completion.nix"
 require '"<S-Left>"' "$repo_root/config/plugins/completion.nix"
 require_literal 'cmp.mapping.confirm({ select = false })' "$repo_root/config/plugins/completion.nix"
+
+# Statusline/winbar visual contract: mini.statusline-inspired sections, no
+# capsules outside the single fixed-color mode segment.
 require 'LivaraBar\.statusline' "$statusline"
 require 'LivaraBar\.winbar' "$statusline"
-require 'BufferLineDevIcon' "$repo_root/config/theme.nix"
-require 'NeoTreeFileIcon' "$repo_root/config/theme.nix"
-require 'NvimTreeFileIcon' "$repo_root/config/theme.nix"
-require 'BufWinEnter' "$repo_root/config/theme.nix"
-require 'livara_theme_watcher_started' "$repo_root/config/theme.nix"
-require 'livara_config_dir = vim\.fn\.stdpath\("config"\)' "$repo_root/config/theme.nix"
-require 'lua/matugen_colors\.lua' "$repo_root/config/theme.nix"
-require 'legacy/manual install fallback' "$repo_root/config/theme.nix"
-forbidden 'local livara_theme_path = vim\.fn\.stdpath\("config"\) .. "/matugen_colors\.lua"' "$repo_root/config/theme.nix"
 require 'vim\.o\.statusline' "$statusline"
 require 'vim\.o\.winbar = "%!v:lua\.LivaraBar\.winbar\(\)"' "$statusline"
 require 'laststatus = 3' "$repo_root/config/options.nix"
-require 'LivaraBarCap' "$statusline"
-require 'LivaraBarBlock' "$statusline"
-require 'LivaraBarMode' "$statusline"
-require 'current_name' "$statusline"
+require 'MODE_BG = "#ff6b9d"' "$statusline"
+require 'LivaraModeEdge' "$statusline"
+require 'LivaraModeIcon' "$statusline"
+require 'LivaraModeText' "$statusline"
+require 'LivaraModeTail' "$statusline"
+require 'mode_segment' "$statusline"
 require 'git_component' "$statusline"
 require 'diagnostics_component' "$statusline"
 require 'lsp_component' "$statusline"
 require 'position_component' "$statusline"
-require 'return "%#LivaraBarCap#' "$statusline"
-require 'blend = 8' "$statusline"
-forbidden 'vim\.fn\.expand\("%:~:\."\)' "$statusline"
-forbidden 'LivaraStatusMode|LivaraStatusGitSep|LivaraStatusLocationSep' "$statusline"
+require 'file_icon' "$statusline"
+require 'MiniIcons\.get' "$statusline"
+require 'narrow_statusline' "$statusline"
+require 'BufModifiedSet' "$statusline"
+require 'livara_statusline_activate' "$statusline"
+require 'LivaraStatusText' "$theme"
+require 'LivaraStatusMuted' "$theme"
+require 'LivaraStatusAccent' "$theme"
+for group in LivaraStatusError LivaraStatusWarn LivaraStatusInfo LivaraStatusHint LivaraStatusGit; do
+  require "$group" "$theme"
+done
+for forbidden_visual in 'pill' 'LivaraCap' 'LivaraBarCap' 'LivaraBarBlock' 'blend = 8' 'LivaraStatusMode|LivaraStatusGitSep|LivaraStatusLocationSep'; do
+  forbidden "$forbidden_visual" "$statusline"
+done
 forbidden 'barbecue|nvim-navic' "$ui"
-forbidden 'barbecue' "$repo_root/config/theme.nix"
+forbidden 'barbecue|nvim-navic' "$theme"
+forbidden 'lualine' "$ui"
+forbidden 'lualine' "$theme"
+forbidden 'vim\.fn\.expand\("%:~:\."\)' "$statusline"
+
+# Bufferline remains transparent for all background-bearing subcomponents.
 for group in warning warning_visible warning_selected warning_diagnostic warning_diagnostic_visible warning_diagnostic_selected error error_visible error_selected error_diagnostic error_diagnostic_visible error_diagnostic_selected; do
   require_literal "${group} = { bg = \"NONE\"; };" "$ui"
 done
-forbidden 'lualine' "$ui"
-forbidden 'lualine' "$repo_root/config/theme.nix"
+
+# Language and workflow contracts retained by the refactor.
 require 'filetypes = \[' "$web"
 require '"php"' "$web"
 require 'showExpandedAbbreviation = "always"' "$web"
 for server in nil_ls lua_ls bashls dockerls clangd pyright marksman; do
-  require "${server}" "$repo_root/config/languages/general.nix"
+  require "$server" "$repo_root/config/languages/general.nix"
 done
 for server in ts_ls eslint html cssls jsonls yamlls emmet_language_server tailwindcss; do
-  require "${server}" "$web"
+  require "$server" "$web"
 done
 require 'phpactor\.enable' "$repo_root/config/languages/specialized.nix"
 require 'postgres_lsp\.enable' "$repo_root/config/languages/specialized.nix"
@@ -132,7 +146,7 @@ if command -v luac5.4 >/dev/null 2>&1; then
   tmp_dir="$(mktemp -d)"
   trap 'rm -rf "$tmp_dir"' EXIT
   index=0
-  for file in "$ui" "$statusline" "$repo_root/config/theme.nix" "$repo_root/config/plugins/completion.nix" "$vault"; do
+  for file in "$ui" "$statusline" "$theme" "$repo_root/config/plugins/completion.nix" "$vault"; do
     while IFS= read -r -d '' block; do
       index=$((index + 1))
       lua_file="$tmp_dir/block-${index}.lua"
