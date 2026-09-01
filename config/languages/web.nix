@@ -2,11 +2,14 @@
   plugins.lsp = {
     enable = true;
     servers = {
-      # Angular language service is intentionally not enabled globally: its
-      # default filetypes overlap plain HTML and compete with html-language-server
-      # for nvim-navic. Angular projects should enable it in a project-specific
-      # module where its root/filetypes can be scoped deliberately.
+      # Angular is root-scoped so template completion is available in Angular/Nx
+      # workspaces without attaching the service to unrelated HTML projects.
       ts_ls.enable = true;
+      angularls = {
+        enable = true;
+        filetypes = [ "typescript" "html" "typescriptreact" "htmlangular" ];
+        rootMarkers = [ "angular.json" "project.json" "nx.json" ];
+      };
       eslint.enable = true;
       html.enable = true;
       cssls.enable = true;

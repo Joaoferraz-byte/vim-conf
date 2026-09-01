@@ -158,3 +158,9 @@ The loader now prefers the generated `lua/matugen_colors.lua` module and retains
 The statusline exposed cursor position only as plain text and its Git highlight groups were not initialized by the renderer. Bufferline's generic transparent groups did not cover the warning/error diagnostic variants used with `diagnostics = "nvim_lsp"`.
 
 The renderer now keeps `%=` alignment and adds a third rounded location island with its own dynamic highlight groups, while preserving mode, Git, filetype, diagnostics, LSP and winbar behavior. Bufferline explicitly sets warning/error, visible, selected and diagnostic variants to `bg = "NONE"`, preserving semantic foreground colors without opaque rectangles. The updated static contract validator passes on this branch.
+
+## Stage 6 — Root-scoped Angular completion and language contract cleanup (2026-09-01)
+
+The public documentation claimed Angular support while `angularls` was intentionally disabled to avoid attaching it to every HTML buffer. That left Angular template completion absent, while the README also retained stale IntelliJ-LSP and root-level Matugen references.
+
+Angular Language Service is now enabled with `angular.json`, `project.json` and `nx.json` root markers and the Angular template filetypes, keeping unrelated HTML workspaces on their existing servers. The README now names JDTLS as the Java/Spring owner and documents the canonical generated Matugen path. Python/Manim remains correctly represented as one Pyright-backed workflow rather than an invented Manim server. Static language and completion contracts pass; no build or live switch was performed.

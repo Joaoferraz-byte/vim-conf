@@ -53,7 +53,7 @@ A decisão arquitetural completa, incluindo comparação com dendritic, camadas,
 
 ## Tema Matugen/Livara
 
-O editor mantém `habamax` como fallback durante a primeira inicialização e força `background = "dark"`. Quando `~/.config/nvim/matugen_colors.lua` existe, `config/theme.nix` carrega a tabela Lua produzida pelo adapter Livara e aplica a paleta derivada do wallpaper.
+O editor mantém `habamax` como fallback durante a primeira inicialização e força `background = "dark"`. Quando `~/.config/nvim/lua/matugen_colors.lua` existe, `config/theme.nix` carrega a tabela Lua produzida pelo adapter Livara e aplica a paleta derivada do wallpaper.
 
 O loader usa um único contrato `_G.reload_livara_theme`, grupos de modo `LivaraStatus*` e um watcher `vim.uv.new_fs_event`. `LivaraStatusline` é o único owner de `vim.o.statusline` e `vim.o.winbar`: o lado esquerdo mostra o ícone do Neovim, modo e branch; o lado direito mantém diagnósticos, clientes LSP e posição. A transparência é limitada ao canvas e às superfícies estruturais. Menus, floats, completion e segmentos legíveis do statusline mantêm superfícies com contraste; portanto, o tema não apaga indiscriminadamente todos os backgrounds.
 
@@ -63,7 +63,7 @@ Matugen é o owner da paleta dinâmica. O NixVim apenas consome o arquivo gerado
 
 Snacks é a fundação de picker, explorer, dashboard, input, notifier, quickfile, terminal, image, scope, indent e zen. Oil é o owner da edição de filesystem como buffer. Neo-tree, NvimTree, Telescope, Mini Files e project.nvim não fazem parte da configuração ativa.
 
-Plugins especializados permanecem quando não existe paridade real: Aerial para outline, Neogit/Diffview/Gitsigns para Git, nvim-dap para debugging, Conform para formatação, Neotest para testes e o adapter Intellij LSP/neotest-java para Java/Spring. A modernização não remove uma feature somente porque existe um plugin mais novo em outra área.
+Plugins especializados permanecem quando não existe paridade real: Aerial para outline, Neogit/Diffview/Gitsigns para Git, nvim-dap para debugging, Conform para formatação, Neotest para testes e `nvim-jdtls`/JDTLS para Java/Spring. A modernização não remove uma feature somente porque existe um plugin mais novo em outra área.
 
 ### Markdown pesado
 
@@ -110,7 +110,7 @@ A cobertura solicitada fica organizada da seguinte forma:
 | Ecossistema | Suporte | Owner do LSP/completion |
 |---|---|---|
 | Java, Spring Boot, Swing/JFrame | Workflow Java dedicado com JDTLS, JDK 21, Lombok, Maven, Gradle e Neotest | `nvim-jdtls` + `jdt-language-server` + `nvim-cmp` |
-| HTML, CSS, JavaScript/TypeScript | Angular, TypeScript, ESLint, HTML, CSS, Emmet e Tailwind | servidores declarativos do NixVim + `nvim-cmp` |
+| HTML, CSS, JavaScript/TypeScript | Angular root-scoped por `angular.json`/`nx.json`, TypeScript, ESLint, HTML, CSS, Emmet e Tailwind | servidores declarativos do NixVim + `nvim-cmp` |
 | PHP | PHP e projetos Composer | `phpactor` + `nvim-cmp` |
 | C/C++ | C e C++ com toolchain clang/gcc | `clangd` + `nvim-cmp` |
 | Python e Manim | Python; Manim é uma biblioteca/workflow Python e usa o mesmo servidor | `pyright` + `nvim-cmp` |
