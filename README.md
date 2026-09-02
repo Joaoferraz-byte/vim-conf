@@ -49,8 +49,6 @@ The configuration uses a hybrid **layered and workflow** architecture rather tha
 
 Each plugin has one primary owner. The layout does not artificially fragment every option into its own file: plugins that form a workflow stay together, while distinct domains remain isolated.
 
-The full architectural decision, including the comparison of dendritic modules, layers, vertical slices, NixVim, nvf and nixCats, is recorded in [`ARCHITECTURE_PROPOSAL.md`](./ARCHITECTURE_PROPOSAL.md).
-
 ## Matugen/Livara theme
 
 The editor keeps `habamax` as its first-start fallback and forces `background = "dark"`. When `~/.config/nvim/lua/matugen_colors.lua` exists, `config/theme.nix` loads the Lua table produced by the Livara adapter and applies the wallpaper-derived palette.
@@ -168,4 +166,20 @@ The standalone package `nix build` is a later validation step and should run on 
 - [NixVim](https://github.com/nix-community/nixvim)
 - [Snacks.nvim](https://github.com/folke/snacks.nvim)
 - [Oil.nvim](https://github.com/stevearc/oil.nvim)
-- [Architectural proposal](./ARCHITECTURE_PROPOSAL.md)
+
+## Repository structure
+
+```text
+.
+ARCHITECTURE_PROPOSAL.md
+README.md
+config
+  └── config/default.nix
+  └── config/keymaps.nix
+  └── config/languages
+  └── config/options.nix
+  └── config/plugins
+  └── config/theme.nix
+flake.lock
+flake.nix
+```
