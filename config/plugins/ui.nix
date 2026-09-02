@@ -363,7 +363,6 @@
     end
 
     local templates = {
-      java = 'package %s;\n\npublic class %s {\n    public static void main(String[] args) {\n        // TODO\n    }\n}\n',
       py = '#!/usr/bin/env python3\n"""Module %s."""\n\n\ndef main():\n    pass\n\n\nif __name__ == "__main__":\n    main()\n',
       js = '// %s\n\nexport default function %s() {\n  return null;\n}\n',
       ts = '// %s\n\nexport function %s(): void {\n  // TODO\n}\n',
@@ -376,8 +375,82 @@
       c = '#include <stdio.h>\n\nint main(void) {\n    return 0;\n}\n',
       cpp = '#include <iostream>\n\nint main() {\n    return 0;\n}\n',
       rs = 'fn main() {\n    println!("Hello");\n}\n',
-      go = 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello")\n}\n',
     }
+
+    local function nearest_project_root(path)
+      local directory = vim.fn.fnamemodify(path, ":h")
+      local markers = vim.fs.find({
+        "pom.xml",
+        "mvnw",
+        "build.gradle",
+        "build.gradle.kts",
+        "gradlew",
+        "settings.gradle",
+        "settings.gradle.kts",
+      }, { path = directory, upward = true, type = "file" })
+      if #markers > 0 then return vim.fn.fnamemodify(markers[1], ":h") end
+      local git_marker = vim.fs.find(".git", { path = directory, upward = true, type = "directory" })
+      if #git_marker > 0 then return vim.fn.fnamemodify(git_marker[1], ":h") end
+      return directory
+    end
+
+    local function file_identifier(stem)
+      local identifier = stem:gsub("[^%w_]", "")
+      if identifier == "" then identifier = "Main" end
+      if identifier:match("^%d") then identifier = "_" .. identifier end
+      return identifier:gsub("^%l", string.upper)
+    end
+
+    local function java_package_for(path)
+      if not path or path == "" then return nil end
+      local root = nearest_project_root(path)
+      local source_root
+      for _, relative_root in ipairs({ "src/main/java", "src/test/java", "src" }) do
+        local candidate = root .. "/" .. relative_root
+        if vim.fn.isdirectory(candidate) == 1 and path:sub(1, #candidate + 1) == candidate .. "/" then
+          source_root = candidate
+          break
+        end
+      end
+      if not source_root then
+        local projects_marker = path:find("/Projects/", 1, true)
+        if projects_marker then
+          source_root = path:sub(1, projects_marker + #"/Projects" - 1)
+        else
+          return nil
+        end
+      end
+      local relative = path:sub(#source_root + 2)
+      local package_directory = vim.fn.fnamemodify(relative, ":h")
+      if package_directory == "." or package_directory == "" then return nil end
+      local parts = {}
+      for part in package_directory:gmatch("[^/]+") do
+        local identifier = part:gsub("[^%w_]", "")
+        if identifier == "" or identifier:match("^%d") then return nil end
+        parts[#parts + 1] = identifier:lower()
+      end
+      return #parts > 0 and table.concat(parts, ".") or nil
+    end
+
+    local function go_package_for(path)
+      local directory = vim.fn.fnamemodify(path, ":h")
+      local root = nearest_project_root(path)
+      if directory == root then return "main" end
+      local identifier = vim.fn.fnamemodify(directory, ":t"):gsub("[^%w_]", "")
+      if identifier == "" or identifier:match("^%d") then return "main" end
+      return identifier:lower()
+    end
+
+    local function java_template(path, class_name)
+      local package_name = java_package_for(path)
+      local header = package_name and ("package " .. package_name .. ";\n\n") or ""
+      return header .. string.format([[public class %s {
+    public static void main(String[] args) {
+        // TODO
+    }
+}
+]], class_name)
+    end
 
     local template_choices = {
       { ext = "java", label = "Java class" },
@@ -396,19 +469,30 @@
       { ext = "go", label = "Go program" },
     }
 
-    local function template_content(ext, name)
+    local function template_content(ext, name, path)
+      local stem = name:gsub("%.[^.]+$", "")
+      local identifier = file_identifier(stem)
+      if ext == "java" then return java_template(path or vim.fn.expand("%:p"), identifier) end
+      if ext == "go" then
+        return string.format([[package %s
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello")
+}
+]], go_package_for(path or vim.fn.expand("%:p")))
+      end
       local template = templates[ext]
       if not template then return nil end
-      local stem = name:gsub("%.[^.]+$", "")
-      local class_name = stem:gsub("^%l", string.upper):gsub("[^%w]", "")
-      local ok, content = pcall(string.format, template, class_name, class_name)
+      local ok, content = pcall(string.format, template, identifier, identifier)
       return ok and content or nil
     end
 
     local function apply_current_template(choice)
       local name = vim.fn.expand("%:t")
       if name == "" then name = "Main" end
-      local content = template_content(choice.ext, name)
+      local content = template_content(choice.ext, name, vim.fn.expand("%:p"))
       if not content then
         notify("Template unavailable: " .. choice.ext, vim.log.levels.ERROR)
         return
@@ -449,7 +533,7 @@
       local name = vim.fn.fnamemodify(path, ":t")
       local ext = name:match("%.([^.]+)$") or ""
       vim.cmd("edit " .. vim.fn.fnameescape(path))
-      local content = template_content(ext, name)
+      local content = template_content(ext, name, path)
       if content then
         vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(content, "\n", { plain = true }))
       end
