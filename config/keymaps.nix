@@ -45,16 +45,15 @@
       neotest.run.run(strategy and { strategy = strategy } or nil)
     end
 
-    _G.livara_java_command = java_command
     _G.livara_java_test = java_test
     _G.livara_java_organize_imports = function()
       if vim.bo.filetype ~= "java" then
         vim.notify("Java workflow requires a Java buffer", vim.log.levels.WARN)
         return
       end
-      local clients = vim.lsp.get_clients({ bufnr = 0, name = "intellij-lsp" })
+      local clients = vim.lsp.get_clients({ bufnr = 0, name = "jdtls" })
       if #clients == 0 then
-        vim.notify("IntelliJ LSP is not attached to this buffer", vim.log.levels.WARN)
+        vim.notify("JDTLS is not attached to this buffer", vim.log.levels.WARN)
         return
       end
       vim.lsp.buf.code_action({
@@ -161,14 +160,12 @@
       options = { silent = true; desc = "Capture in Inbox"; };
     }
 
-    # Java/Spring uses IntelliJ LSP for language intelligence and delegates
-    # test execution to Neotest, keeping one discoverable workflow namespace.
-      {
-        key = "<leader>jr";
-        action.__raw = "function() _G.livara_intellij_lsp_start() end";
-        mode = [ "n" ];
-        options = { silent = true; desc = "Connect IntelliJ LSP"; };
-      }
+    {
+      key = "<leader>jr";
+      action = "<cmd>JavaRunnerRunMain<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Run Java Main"; };
+    }
     {
       key = "<leader>jd";
       action = "<cmd>DapContinue<CR>";
@@ -183,27 +180,21 @@
     }
       {
         key = "<leader>jR";
-        action.__raw = "function() _G.livara_intellij_lsp_restart() end";
+        action = "<cmd>JavaBuildBuildWorkspace<CR>";
         mode = [ "n" ];
-        options = { silent = true; desc = "Restart IntelliJ LSP"; };
+        options = { silent = true; desc = "Build Java Workspace"; };
       }
       {
         key = "<leader>ji";
-        action.__raw = "function() _G.livara_intellij_lsp_start() end";
+        action = "<cmd>JavaRunnerToggleLogs<CR>";
         mode = [ "n" ];
-        options = { silent = true; desc = "Refresh IntelliJ LSP"; };
+        options = { silent = true; desc = "Toggle Java Logs"; };
       }
       {
         key = "<leader>jl";
         action = "<cmd>LspInfo<CR>";
         mode = [ "n" ];
-        options = { silent = true; desc = "Show IntelliJ LSP"; };
-      }
-      {
-        key = "<leader>jw";
-        action.__raw = "function() _G.livara_intellij_lsp_stop() end";
-        mode = [ "n" ];
-        options = { silent = true; desc = "Disconnect IntelliJ LSP"; };
+        options = { silent = true; desc = "Show Java LSP"; };
       }
     {
       key = "<leader>jh";

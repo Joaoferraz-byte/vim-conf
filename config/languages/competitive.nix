@@ -8,7 +8,7 @@
 
   extraConfigLua = ''
     require("leetcode").setup({
-      lang = "cpp",
+      lang = "java",
       logging = false,
       plugins = {
         non_standalone = true,
@@ -72,8 +72,6 @@
   ];
 
   extraPackages = with pkgs; [
-    clang
-    clang-tools
-    gcc
+    jdk21
   ];
 }
