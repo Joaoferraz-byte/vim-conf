@@ -183,6 +183,13 @@
           { __unkeyed-1 = "<leader>f"; group = "Files"; icon = " "; }
           { __unkeyed-1 = "<leader>c"; group = "Configuration"; icon = " "; }
           { __unkeyed-1 = "<leader>l"; group = "Language"; icon = "󰘦 "; }
+          { __unkeyed-1 = "<leader>p"; group = "Programming"; icon = " "; }
+          { __unkeyed-1 = "<leader>pc"; desc = "Open LeetCode Menu"; icon = "󰅩 "; }
+          { __unkeyed-1 = "<leader>pd"; desc = "Open LeetCode Daily"; icon = "󰃭 "; }
+          { __unkeyed-1 = "<leader>pl"; desc = "List LeetCode Problems"; icon = " "; }
+          { __unkeyed-1 = "<leader>pr"; desc = "Open Random LeetCode Problem"; icon = " "; }
+          { __unkeyed-1 = "<leader>pt"; desc = "Test LeetCode Solution"; icon = " "; }
+          { __unkeyed-1 = "<leader>px"; desc = "Submit LeetCode Solution"; icon = "󰄬 "; }
           { __unkeyed-1 = "<leader>j"; group = "Java"; icon = " "; }
           { __unkeyed-1 = "<leader>n"; group = "New"; icon = " "; }
           { __unkeyed-1 = "<leader>v"; group = "Vault"; icon = "󰈙 "; }
