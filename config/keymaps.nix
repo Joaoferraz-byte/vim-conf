@@ -118,6 +118,12 @@
       options = { silent = true; desc = "New File (Advanced)"; };
     }
     {
+      key = "<leader>nj";
+      action = "<cmd>JavaScaffold<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "New Java Class"; };
+    }
+    {
       key = "<leader>nt";
       action = "<cmd>lua _G.load_current_template()<CR>";
       mode = [ "n" ];

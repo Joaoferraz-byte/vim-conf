@@ -1,5 +1,11 @@
 { ... }:
 {
+  files."lua/java_scaffold.lua".extraConfigLua = builtins.readFile ../../lua/java_scaffold.lua;
+
+  extraConfigLuaPost = ''
+    require("java_scaffold").setup()
+  '';
+
   plugins = {
     lazy.settings = {
       checker.enabled = false;
@@ -46,8 +52,8 @@
               {
                 icon = " ";
                 key = "n";
-                desc = "New File";
-                action = ":lua _G.advanced_new_file()";
+                desc = "New Java Class";
+                action = ":JavaScaffold";
               }
               {
                 icon = " ";
@@ -124,6 +130,17 @@
             follow_file = true;
             auto_close = false;
             layout.preset = "sidebar";
+            actions.java_scaffold.__raw = ''function(picker)
+              local base_dir = picker:dir()
+              if not base_dir then return end
+              picker:close()
+              require("java_scaffold").create({ base_dir = base_dir })
+            end'';
+            win.input.keys."<leader>j" = {
+              __unkeyed-1 = "java_scaffold";
+              mode = [ "n" "i" ];
+              desc = "Create Java Class Here";
+            };
           };
           previewers.file.max_size = 1024 * 1024;
         };
@@ -140,6 +157,12 @@
       enable = true;
       settings = {
         default_file_explorer = true;
+        keymaps."<leader>j".__raw = ''function()
+          local directory = require("oil").get_current_dir(0)
+          if directory then
+            require("java_scaffold").create({ base_dir = directory })
+          end
+        end'';
         columns = [ "icon" ];
         delete_to_trash = true;
         constrain_cursor = "editable";
@@ -192,6 +215,7 @@
           { __unkeyed-1 = "<leader>px"; desc = "Submit LeetCode Solution"; icon = "󰄬 "; }
           { __unkeyed-1 = "<leader>j"; group = "Java"; icon = " "; }
           { __unkeyed-1 = "<leader>n"; group = "New"; icon = " "; }
+          { __unkeyed-1 = "<leader>nj"; desc = "New Java Class"; icon = " "; }
           { __unkeyed-1 = "<leader>v"; group = "Vault"; icon = "󰈙 "; }
           { __unkeyed-1 = "<leader>b"; group = "Buffers"; icon = "󰓩 "; }
           { __unkeyed-1 = "<leader>g"; group = "Git"; icon = " "; }
@@ -401,37 +425,6 @@
       return identifier:gsub("^%l", string.upper)
     end
 
-    local function java_package_for(path)
-      if not path or path == "" then return nil end
-      local root = nearest_project_root(path)
-      local source_root
-      for _, relative_root in ipairs({ "src/main/java", "src/test/java", "src" }) do
-        local candidate = root .. "/" .. relative_root
-        if vim.fn.isdirectory(candidate) == 1 and path:sub(1, #candidate + 1) == candidate .. "/" then
-          source_root = candidate
-          break
-        end
-      end
-      if not source_root then
-        local projects_marker = path:find("/Projects/", 1, true)
-        if projects_marker then
-          source_root = path:sub(1, projects_marker + #"/Projects" - 1)
-        else
-          return nil
-        end
-      end
-      local relative = path:sub(#source_root + 2)
-      local package_directory = vim.fn.fnamemodify(relative, ":h")
-      if package_directory == "." or package_directory == "" then return nil end
-      local parts = {}
-      for part in package_directory:gmatch("[^/]+") do
-        local identifier = part:gsub("[^%w_]", "")
-        if identifier == "" or identifier:match("^%d") then return nil end
-        parts[#parts + 1] = identifier:lower()
-      end
-      return #parts > 0 and table.concat(parts, ".") or nil
-    end
-
     local function go_package_for(path)
       local directory = vim.fn.fnamemodify(path, ":h")
       local root = nearest_project_root(path)
@@ -441,19 +434,7 @@
       return identifier:lower()
     end
 
-    local function java_template(path, class_name)
-      local package_name = java_package_for(path)
-      local header = package_name and ("package " .. package_name .. ";\n\n") or ""
-      return header .. string.format([[public class %s {
-    public static void main(String[] args) {
-        // TODO
-    }
-}
-]], class_name)
-    end
-
     local template_choices = {
-      { ext = "java", label = "Java class" },
       { ext = "py", label = "Python module" },
       { ext = "js", label = "JavaScript module" },
       { ext = "ts", label = "TypeScript function" },
@@ -472,7 +453,6 @@
     local function template_content(ext, name, path)
       local stem = name:gsub("%.[^.]+$", "")
       local identifier = file_identifier(stem)
-      if ext == "java" then return java_template(path or vim.fn.expand("%:p"), identifier) end
       if ext == "go" then
         return string.format([[package %s
 
