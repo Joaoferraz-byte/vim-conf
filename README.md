@@ -61,7 +61,7 @@ Matugen is the owner of the dynamic palette. NixVim only consumes the generated 
 
 Snacks is the foundation for picker, explorer, dashboard, input, notifier, quickfile, terminal, image, scope, indent and zen. Oil owns filesystem editing as a buffer. Neo-tree, NvimTree, Telescope, Mini Files and project.nvim are not active.
 
-Specialized plugins remain when no real parity exists: Aerial for outlines, Neogit/Diffview/Gitsigns for Git, nvim-dap for debugging, Conform for formatting, Neotest for testing and `nvim-jdtls`/JDTLS for Java/Spring. Modernization does not remove a feature merely because another area has a newer plugin.
+Specialized plugins remain when no real parity exists: Aerial for outlines, Neogit/Diffview/Gitsigns for Git, nvim-dap for debugging, Conform for formatting, Neotest for testing and the IntelliJ LSP bridge for Java/Kotlin/Spring. Modernization does not remove a feature merely because another area has a newer plugin.
 
 ### Rich Markdown
 
@@ -93,7 +93,7 @@ The Vault workflow is centered on portable Markdown and does not depend on an Ob
 | `<leader>z` | Toggle Snacks Zen. |
 | `gd`, `gD`, `gi`, `gr`, `K` | LSP navigation and documentation. |
 | `<leader>lr`, `<leader>la`, `<leader>lf` | Rename, code action and format. |
-| `<leader>j*` | Java workflow: compile, debug through DAP, organize imports, control JDTLS and run/debug Neotest tests. |
+| `<leader>j*` | Java workflow: connect/restart/inspect IntelliJ LSP, debug through DAP, organize imports when supported, and run/debug Neotest tests. |
 | `<leader>lx` | Toggle diagnostics with Trouble. |
 | `<C-h/j/k/l>` | Navigate between Neovim splits; the global physical remapping remains owned by keyd. |
 
@@ -107,7 +107,7 @@ The supported coverage is organized as follows:
 
 | Ecosystem | Support | LSP/completion owner |
 |---|---|---|
-| Java, Spring Boot, Swing/JFrame | Dedicated Java workflow with JDTLS, JDK 21, Lombok, Maven, Gradle and Neotest | `nvim-jdtls` + `jdt-language-server` + `nvim-cmp` |
+| Java, Kotlin, Spring Boot, Swing/JFrame | Dedicated workflow connected to an indexed IntelliJ project, with Maven, Gradle and Neotest | IntelliJ LSP bridge + `nvim-cmp` |
 | HTML, CSS, JavaScript/TypeScript | Angular root-scoped by `angular.json`/`nx.json`, TypeScript, ESLint, HTML, CSS, Emmet and Tailwind | Declarative NixVim servers + `nvim-cmp` |
 | PHP | PHP and Composer projects | `phpactor` + `nvim-cmp` |
 | C/C++ | C and C++ with clang/gcc toolchains | `clangd` + `nvim-cmp` |
@@ -115,11 +115,9 @@ The supported coverage is organized as follows:
 | SQL/PostgreSQL | SQL with PostgreSQL/PLpgSQL-specific analysis | `postgres_lsp` + `nvim-cmp` |
 | XML | XML, XSD, XSLT, SVG | `lemminx` + `nvim-cmp` |
 
-Java is treated as a dedicated workflow. The default path uses `nvim-jdtls` with the Nix-packaged `jdt-language-server`, JDK 21, Lombok, Maven, Gradle and Neotest. The JDTLS workspace is resolved per project and Java 21 is the declared default runtime, avoiding the downloaded ELF launcher that previously failed before the NixOS handshake. Lombok is loaded once through `JDTLS_JVM_ARGS` with the packaged `lombok.jar`, while `java.jdt.ls.lombokSupport.enabled` remains explicit in the server settings.
+Java and Kotlin are treated as a dedicated workflow backed by the IntelliJ LSP Server plugin. IntelliJ must be open with the project indexed and its LSP server listening on TCP `127.0.0.1:2087`; the Neovim client connects automatically for Java and Kotlin buffers. This delegates project model, classpath, completion, references and diagnostics to IntelliJ rather than starting a local JDTLS process.
 
-Completion does not depend on a separate server per language. `plugins.cmp` enables the `nvim_lsp`, `luasnip`, `path` and `buffer` sources; with `autoEnableSources = true`, NixVim installs those sources and the global `plugins.lsp.capabilities` owner applies `cmp_nvim_lsp.default_capabilities()` to the servers. Every server in the language table therefore participates in the same completion menu, while Pyright provides the base for Manim scripts in the project Python environment. JDTLS remains the Java server because its initialization, code lenses, import organization, Neotest integration and DAP workflow are currently the validated path.
-
-Lombok-generated methods such as getters, setters and constructors appear in completion only when JDTLS indexes the project with the Lombok dependency and JVM agent enabled; there is no separate `cmp` provider for these methods. After changing the agent version or classpath, the JDTLS workspace must be cleared or restarted to rebuild its index. The configuration does not perform that destructive operation automatically.
+Completion still uses the shared `nvim-cmp` sources. The IntelliJ LSP bridge supplies completion and diagnostics, while Neotest remains responsible for test execution and DAP remains responsible for debugging. If the server is unavailable, `<leader>jr` or `<leader>ji` retries the connection, `<leader>jR` restarts the client, `<leader>jl` opens `:LspInfo`, and `<leader>jw` disconnects it. Organize-import code actions depend on the IntelliJ LSP plugin exposing that capability.
 
 `.xopp` files are not interpreted as text by the editor. The `BufReadCmd` autocmd starts Xournal++ with the absolute path and removes the temporary buffer; the corresponding XDG association is declared in `nix-conf` with the `application/x-xopp` MIME type. Opening the file through Oil, Snacks or the file manager therefore converges on the same format owner.
 

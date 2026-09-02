@@ -30,17 +30,7 @@
       end)
     end
 
-    local function java_command(command)
-      if vim.bo.filetype ~= "java" then
-        vim.notify("Java workflow requires a Java buffer", vim.log.levels.WARN)
-        return
-      end
-      if vim.fn.exists(":" .. command) ~= 2 then
-        vim.notify("Java command is unavailable: " .. command, vim.log.levels.ERROR)
-        return
-      end
-      vim.cmd(command)
-    end
+
 
     local function java_test(strategy)
       if vim.bo.filetype ~= "java" then
@@ -62,12 +52,15 @@
         vim.notify("Java workflow requires a Java buffer", vim.log.levels.WARN)
         return
       end
-      local ok, jdtls = pcall(require, "jdtls")
-      if not ok then
-        vim.notify("nvim-jdtls is unavailable", vim.log.levels.ERROR)
+      local clients = vim.lsp.get_clients({ bufnr = 0, name = "intellij-lsp" })
+      if #clients == 0 then
+        vim.notify("IntelliJ LSP is not attached to this buffer", vim.log.levels.WARN)
         return
       end
-      jdtls.organize_imports()
+      vim.lsp.buf.code_action({
+        context = { only = { "source.organizeImports" }, diagnostics = {} },
+        apply = true,
+      })
     end
     _G.livara_java_summary = function()
       local ok, neotest = pcall(require, "neotest")
@@ -168,14 +161,14 @@
       options = { silent = true; desc = "Capture in Inbox"; };
     }
 
-    # Java/Spring owns the JDTLS commands and delegates test execution to
-    # Neotest, keeping one discoverable namespace for the workflow.
-    {
-      key = "<leader>jr";
-      action = "<cmd>lua _G.livara_java_command('JdtCompile')<CR>";
-      mode = [ "n" ];
-      options = { silent = true; desc = "Build Java Workspace"; };
-    }
+    # Java/Spring uses IntelliJ LSP for language intelligence and delegates
+    # test execution to Neotest, keeping one discoverable workflow namespace.
+      {
+        key = "<leader>jr";
+        action.__raw = "function() _G.livara_intellij_lsp_start() end";
+        mode = [ "n" ];
+        options = { silent = true; desc = "Connect IntelliJ LSP"; };
+      }
     {
       key = "<leader>jd";
       action = "<cmd>DapContinue<CR>";
@@ -188,30 +181,30 @@
       mode = [ "n" ];
       options = { silent = true; desc = "Organize Java Imports"; };
     }
-    {
-      key = "<leader>jR";
-      action = "<cmd>lua _G.livara_java_command('JdtRestart')<CR>";
-      mode = [ "n" ];
-      options = { silent = true; desc = "Restart JDTLS"; };
-    }
-    {
-      key = "<leader>ji";
-      action = "<cmd>lua _G.livara_java_command('JdtUpdateConfig')<CR>";
-      mode = [ "n" ];
-      options = { silent = true; desc = "Refresh Java Workspace"; };
-    }
-    {
-      key = "<leader>jl";
-      action = "<cmd>lua _G.livara_java_command('JdtShowLogs')<CR>";
-      mode = [ "n" ];
-      options = { silent = true; desc = "Open JDTLS Log"; };
-    }
-    {
-      key = "<leader>jw";
-      action = "<cmd>lua _G.livara_java_command('JdtWipeDataAndRestart')<CR>";
-      mode = [ "n" ];
-      options = { silent = true; desc = "Wipe and Restart JDTLS Workspace"; };
-    }
+      {
+        key = "<leader>jR";
+        action.__raw = "function() _G.livara_intellij_lsp_restart() end";
+        mode = [ "n" ];
+        options = { silent = true; desc = "Restart IntelliJ LSP"; };
+      }
+      {
+        key = "<leader>ji";
+        action.__raw = "function() _G.livara_intellij_lsp_start() end";
+        mode = [ "n" ];
+        options = { silent = true; desc = "Refresh IntelliJ LSP"; };
+      }
+      {
+        key = "<leader>jl";
+        action = "<cmd>LspInfo<CR>";
+        mode = [ "n" ];
+        options = { silent = true; desc = "Show IntelliJ LSP"; };
+      }
+      {
+        key = "<leader>jw";
+        action.__raw = "function() _G.livara_intellij_lsp_stop() end";
+        mode = [ "n" ];
+        options = { silent = true; desc = "Disconnect IntelliJ LSP"; };
+      }
     {
       key = "<leader>jh";
       action = "<cmd>checkhealth vim.lsp<CR>";
