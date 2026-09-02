@@ -27,7 +27,7 @@ vim-conf flake contract
     ├── ui.nix             Snacks/Oil/Which-Key/Noice/status surfaces
     ├── completion.nix     completion and snippets
     ├── language modules   LSP, treesitter, formatters and language tools
-    ├── workflows           Git, test, debug, Spring/Java, projects
+    ├── workflows           Git, test, debug, Spring/Java, LeetCode, projects
     └── theme.nix          Matugen adapter and highlight contract
 ```
 
@@ -35,19 +35,19 @@ This is not strict dendritic organization. A module may own a coherent workflow 
 
 ## UI ownership decision
 
-The current configuration has Neo-tree, Oil, Mini Files and Telescope file browsing. The target removes this overlap as follows:
+The current configuration uses Snacks as the picker/explorer foundation and Oil as the filesystem buffer owner. The architecture keeps this separation explicit and avoids reintroducing overlapping file browsers:
 
 | Capability | Canonical owner | Retained alternatives |
 |---|---|---|
 | Filesystem editing and directory navigation | Oil | None for the same role. |
 | File/grep/buffer/LSP/project pickers | Snacks Picker | Telescope removed where parity is confirmed. |
-| Dashboard | Snacks Dashboard | The current dashboard is migrated only after all custom actions are ported. |
+| Dashboard | Snacks Dashboard | Custom actions are declared in the existing dashboard workflow. |
 | Input/notifications/quickfile/terminal/zen | Snacks | No duplicate plugin for the same surface. |
 | Icons/text objects | mini.icons, mini.ai, mini.surround, mini.bracketed | mini.files removed because Oil owns filesystem navigation. |
 | LSP symbols/outline | Aerial or Snacks picker, one canonical owner per command | Keep Aerial if its outline view is required. |
 | Git status/history/diff | Neogit/Diffview/Gitsigns | Snacks Git/picker may replace only commands with verified parity. |
 | Debugging | nvim-dap/dap-ui | No Snacks replacement. |
-| Java/Spring | Intellij LSP/neotest-java or a validated JDTLS migration | No speculative replacement. |
+| Java/Spring | JDTLS, nvim-jdtls and Neotest | Keep the validated Java workflow; do not introduce an untested IntelliJ LSP replacement. |
 
 ## Theme ownership
 
@@ -67,9 +67,9 @@ The flake publishes only systems compatible with the actual configuration. The c
 
 This refactor does not replace NixVim with nixCats, nvf or a Lua-only repository. It does not remove specialized plugins merely because Snacks is newer. It does not change Java tooling without first testing LSP initialization, code lenses, import organization, neotest and DAP attach behavior.
 
-## Sources
+## References
 
-- NixVim: https://github.com/nix-community/nixvim
-- Snacks: https://github.com/folke/snacks.nvim
-- Oil: https://github.com/stevearc/oil.nvim
-- Community comparison: https://www.reddit.com/r/NixOS/comments/1jgmdo3/best_way_to_manage_neovim_config_on_nixos/
+- [NixVim](https://github.com/nix-community/nixvim)
+- [Snacks.nvim](https://github.com/folke/snacks.nvim)
+- [Oil.nvim](https://github.com/stevearc/oil.nvim)
+- [Community comparison](https://www.reddit.com/r/NixOS/comments/1jgmdo3/best_way_to_manage_neovim_config_on_nixos/)

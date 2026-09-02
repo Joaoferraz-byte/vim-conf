@@ -1,149 +1,149 @@
 # Livara NixVim
 
-Este repositório fornece um ambiente NixVim declarativo e reproduzível para Java, Spring Boot, Angular, web, C/C++, embedded e programação competitiva. Servidores LSP, formatadores, debuggers e dependências de desenvolvimento são fornecidos por Nix em vez de depender de instalação imperativa via Mason.
+This repository provides a declarative and reproducible NixVim environment for Java, Spring Boot, Angular, web, C/C++, embedded and competitive programming. LSP servers, formatters, debuggers and development dependencies are supplied by Nix rather than installed imperatively through Mason.
 
-## Contrato público
+## Public contract
 
-| Output | Finalidade |
+| Output | Purpose |
 |---|---|
-| `lib.nixvimModule` | Módulo NixVim reutilizável por Home Manager ou outra composição. |
-| `lib.nixvimModules.default` | Alias do módulo reutilizável padrão. |
-| `packages.<system>.default` | Pacote NixVim standalone para Linux. |
-| `checks.<system>.nixvim` | Check do pacote standalone. |
-| `formatter.<system>` | Formatador do repositório. |
+| `lib.nixvimModule` | Reusable NixVim module for Home Manager or another composition. |
+| `lib.nixvimModules.default` | Alias for the default reusable module. |
+| `packages.<system>.default` | Standalone NixVim package for Linux. |
+| `checks.<system>.nixvim` | Check for the standalone package. |
+| `formatter.<system>` | Repository formatter. |
 
-O flake publica somente sistemas Linux porque a configuração inclui ferramentas Wayland como `wl-clipboard`, além de imagem, terminal e integrações próprias do desktop Livara. O input NixVim upstream pode suportar outros sistemas, mas esta configuração não promete compatibilidade que não foi avaliada.
+The flake publishes Linux systems only because the configuration includes Wayland tools such as `wl-clipboard`, terminal/image tooling and Livara desktop integrations. Upstream NixVim may support other systems, but this configuration does not promise compatibility that has not been evaluated.
 
-## Atualização controlada
+## Controlled updates
 
-A versão do editor e dos plugins é determinada pelo `flake.lock`. Inicialização, `nix flake check`, `nix eval`, `nix build` e o rebuild do sistema usam os inputs já bloqueados; nenhum desses caminhos deve atualizar o lockfile ou buscar uma revisão mais nova implicitamente. O `lazy.nvim` também mantém o checker de atualizações desabilitado, pois a instalação de plugins é responsabilidade declarativa do NixVim.
+The editor and plugin versions are determined by `flake.lock`. Startup, `nix flake check`, `nix eval`, `nix build` and system rebuilds use the locked inputs; none of these paths may update the lockfile or implicitly fetch a newer revision. `lazy.nvim` also keeps its update checker disabled because plugin installation is declarative NixVim responsibility.
 
-Para atualizar sob demanda, altere o lockfile em uma operação explícita e revise o diff antes de comitar:
+To update on demand, change the lockfile in an explicit operation and review the diff before committing:
 
 ```bash
-# Dentro deste repositório: atualizar apenas a dependência upstream do NixVim.
+# Inside this repository: update only the upstream NixVim dependency.
 nix flake update nixvim
 git diff --check
 git diff -- flake.lock
 git add flake.lock && git commit -m "chore: update nixvim input"
 
-# No sistema consumidor: atualizar os inputs selecionados do desktop.
+# In the consuming system: update the selected desktop inputs.
 NIX_CONF_UPDATE_FLAKE=1 NIX_CONF_UPDATE_INPUTS="vim-conf nixvim" ./install.sh
 ```
 
-O primeiro fluxo publica uma nova revisão de `vim-conf`; o segundo atualiza explicitamente o lockfile do `nix-conf`. Se a revisão for rejeitada, basta descartar o commit do lockfile ou usar a cópia de segurança criada pelo installer. Assim, atualizar o editor se comporta como uma ação administrativa semelhante a atualizar Flatpaks, e não como efeito colateral de iniciar o Neovim.
+The first flow publishes a new `vim-conf` revision; the second explicitly updates the `nix-conf` lockfile. If the revision is rejected, discard the lockfile commit or use the backup created by the installer. Updating the editor is therefore an auditable administrative action rather than a side effect of starting Neovim.
 
-## Arquitetura
+## Architecture
 
-A configuração usa uma arquitetura híbrida de **camadas e workflows**, não um padrão dendrítico imposto:
+The configuration uses a hybrid **layered and workflow** architecture rather than imposing a strict dendritic pattern:
 
-| Camada | Owner |
+| Layer | Owner |
 |---|---|
-| Contrato do flake | `flake.nix`: inputs, outputs, sistemas e formatter. |
-| Editor | `config/options.nix`: opções globais, defaults e performance. |
-| Tema | `config/theme.nix`: Matugen, highlights, transparência e reload. |
-| UI | `config/plugins/ui.nix`: Snacks, Oil, Which-Key, Noice, statusline e superfícies de interface. |
-| Core | `config/plugins/core.nix`: Git, treesitter, movimento, text objects e ferramentas especializadas. |
-| Linguagens | `config/languages/*.nix`: LSP, toolchains e testes por ecossistema. |
-| Workflows | `config/keymaps.nix` e helpers Lua: Java/Spring, projetos, criação de arquivos, Git, DAP e testes. |
+| Flake contract | `flake.nix`: inputs, outputs, systems and formatter. |
+| Editor | `config/options.nix`: global options, defaults and performance. |
+| Theme | `config/theme.nix`: Matugen, highlights, transparency and reload. |
+| UI | `config/plugins/ui.nix`: Snacks, Oil, Which-Key, Noice, statusline and interface surfaces. |
+| Core | `config/plugins/core.nix`: Git, Treesitter, movement, text objects and specialized tools. |
+| Languages | `config/languages/*.nix`: LSP, toolchains and ecosystem tests. |
+| Workflows | `config/keymaps.nix` and Lua helpers: Java/Spring, projects, file creation, Git, DAP and testing. |
 
-Cada plugin possui um owner principal. A organização não fragmenta artificialmente cada opção em um arquivo: plugins que formam um workflow permanecem juntos, enquanto domínios diferentes continuam isolados.
+Each plugin has one primary owner. The layout does not artificially fragment every option into its own file: plugins that form a workflow stay together, while distinct domains remain isolated.
 
-A decisão arquitetural completa, incluindo comparação com dendritic, camadas, slices verticais, NixVim, nvf e nixCats, está em [`ARCHITECTURE_PROPOSAL.md`](./ARCHITECTURE_PROPOSAL.md).
+The full architectural decision, including the comparison of dendritic modules, layers, vertical slices, NixVim, nvf and nixCats, is recorded in [`ARCHITECTURE_PROPOSAL.md`](./ARCHITECTURE_PROPOSAL.md).
 
-## Tema Matugen/Livara
+## Matugen/Livara theme
 
-O editor mantém `habamax` como fallback durante a primeira inicialização e força `background = "dark"`. Quando `~/.config/nvim/lua/matugen_colors.lua` existe, `config/theme.nix` carrega a tabela Lua produzida pelo adapter Livara e aplica a paleta derivada do wallpaper.
+The editor keeps `habamax` as its first-start fallback and forces `background = "dark"`. When `~/.config/nvim/lua/matugen_colors.lua` exists, `config/theme.nix` loads the Lua table produced by the Livara adapter and applies the wallpaper-derived palette.
 
-O loader usa um único contrato `_G.reload_livara_theme` e um watcher `vim.uv.new_fs_event`. `LivaraStatusline` é o único owner de `vim.o.statusline`: o footer global usa uma composição linear com informações do arquivo, Git, diagnósticos, clientes LSP, filetype, posição e scrollbar. `vim.o.winbar` fica intencionalmente vazio, impedindo que um plugin de breadcrumbs herde ou redesenhe a barra. O canvas e os grupos da statusline são transparentes; menus, floats e completion mantêm superfícies com contraste.
+The loader uses one `_G.reload_livara_theme` contract and a `vim.uv.new_fs_event` watcher. `LivaraStatusline` is the sole owner of `vim.o.statusline`: the global footer uses a linear composition with file, Git, diagnostic, LSP client, filetype, position and scrollbar information. `vim.o.winbar` intentionally remains empty, preventing a breadcrumb plugin from inheriting or redrawing the bar. The canvas and statusline groups are transparent; menus, floats and completion retain contrasting surfaces.
 
-Matugen é o owner da paleta dinâmica. O NixVim apenas consome o arquivo gerado e não inicia compositor, shell visual, QuickShell, Hyprland ou Serpantinum.
+Matugen is the owner of the dynamic palette. NixVim only consumes the generated file and does not start a compositor, visual shell, QuickShell, Hyprland or Serpantinum.
 
-## Interface e workflows
+## Interface and workflows
 
-Snacks é a fundação de picker, explorer, dashboard, input, notifier, quickfile, terminal, image, scope, indent e zen. Oil é o owner da edição de filesystem como buffer. Neo-tree, NvimTree, Telescope, Mini Files e project.nvim não fazem parte da configuração ativa.
+Snacks is the foundation for picker, explorer, dashboard, input, notifier, quickfile, terminal, image, scope, indent and zen. Oil owns filesystem editing as a buffer. Neo-tree, NvimTree, Telescope, Mini Files and project.nvim are not active.
 
-Plugins especializados permanecem quando não existe paridade real: Aerial para outline, Neogit/Diffview/Gitsigns para Git, nvim-dap para debugging, Conform para formatação, Neotest para testes e `nvim-jdtls`/JDTLS para Java/Spring. A modernização não remove uma feature somente porque existe um plugin mais novo em outra área.
+Specialized plugins remain when no real parity exists: Aerial for outlines, Neogit/Diffview/Gitsigns for Git, nvim-dap for debugging, Conform for formatting, Neotest for testing and `nvim-jdtls`/JDTLS for Java/Spring. Modernization does not remove a feature merely because another area has a newer plugin.
 
-### Markdown pesado
+### Rich Markdown
 
-O workflow do Vault é centrado em Markdown portátil, sem depender de runtime Obsidian. `render-markdown.nvim` fornece renderização em buffer por opções explícitas para headings, blocos de código, listas, checkboxes, callouts, tabelas, links e fórmulas LaTeX; Treesitter instala de forma reprodutível os parsers de Markdown, Markdown inline, HTML, YAML e LaTeX. O plugin `mermaid.nvim` permanece como ferramenta dedicada para diagramas Mermaid e preview no terminal. O limite de arquivo de 16 MiB evita transformar notas grandes em uma fonte de latência global, e a renderização preserva o texto-fonte para edição normal.
+The Vault workflow is centered on portable Markdown and does not depend on an Obsidian runtime. `render-markdown.nvim` renders buffers through explicit options for headings, code blocks, lists, checkboxes, callouts, tables, links and LaTeX formulas; Treesitter reproducibly installs Markdown, Markdown inline, HTML, YAML and LaTeX parsers. `mermaid.nvim` remains the dedicated tool for Mermaid diagrams and terminal previews. The 16 MiB file limit prevents large notes from becoming a global latency source, and rendering preserves source text for normal editing.
 
-| Recurso | Implementação | Dependência de runtime |
+| Resource | Implementation | Runtime dependency |
 |---|---|---|
-| Markdown estrutural | `render-markdown.nvim` com opções explícitas e tabelas arredondadas | Nixvim + Treesitter |
-| LaTeX inline/bloco | parser `latex` e conversor `utftex`/`latex2text` quando disponível | executável opcional no `PATH` |
-| Mermaid | plugin `mermaid.nvim` fixado no flake | `chafa` para fallback terminal quando suportado |
-| Frontmatter | parser `yaml` e LSP Marksman | Nixvim |
-| Templates | criação de arquivo estática e explícita no workflow Lua | nenhum plugin Obsidian |
+| Structured Markdown | `render-markdown.nvim` with explicit options and rounded tables | NixVim + Treesitter |
+| Inline/block LaTeX | `latex` parser and `utftex`/`latex2text` converter when available | Optional executable in `PATH` |
+| Mermaid | `mermaid.nvim` plugin pinned in the flake | `chafa` for terminal fallback when supported |
+| Frontmatter | `yaml` parser and Marksman LSP | NixVim |
+| Templates | Static and explicit file creation in the Lua workflow | No Obsidian plugin |
 
-| Mapping | Ação |
+| Mapping | Action |
 |---|---|
-| `<leader>e` / `<leader>mf` | Abrir Snacks Explorer. |
-| `<leader>vd` / `<leader>vs` / `<leader>vc` | Criar nota diária / fonte / conceito no Vault, com frontmatter estático. |
-| `<leader>vb` / `<leader>vq` | Criar referência de livro / capturar texto no inbox do Vault. |
-| `-` | Abrir Oil no diretório pai. |
-| `<leader>cn` / `<leader>cs` | Abrir a configuração do Neovim / sistema no Oil. |
-| `<leader>d` | Abrir o dashboard Snacks. |
-| `v` no Dashboard | Abrir o Vault em `~/Vault` usando Oil. |
-| `<leader>ff` / `<leader>fg` | Encontrar arquivos / pesquisar conteúdo com Snacks Picker. |
-| `<leader>fi` | Encontrar arquivos de imagem/documentos com preview Snacks quando suportado pelo terminal. |
-| `<leader>fr` / `<leader>fp` | Arquivos recentes / projetos. |
-| `<leader>o` | Alternar o outline Aerial. |
-| `<leader>ha` / `<leader>ht` | Adicionar ao Harpoon / abrir seu quick menu nativo. |
-| `s` / `S` | Navegação Flash / seleção Treesitter. |
-| `<leader>z` | Alternar Snacks Zen. |
-| `gd`, `gD`, `gi`, `gr`, `K` | Navegação e documentação LSP. |
-| `<leader>lr`, `<leader>la`, `<leader>lf` | Rename, code action e format. |
-| `<leader>j*` | Workflow Java: compilar, depurar via DAP, organizar imports, controlar JDTLS e executar/debugar testes Neotest. |
-| `<leader>lx` | Alternar diagnósticos com Trouble. |
-| `<C-h/j/k/l>` | Navegar entre splits no Neovim; o remapeamento físico global continua sendo owner do keyd. |
+| `<leader>e` / `<leader>mf` | Open Snacks Explorer. |
+| `<leader>vd` / `<leader>vs` / `<leader>vc` | Create a daily note, source or concept in the Vault with static frontmatter. |
+| `<leader>vb` / `<leader>vq` | Create a book reference or capture text in the Vault inbox. |
+| `-` | Open Oil in the parent directory. |
+| `<leader>cn` / `<leader>cs` | Open the Neovim or system configuration in Oil. |
+| `<leader>d` | Open the Snacks dashboard. |
+| `v` in Dashboard | Open the Vault at `~/Vault` using Oil. |
+| `<leader>ff` / `<leader>fg` | Find files or search content with Snacks Picker. |
+| `<leader>fi` | Find image/document files with Snacks preview when supported by the terminal. |
+| `<leader>fr` / `<leader>fp` | Recent files or projects. |
+| `<leader>o` | Toggle the Aerial outline. |
+| `<leader>ha` / `<leader>ht` | Add to Harpoon or open its native quick menu. |
+| `s` / `S` | Flash navigation or Treesitter selection. |
+| `<leader>z` | Toggle Snacks Zen. |
+| `gd`, `gD`, `gi`, `gr`, `K` | LSP navigation and documentation. |
+| `<leader>lr`, `<leader>la`, `<leader>lf` | Rename, code action and format. |
+| `<leader>j*` | Java workflow: compile, debug through DAP, organize imports, control JDTLS and run/debug Neotest tests. |
+| `<leader>lx` | Toggle diagnostics with Trouble. |
+| `<C-h/j/k/l>` | Navigate between Neovim splits; the global physical remapping remains owned by keyd. |
 
-A criação avançada de arquivos, o picker de projetos e o Spring Boot wizard usam APIs documentadas do Snacks (`Snacks.input`, `Snacks.picker.pick` e `vim.ui.select`). O wizard valida o diretório e usa `curl`/`tar` com escaping explícito, mantendo o processo fora da avaliação Nix.
+Advanced file creation, the project picker and the Spring Boot wizard use documented Snacks APIs (`Snacks.input`, `Snacks.picker.pick` and `vim.ui.select`). The wizard validates the directory and uses `curl`/`tar` with explicit escaping, keeping the operation outside Nix evaluation.
 
-## Linguagens e toolchains
+## Languages and toolchains
 
-A configuração inclui LSP para Lua, Nix, Bash, Docker, C/C++, Python, Markdown, Angular, TypeScript, ESLint, HTML, CSS, JSON, YAML, Emmet e Tailwind. Também inclui CMake Tools, OpenOCD, Cppcheck e Competitest.
+The configuration includes LSP support for Lua, Nix, Bash, Docker, C/C++, Python, Markdown, Angular, TypeScript, ESLint, HTML, CSS, JSON, YAML, Emmet and Tailwind. It also includes CMake Tools, OpenOCD, Cppcheck, Competitest and a declarative LeetCode workflow under `<leader>p`.
 
-A cobertura solicitada fica organizada da seguinte forma:
+The supported coverage is organized as follows:
 
-| Ecossistema | Suporte | Owner do LSP/completion |
+| Ecosystem | Support | LSP/completion owner |
 |---|---|---|
-| Java, Spring Boot, Swing/JFrame | Workflow Java dedicado com JDTLS, JDK 21, Lombok, Maven, Gradle e Neotest | `nvim-jdtls` + `jdt-language-server` + `nvim-cmp` |
-| HTML, CSS, JavaScript/TypeScript | Angular root-scoped por `angular.json`/`nx.json`, TypeScript, ESLint, HTML, CSS, Emmet e Tailwind | servidores declarativos do NixVim + `nvim-cmp` |
-| PHP | PHP e projetos Composer | `phpactor` + `nvim-cmp` |
-| C/C++ | C e C++ com toolchain clang/gcc | `clangd` + `nvim-cmp` |
-| Python e Manim | Python; Manim é uma biblioteca/workflow Python e usa o mesmo servidor | `pyright` + `nvim-cmp` |
-| SQL/PostgreSQL | SQL com análise específica de PostgreSQL/PLpgSQL | `postgres_lsp` + `nvim-cmp` |
+| Java, Spring Boot, Swing/JFrame | Dedicated Java workflow with JDTLS, JDK 21, Lombok, Maven, Gradle and Neotest | `nvim-jdtls` + `jdt-language-server` + `nvim-cmp` |
+| HTML, CSS, JavaScript/TypeScript | Angular root-scoped by `angular.json`/`nx.json`, TypeScript, ESLint, HTML, CSS, Emmet and Tailwind | Declarative NixVim servers + `nvim-cmp` |
+| PHP | PHP and Composer projects | `phpactor` + `nvim-cmp` |
+| C/C++ | C and C++ with clang/gcc toolchains | `clangd` + `nvim-cmp` |
+| Python and Manim | Python; Manim is a Python library/workflow using the same server | `pyright` + `nvim-cmp` |
+| SQL/PostgreSQL | SQL with PostgreSQL/PLpgSQL-specific analysis | `postgres_lsp` + `nvim-cmp` |
 | XML | XML, XSD, XSLT, SVG | `lemminx` + `nvim-cmp` |
 
-Java é tratado como workflow próprio. O caminho padrão usa `nvim-jdtls` com o `jdt-language-server` empacotado pelo Nix, JDK21, Lombok, Maven, Gradle e Neotest. O workspace do JDTLS é resolvido por projeto e o runtime Java 21 é declarado como default, evitando o launcher ELF baixado que falhava antes do handshake no NixOS. Lombok é carregado uma única vez pelo `JDTLS_JVM_ARGS` com o `lombok.jar` empacotado, enquanto `java.jdt.ls.lombokSupport.enabled` permanece explícito no settings do servidor.
+Java is treated as a dedicated workflow. The default path uses `nvim-jdtls` with the Nix-packaged `jdt-language-server`, JDK 21, Lombok, Maven, Gradle and Neotest. The JDTLS workspace is resolved per project and Java 21 is the declared default runtime, avoiding the downloaded ELF launcher that previously failed before the NixOS handshake. Lombok is loaded once through `JDTLS_JVM_ARGS` with the packaged `lombok.jar`, while `java.jdt.ls.lombokSupport.enabled` remains explicit in the server settings.
 
-O completion não depende de um servidor separado por linguagem. `plugins.cmp` habilita as fontes `nvim_lsp`, `luasnip`, `path` e `buffer`; como `autoEnableSources = true`, o NixVim instala as fontes e o owner global `plugins.lsp.capabilities` aplica `cmp_nvim_lsp.default_capabilities()` aos servidores. Assim, cada servidor desta tabela participa do mesmo menu de completion, enquanto o Pyright fornece a base para scripts Manim dentro do ambiente Python do projeto. A avaliação de uma eventual troca pelo IntelliJ LSP está em [`docs/intellij-lsp-assessment.md`](./docs/intellij-lsp-assessment.md); a conclusão atual é manter JDTLS até existir um servidor standalone documentado e testável pelo Neovim.
+Completion does not depend on a separate server per language. `plugins.cmp` enables the `nvim_lsp`, `luasnip`, `path` and `buffer` sources; with `autoEnableSources = true`, NixVim installs those sources and the global `plugins.lsp.capabilities` owner applies `cmp_nvim_lsp.default_capabilities()` to the servers. Every server in the language table therefore participates in the same completion menu, while Pyright provides the base for Manim scripts in the project Python environment. JDTLS remains the Java server because its initialization, code lenses, import organization, Neotest integration and DAP workflow are currently the validated path.
 
-Métodos gerados por Lombok, como getters, setters e construtores, só aparecem no completion quando o JDTLS indexa o projeto com a dependência Lombok e o agente JVM ativo; não existe um provider `cmp` separado para esses métodos. Após alterar a versão do agente ou o classpath, o workspace do JDTLS deve ser limpo/reiniciado para reconstruir o índice. A configuração não executa essa limpeza automaticamente, pois ela é uma ação destrutiva dependente do workspace selecionado.
+Lombok-generated methods such as getters, setters and constructors appear in completion only when JDTLS indexes the project with the Lombok dependency and JVM agent enabled; there is no separate `cmp` provider for these methods. After changing the agent version or classpath, the JDTLS workspace must be cleared or restarted to rebuild its index. The configuration does not perform that destructive operation automatically.
 
-Arquivos `.xopp` não são interpretados como texto pelo editor. O autocmd `BufReadCmd` inicia Xournal++ com o caminho absoluto e remove o buffer temporário; a associação XDG correspondente é declarada em `nix-conf` com o MIME `application/x-xopp`. Assim, abrir o arquivo pelo Oil, Snacks ou pelo gerenciador de arquivos converge para o mesmo owner do formato.
+`.xopp` files are not interpreted as text by the editor. The `BufReadCmd` autocmd starts Xournal++ with the absolute path and removes the temporary buffer; the corresponding XDG association is declared in `nix-conf` with the `application/x-xopp` MIME type. Opening the file through Oil, Snacks or the file manager therefore converges on the same format owner.
 
-A formatação é declarada pelo Conform com fallback LSP e executáveis Nix para Java, C/C++, Python, web, Nix, Lua e shell; Python usa o formatter Ruff. Debugging usa LLDB para C/C++ e attach Java na porta 5005.
+Formatting is declared through Conform with LSP fallback and Nix executables for Java, C/C++, Python, web, Nix, Lua and shell; Python uses the Ruff formatter. Debugging uses LLDB for C/C++ and Java attach on port 5005.
 
-## Validação incremental
+## Incremental validation
 
-Como a configuração NixOS consumidora possui uma closure grande, a validação recomendada é incremental:
+Because the consuming NixOS configuration has a large closure, validation should be incremental:
 
 ```bash
-# Sintaxe Nix de cada módulo
+# Parse each Nix module
 find config -name '*.nix' -print0 | xargs -0 -n1 nix-instantiate --parse
 
-# Avaliação dos outputs e opções, sem materializar o sistema
+# Evaluate outputs and options without materializing the system
 nix flake check --no-build --show-trace --all-systems
 nix eval .#packages.x86_64-linux.default
 nix eval .#checks.x86_64-linux.nixvim
 ```
 
-O `nix build` do pacote standalone é uma validação posterior e deve ser executado em uma máquina com espaço e memória adequados. Não é necessário construir o toplevel NixOS inteiro para validar alterações de sintaxe, opções, imports ou contratos do NixVim.
+The standalone package `nix build` is a later validation step and should run on a machine with sufficient space and memory. Building the complete NixOS toplevel is not necessary to validate syntax, options, imports or NixVim contracts.
 
-## Integração com NixOS e Home Manager
+## NixOS and Home Manager integration
 
 ```nix
 {
@@ -163,10 +163,9 @@ O `nix build` do pacote standalone é uma validação posterior e deve ser execu
 }
 ```
 
-## Referências
+## References
 
 - [NixVim](https://github.com/nix-community/nixvim)
 - [Snacks.nvim](https://github.com/folke/snacks.nvim)
 - [Oil.nvim](https://github.com/stevearc/oil.nvim)
-- [Proposta arquitetural](./ARCHITECTURE_PROPOSAL.md)
-- [Achados comunitários](../nixvim-community-findings.md)
+- [Architectural proposal](./ARCHITECTURE_PROPOSAL.md)
