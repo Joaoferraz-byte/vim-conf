@@ -24,6 +24,7 @@
           "jdt.ls.lombokSupport.enabled" = true;
           configuration = {
             updateBuildConfiguration = "automatic";
+            importOnFirstTimeStartup = "automatic";
             runtimes = [
               {
                 name = "JavaSE-1.8";
@@ -54,6 +55,7 @@
           references = {
             includeDecompiledSources = true;
           };
+          errors.incompleteClasspath.severity = "warning";
           signatureHelp = {
             enabled = true;
           };
@@ -67,9 +69,14 @@
             enabled = true;
           };
           saveActions = {
-            organizeImports = true;
+            # Do not delete a manually added import on write. Organizing imports
+            # remains available through the explicit Java workflow keymap/code action.
+            organizeImports = false;
           };
           completion = {
+            # Ask JDTLS to attach additionalTextEdits for accepted symbols so
+            # nvim-cmp can insert their imports together with the completion.
+            importOnCompletion = true;
             favoriteStaticMembers = [
               "org.junit.Assert.*"
               "org.junit.Assume.*"
@@ -107,6 +114,7 @@
       "settings.gradle"
       "settings.gradle.kts"
       ".git"
+      { __raw = ''function(fname) return vim.fs.dirname(fname) end''; }
     ];
   };
 

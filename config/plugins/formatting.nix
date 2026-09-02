@@ -5,7 +5,8 @@
     autoInstall.enable = false;
     settings = {
       formatters_by_ft = {
-        java = [ "google-java-format" ];
+        # Java formatting falls back to JDTLS. Google Java Format also normalizes
+        # imports, which can remove a manually added import before its symbol is used.
         c = [ "clang-format" ];
         cpp = [ "clang-format" ];
         javascript = {
@@ -49,7 +50,6 @@
   };
 
   extraPackages = with pkgs; [
-    google-java-format
     clang-tools
     prettierd
     prettier
