@@ -28,38 +28,44 @@
 
   keymaps = [
     {
+      key = "<leader>p";
+      action = "<cmd>Leet<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Open LeetCode Menu"; };
+    }
+    {
       key = "<leader>pc";
-      action = "<cmd>lua require('leetcode.command').menu()<CR>";
+      action = "<cmd>Leet menu<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Open LeetCode Menu"; };
     }
     {
       key = "<leader>pd";
-      action = "<cmd>lua require('leetcode.command').qot()<CR>";
+      action = "<cmd>Leet daily<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Open LeetCode Daily"; };
     }
     {
       key = "<leader>pl";
-      action = "<cmd>lua require('leetcode.command').problems({})<CR>";
+      action = "<cmd>Leet list<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "List LeetCode Problems"; };
     }
     {
       key = "<leader>pr";
-      action = "<cmd>lua require('leetcode.command').random_question({})<CR>";
+      action = "<cmd>Leet random<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Open Random LeetCode Problem"; };
     }
     {
       key = "<leader>pt";
-      action = "<cmd>lua require('leetcode.command').q_run()<CR>";
+      action = "<cmd>Leet test<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Test LeetCode Solution"; };
     }
     {
       key = "<leader>px";
-      action = "<cmd>lua require('leetcode.command').q_submit()<CR>";
+      action = "<cmd>Leet submit<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Submit LeetCode Solution"; };
     }
