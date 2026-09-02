@@ -35,37 +35,37 @@
     }
     {
       key = "<leader>pc";
-      action = "<cmd>Leet menu<CR>";
+      action = "<cmd>Leet<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Open LeetCode Menu"; };
     }
     {
       key = "<leader>pd";
-      action = "<cmd>Leet daily<CR>";
+      action = "<cmd>lua require(\"leetcode.command\").qot()<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Open LeetCode Daily"; };
     }
     {
       key = "<leader>pl";
-      action = "<cmd>Leet list<CR>";
+      action = "<cmd>lua require(\"leetcode.command\").problems({})<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "List LeetCode Problems"; };
     }
     {
       key = "<leader>pr";
-      action = "<cmd>Leet random<CR>";
+      action = "<cmd>lua require(\"leetcode.command\").random_question({})<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Open Random LeetCode Problem"; };
     }
     {
       key = "<leader>pt";
-      action = "<cmd>Leet test<CR>";
+      action = "<cmd>lua require(\"leetcode.command\").q_run()<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Test LeetCode Solution"; };
     }
     {
       key = "<leader>px";
-      action = "<cmd>Leet submit<CR>";
+      action = "<cmd>lua require(\"leetcode.command\").q_submit()<CR>";
       mode = [ "n" ];
       options = { silent = true; desc = "Submit LeetCode Solution"; };
     }
