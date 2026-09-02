@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ pkgs, ... }:
 let
   extensionRoot = package: name: "${package}/share/vscode/extensions/${name}";
 in
@@ -52,14 +52,7 @@ in
     };
   };
 
-  plugins.spring-boot = {
-    enable = true;
-    settings = {
-      java_cmd = lib.getExe pkgs.jdk21;
-      server.root_dir.__raw = "vim.fs.root(0, { '.git', 'mvnw', 'gradlew' })";
-      autocmd = true;
-    };
-  };
+  plugins.spring-boot.enable = true;
 
   plugins.neotest = {
     enable = true;
@@ -68,7 +61,10 @@ in
     ];
   };
 
-  extraPlugins = [ pkgs.vimPlugins.neotest-java ];
+  extraPlugins = with pkgs.vimPlugins; [
+    neotest-java
+    spring-boot-nvim
+  ];
 
   extraConfigLuaPost = ''
     vim.lsp.config("jdtls", {
