@@ -52,8 +52,6 @@ in
     };
   };
 
-  plugins.spring-boot.enable = true;
-
   plugins.neotest = {
     enable = true;
     settings.adapters = [
