@@ -1,6 +1,6 @@
 { ... }:
 {
-  files."lua/java_scaffold.lua".extraConfigLua = builtins.readFile ../../lua/java_scaffold.lua;
+  files."lua/java_scaffold.lua".content = builtins.readFile ../../lua/java_scaffold.lua;
 
   extraConfigLuaPost = ''
     require("java_scaffold").setup()
