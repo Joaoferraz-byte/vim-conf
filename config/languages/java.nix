@@ -14,7 +14,6 @@ in
         "gradlew"
         "settings.gradle"
         "settings.gradle.kts"
-        ".git"
       ];
       jdtls = {
         path = "${pkgs.jdt-language-server}/share/java/jdtls";
@@ -66,6 +65,7 @@ in
 
   extraConfigLuaPost = ''
     vim.lsp.config("jdtls", {
+      capabilities = require("cmp_nvim_lsp").default_capabilities(),
       settings = {
         java = {
           configuration = {
@@ -109,7 +109,6 @@ in
       root_markers = {
         { "pom.xml"; "mvnw"; };
         { "build.gradle"; "build.gradle.kts"; "gradlew"; "settings.gradle"; "settings.gradle.kts"; };
-        { ".git"; };
       };
     });
     vim.lsp.enable("jdtls");
