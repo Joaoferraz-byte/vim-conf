@@ -192,14 +192,18 @@ end
 
 function M.create(opts)
   opts = opts or {}
-  local base_dir = normalize(opts.base_dir or current_dir())
+  local requested_dir = normalize(opts.base_dir or current_dir())
+  local base_dir = requested_dir
+  while not is_dir(base_dir) and base_dir ~= "/" do
+    base_dir = vim.fn.fnamemodify(base_dir, ":h")
+  end
   if not is_dir(base_dir) then
     notify("Selected location is not a directory", vim.log.levels.ERROR)
     return false
   end
 
   local root = find_root(base_dir)
-  local source_root, inferred_package = source_context(base_dir, root)
+  local source_root, inferred_package = source_context(requested_dir, root)
   local project_base = project_package(root)
   local default_package = inferred_package or project_base or ""
   if project_base and inferred_package and not inferred_package:match("^" .. vim.pesc(project_base) .. "(%..*)?$") then
