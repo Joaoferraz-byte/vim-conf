@@ -1,21 +1,25 @@
-local M = {}
-
 local uv = vim.uv or vim.loop
+local M = {}
 local state = {
   source_roots = { "src/main/java", "src/test/java", "src" },
   root_markers = {
-    "pom.xml",
-    "mvnw",
-    "build.gradle",
-    "build.gradle.kts",
-    "gradlew",
     "settings.gradle",
     "settings.gradle.kts",
+    "pom.xml",
+    "build.gradle",
+    "build.gradle.kts",
+    "mvnw",
+    "gradlew",
+    ".git",
   },
 }
 
 local function normalize(path)
   return vim.fs.normalize(vim.fn.fnamemodify(path, ":p"))
+end
+
+local joinpath = vim.fs.joinpath or function(...)
+  return table.concat({ ... }, "/"):gsub("/+", "/")
 end
 
 local function existing_path(path)
@@ -73,7 +77,7 @@ end
 local valid_package
 
 local function project_package(root)
-  local pom = vim.fs.joinpath(root, "pom.xml")
+  local pom = joinpath(root, "pom.xml")
   if uv.fs_stat(pom) then
     for _, line in ipairs(vim.fn.readfile(pom)) do
       local package = line:match("<groupId>%s*([%w_%.%-]+)%s*</groupId>")
@@ -82,9 +86,10 @@ local function project_package(root)
       end
     end
   end
-  local gradle = vim.fs.joinpath(root, "build.gradle")
-  local gradle_kts = vim.fs.joinpath(root, "build.gradle.kts")
-  for _, file in ipairs({ gradle, gradle_kts }) do
+  for _, file in ipairs({
+    joinpath(root, "build.gradle"),
+    joinpath(root, "build.gradle.kts"),
+  }) do
     if uv.fs_stat(file) then
       for _, line in ipairs(vim.fn.readfile(file)) do
         local package = line:match("group%s*[=:]%s*['\"]([%w_%.%-]+)['\"]")
@@ -99,7 +104,7 @@ end
 
 local function source_context(base_dir, root)
   for _, relative in ipairs(state.source_roots) do
-    local source_root = normalize(vim.fs.joinpath(root, relative))
+    local source_root = normalize(joinpath(root, relative))
     if contains(source_root, base_dir) then
       local relative_path = base_dir:sub(#source_root + 2)
       local package = relative_path:gsub("/", ".")
@@ -107,7 +112,7 @@ local function source_context(base_dir, root)
     end
   end
   if base_dir == normalize(root) then
-    local main_source = normalize(vim.fs.joinpath(root, state.source_roots[1]))
+    local main_source = normalize(joinpath(root, state.source_roots[1]))
     if is_dir(main_source) then
       return main_source, nil
     end
@@ -133,14 +138,33 @@ local function valid_class_name(name)
   return name ~= nil and name:match("^[A-Z][A-Za-z0-9_]*$") ~= nil
 end
 
-local function render(package, class_name)
+local function inferred_kind(class_name)
+  if class_name:match("Exception$") or class_name:match("Error$") then
+    return "exception"
+  end
+  return "class"
+end
+
+local function render(package, class_name, kind)
   local header = package ~= "" and ("package " .. package .. ";\n\n") or ""
+  if kind == "exception" then
+    return header .. "public class " .. class_name .. " extends RuntimeException {\n}\n"
+  end
+  if kind == "interface" then
+    return header .. "public interface " .. class_name .. " {\n}\n"
+  end
+  if kind == "enum" then
+    return header .. "public enum " .. class_name .. " {\n}\n"
+  end
+  if kind == "record" then
+    return header .. "public record " .. class_name .. "() {\n}\n"
+  end
   return header .. "public class " .. class_name .. " {\n}\n"
 end
 
 local function atomic_write(path, content)
   local parent = vim.fn.fnamemodify(path, ":h")
-  local temporary = vim.fs.joinpath(parent, "." .. vim.fn.fnamemodify(path, ":t") .. ".tmp-" .. vim.fn.getpid())
+  local temporary = joinpath(parent, "." .. vim.fn.fnamemodify(path, ":t") .. ".tmp-" .. vim.fn.getpid())
   local fd, open_err = uv.fs_open(temporary, "w", 420)
   if not fd then
     return false, open_err or "could not open temporary file"
@@ -166,6 +190,9 @@ end
 
 local function refresh_explorers()
   vim.api.nvim_exec_autocmds("User", { pattern = "JavaScaffoldCreated" })
+  pcall(function()
+    require("oil.actions").refresh.callback()
+  end)
 end
 
 local function notify(message, level)
@@ -211,14 +238,18 @@ function M.create(opts)
   end
   local default_class = opts.class_name or "Main"
 
-  local choose_package = opts.interactive == false and function(callback) callback(default_package) end or function(callback)
+  local choose_package = opts.interactive == false and function(callback)
+    callback(default_package)
+  end or function(callback)
     vim.ui.input({ prompt = "Java package: ", default = default_package }, callback)
   end
   choose_package(function(package)
     if package == nil then
       return
     end
-    local choose_class = opts.class_name and function(callback) callback(opts.class_name) end or function(callback)
+    local choose_class = opts.class_name and function(callback)
+      callback(opts.class_name)
+    end or function(callback)
       vim.ui.input({ prompt = "Java class: ", default = default_class }, callback)
     end
     choose_class(function(class_name)
@@ -237,8 +268,8 @@ function M.create(opts)
       end
 
       local package_path = package:gsub("%.", "/")
-      local target_dir = package == "" and source_root or vim.fs.joinpath(source_root, package_path)
-      local target = vim.fs.joinpath(target_dir, class_name .. ".java")
+      local target_dir = package == "" and source_root or joinpath(source_root, package_path)
+      local target = joinpath(target_dir, class_name .. ".java")
       if not contains(root, target) then
         notify("Target escapes the project root", vim.log.levels.ERROR)
         return
@@ -256,7 +287,7 @@ function M.create(opts)
         notify("Could not create package directory", vim.log.levels.ERROR)
         return
       end
-      local ok, err = atomic_write(target, render(package, class_name))
+      local ok, err = atomic_write(target, render(package, class_name, opts.kind or inferred_kind(class_name)))
       if not ok then
         notify("Could not create " .. target .. ": " .. tostring(err), vim.log.levels.ERROR)
         return
@@ -272,6 +303,7 @@ end
 
 M._valid_package = valid_package
 M._valid_class_name = valid_class_name
+M._inferred_kind = inferred_kind
 M._render = render
 M._contains = contains
 M._project_package = project_package

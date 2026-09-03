@@ -61,7 +61,7 @@ Matugen is the owner of the dynamic palette. NixVim only consumes the generated 
 
 Snacks is the foundation for picker, explorer, dashboard, input, notifier, quickfile, terminal, image, scope, indent and zen. Oil owns filesystem editing as a buffer. Neo-tree, NvimTree, Telescope, Mini Files and project.nvim are not active.
 
-Specialized plugins remain when no real parity exists: Aerial for outlines, Neogit/Diffview/Gitsigns for Git, nvim-dap for debugging, Conform for formatting, Neotest for testing and the IntelliJ LSP bridge for Java/Kotlin/Spring. Modernization does not remove a feature merely because another area has a newer plugin.
+Specialized plugins remain when no real parity exists: Aerial for outlines, Neogit/Diffview/Gitsigns for Git, nvim-dap for debugging, Conform for formatting, Neotest for testing and nvim-java/JDTLS for Java. Modernization does not remove a feature merely because another area has a newer plugin.
 
 ### Rich Markdown
 
@@ -93,7 +93,7 @@ The Vault workflow is centered on portable Markdown and does not depend on an Ob
 | `<leader>z` | Toggle Snacks Zen. |
 | `gd`, `gD`, `gi`, `gr`, `K` | LSP navigation and documentation. |
 | `<leader>lr`, `<leader>la`, `<leader>lf` | Rename, code action and format. |
-| `<leader>j*` | Java workflow: connect/restart/inspect IntelliJ LSP, debug through DAP, organize imports when supported, and run/debug Neotest tests. |
+| `<leader>j*` | Java workflow: run/build with nvim-java, inspect JDTLS, organize imports, debug through DAP, and run/debug Neotest tests. |
 | `<leader>lx` | Toggle diagnostics with Trouble. |
 | `<C-h/j/k/l>` | Navigate between Neovim splits; the global physical remapping remains owned by keyd. |
 
@@ -107,7 +107,7 @@ The supported coverage is organized as follows:
 
 | Ecosystem | Support | LSP/completion owner |
 |---|---|---|
-| Java, Kotlin, Spring Boot, Swing/JFrame | Dedicated workflow connected to an indexed IntelliJ project, with Maven, Gradle and Neotest | IntelliJ LSP bridge + `nvim-cmp` |
+| Java, Spring Boot, Swing/JFrame | Dedicated local JDTLS workflow with Maven, Gradle, nvim-java, Neotest and DAP | nvim-java/JDTLS + `nvim-cmp` |
 | HTML, CSS, JavaScript/TypeScript | Angular root-scoped by `angular.json`/`nx.json`, TypeScript, ESLint, HTML, CSS, Emmet and Tailwind | Declarative NixVim servers + `nvim-cmp` |
 | PHP | PHP and Composer projects | `phpactor` + `nvim-cmp` |
 | C/C++ | C and C++ with clang/gcc toolchains | `clangd` + `nvim-cmp` |
@@ -115,9 +115,11 @@ The supported coverage is organized as follows:
 | SQL/PostgreSQL | SQL with PostgreSQL/PLpgSQL-specific analysis | `postgres_lsp` + `nvim-cmp` |
 | XML | XML, XSD, XSLT, SVG | `lemminx` + `nvim-cmp` |
 
-Java and Kotlin are treated as a dedicated workflow backed by the IntelliJ LSP Server plugin. IntelliJ must be open with the project indexed and its LSP server listening on TCP `127.0.0.1:2087`; the Neovim client connects automatically for Java and Kotlin buffers. This delegates project model, classpath, completion, references and diagnostics to IntelliJ rather than starting a local JDTLS process.
+Java is a dedicated local workflow backed by JDTLS and orchestrated by nvim-java. JDTLS, the JDK, Lombok, Java Test and Java Debug Adapter are provided by Nix and referenced by fixed store paths; no nvim-java tool downloads occur at startup. Spring Tools auto-install is disabled because the pinned nixpkgs set does not provide the matching VS Code extension as a native store package. The Spring Boot plugin remains available without making it a second Java LSP client.
 
-Completion still uses the shared `nvim-cmp` sources. The IntelliJ LSP bridge supplies completion and diagnostics, while Neotest remains responsible for test execution and DAP remains responsible for debugging. If the server is unavailable, `<leader>jr` or `<leader>ji` retries the connection, `<leader>jR` restarts the client, `<leader>jl` opens `:LspInfo`, and `<leader>jw` disconnects it. Organize-import code actions depend on the IntelliJ LSP plugin exposing that capability.
+Completion uses the shared `nvim-cmp` sources and the global LSP capabilities path. JDTLS provides diagnostics, completion, references, code actions and formatting; `java.configuration.completion.importOnCompletion` and `saveActions.organizeImports` manage imports, while Conform does not issue a competing Java LSP format request. `<leader>jl` opens `:LspInfo`, `<leader>jh` checks LSP health, `<leader>jo` runs an explicit organize-import fallback, `<leader>jr` runs the current main class, `<leader>jR` builds the workspace, and `<leader>jt`/`<leader>jT` run or debug the nearest test.
+
+Every Java file creation path converges on `lua/java_scaffold.lua`. The module infers the project root, Maven/Gradle group package and source root, validates package/class names, creates the requested class atomically and opens it with Java filetype. Names ending in `Exception` or `Error` receive a `RuntimeException` base by default; interfaces, enums and records are supported through the same renderer API. Snacks Explorer, Oil, `BufNewFile` and the generic new-file workflow do not maintain separate Java templates. The dashboard no longer exposes an unsolicited Java creation shortcut.
 
 `.xopp` files are not interpreted as text by the editor. The `BufReadCmd` autocmd starts Xournal++ with the absolute path and removes the temporary buffer; the corresponding XDG association is declared in `nix-conf` with the `application/x-xopp` MIME type. Opening the file through Oil, Snacks or the file manager therefore converges on the same format owner.
 

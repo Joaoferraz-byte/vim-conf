@@ -1,82 +1,53 @@
-# Java/Spring and IntelliJ migration proposal
+# Java and application integration architecture
 
 ## Decision
 
-The default Java backend will be Eclipse JDT Language Server (JDTLS), orchestrated by `nvim-java`. The proprietary IntelliJ LSP bridge will no longer attach to Java or Kotlin buffers. IntelliJ IDEA remains an optional desktop IDE and is not used as a Neovim language-server dependency.
+The Java backend is Eclipse JDT Language Server (JDTLS), orchestrated by `nvim-java`. IntelliJ IDEA remains an optional desktop IDE and is not a Neovim language-server dependency. The editor uses one Java LSP owner and does not start `nvim-jdtls` or an IntelliJ bridge beside it.
 
-This decision is based on the current repository state, the public `gipo355/nvim-intellij-lsp` implementation, the current Nixvim module surface, Eclipse JDTLS, nvim-java, Neovim LSP, Conform, LeetCode and JetBrains documentation. The IntelliJ bridge is functional but depends on a preview backend, private launcher behavior, EULA negotiation, mutable remote bundles, log parsing and protocol workarounds. JDTLS and nvim-java provide a maintained open ecosystem for Maven, Gradle, Spring Boot Tools, completion, diagnostics, imports, formatting, tests, debug and refactoring.
+NixVim remains viable because the repository already provides a stable module boundary, while runtime-sensitive behavior lives in one Lua module. Package management remains declarative: JDTLS, JDKs, Lombok, Java Test and Java Debug Adapter are referenced through Nix store paths, and nvim-java auto-install is disabled.
 
 ## Ownership and boundaries
 
 | Owner | Responsibility | Non-responsibility |
 | --- | --- | --- |
-| `vim-conf` | NixVim modules, editor UX, Java commands, diagnostics presentation, format routing, LeetCode and file creation | Installing system packages or managing IntelliJ mutable state |
-| `nix-conf` | JDKs, JDTLS and CLI tools, IntelliJ IDEA package, Matugen templates, user files and desktop integration | Java buffer callbacks or a second LSP client |
-| Nixvim | Declarative plugin composition and generated stable setup | Replacing dynamic Lua logic that needs runtime context |
-| Lua | JDTLS callbacks, Java scaffolding planner, explorer adapters and runtime commands | Downloading mutable tools or duplicating package management |
-| Eclipse JDTLS | Java project model, classpath, completion, diagnostics, navigation, imports and semantic actions | Spring-specific UI, editor keymaps and DAP presentation |
-| `nvim-java` | JDTLS orchestration, Spring Boot Tools, Java test/debug bundles, runner, profiles and refactoring UX | Running alongside `nvim-jdtls` or IntelliJ LSP |
-| Conform | One formatter policy per filetype and format-on-save | Semantic import resolution or a second Java formatter |
-| JDTLS plus Checkstyle | Java semantic diagnostics plus build-aligned style warnings | Treating Checkstyle as a replacement for type analysis |
-| IntelliJ IDEA | Desktop Java/Spring IDE with IdeaVim, NixIDEA, Spring Explyt and Matugen color scheme | Providing Neovim's Java LSP |
-
-## Nixvim viability
-
-Nixvim is viable for this NixOS/Home Manager configuration because the environment already owns a Nixvim flake and supplies tools declaratively. The configuration will use Nixvim for stable plugin modules and `extraConfigLua` only for runtime behavior that has no stable option surface. It will not make Nixvim or Nix the owner of the same generated and mutable files twice.
-
-The Nixvim input must remain compatible with the locked nixpkgs revision. The configuration will not add a second `plugins.jdtls` owner beside `plugins.java`; Nixvim explicitly rejects that combination. Auto-installation in nvim-java will be disabled when a compatible Nix path exists. If a required bundle cannot be supplied by the current nixpkgs closure, the implementation will fail visibly and will not silently add an imperative downloader.
+| `vim-conf` | NixVim modules, Java UX, diagnostics, completion, format routing, tests, debug and file creation | Installing mutable Java tools or managing IDE profile state |
+| `nix-conf` | JDKs, JDTLS, Java CLI tools, IntelliJ/Android Studio packages, desktop entries and Matugen entrypoints | Java buffer callbacks or a second LSP client |
+| `shell-conf` | Runtime application adapters for generated palettes and documented external formats | Noctalia ownership or arbitrary application state resets |
+| `noctalia-conf` | Noctalia runtime, stable settings, wallpaper policy, templates and plugin lifecycle | Application-specific imperative configuration |
+| NixVim | Declarative plugin composition and stable setup order | Runtime context that requires Lua callbacks |
+| Lua | JDTLS callbacks, Java scaffolding, explorer adapters and editor commands | Downloading mutable tools or duplicating package management |
+| JDTLS/nvim-java | Java project model, classpath, completion, diagnostics, imports, formatting, runner, tests, debug and refactoring | Desktop IDE UI |
+| Conform | One formatter policy per filetype | Java semantic import resolution |
 
 ## Java workflow contract
 
-The workflow uses the following stable contracts:
+JDTLS is enabled through `plugins.java`; `plugins.jdtls` is not enabled. The global `cmp_nvim_lsp` capability path is reused, so completion does not create a second capability configuration. The Java configuration enables automatic import on completion, organize-imports on save, project-aware source roots, Maven/Gradle markers, code lenses, formatting, diagnostics and multiple JDK runtimes.
 
-1. `nvim-cmp` consumes JDTLS completion capabilities. JDTLS remains the source of project-aware suggestions and imports.
-2. JDTLS publishes syntax, compilation and semantic diagnostics through `vim.diagnostic`. Checkstyle is a separate save-time supplement when a project provides its configuration.
-3. Java import organization is an explicit JDTLS action. It is not delegated to a formatter.
-4. Conform owns format-on-save routing. Java has one selected authority per project: JDTLS formatting or `google-java-format`; the initial migration keeps the LSP fallback and does not run both on one save.
-5. `nvim-java` owns Java test/debug/runner commands. The existing DAP UI remains a presentation layer and must not start a second adapter.
-6. `leetcode.nvim` remains isolated from Spring workspaces and uses `lang = "java"` with `plugins.non_standalone = true`.
-7. `java_scaffold.lua` is the single source of truth for package derivation and class creation. Global mappings, Snacks, Oil and any Neo-tree adapter only pass context to it.
+The Java toolchain is externalized to Nix paths. The current nixpkgs set provides JDTLS 1.60.0, JDK 8/21/25, Lombok 1.18.46, Java Test 0.45.0 and Java Debug 0.59.0. nvim-java uses those paths with `auto_install = false`. Spring Tools auto-install is disabled because the matching VS Code extension is not provided as a native package in the pinned nixpkgs set; the Spring Boot plugin remains available without introducing another Java LSP owner.
 
-## File and naming standard
+Java formatting is owned by JDTLS. Conform does not issue a competing Java LSP format request, while the explicit organize-import action remains available as a fallback. Diagnostics are presented through `vim.diagnostic`, and Neotest/DAP use the nvim-java-provided Java integrations.
 
-The repository keeps one primary owner per workflow. Language modules use `config/languages/<domain>.nix`; cross-plugin behavior uses `config/keymaps.nix` only when it is a genuine editor workflow. New runtime logic belongs in `lua/<domain>.lua` rather than a shell script or a second copy of the same function in a Nix string.
+`lua/java_scaffold.lua` is the only source of Java file creation behavior. It infers project root, Maven/Gradle package and source root, validates names, prevents escape from the project root, writes atomically and opens the result as Java. `Exception` and `Error` suffixes default to `RuntimeException`; class, interface, enum and record rendering are supported through the same module. Snacks Explorer, Oil, `BufNewFile` and generic new-file creation pass context to this module rather than carrying independent templates. The dashboard does not expose a Java creation shortcut.
 
-Configuration comments are concise, written in English and limited to non-obvious ownership, compatibility or safety decisions. User-facing notifications and documentation may use Portuguese, but configuration comments will not duplicate the implementation. Commit messages use imperative Conventional Commit prefixes and every commit is authored as `Joaoferraz-byte <joaoferraz467@gmail.com>` on `main`.
+## Application theme contract
 
-## Migration stages
+Noctalia produces the wallpaper-derived palette. `shell-conf` converts it only into documented target formats: `.icls` for IntelliJ IDEA and Android Studio, `.tdesktop-theme` for Telegram Desktop, and `theme.css` source for Hydra Launcher. Telegram import remains a user action. Hydra publication remains a review and pull-request action through the official `hydra-themes` repository.
 
-| Stage | Scope | Verification | Commit/push boundary |
-| --- | --- | --- | --- |
-| 0 | Record this architecture and inspect the legacy integration | Search all relevant repositories, inspect recent history and validate upstream URLs | This document, then `main` push |
-| 1 | Replace IntelliJ LSP with nvim-java/JDTLS | Nix option search, source inspection, syntax checks and generated config assertions | Java module change, then `main` push |
-| 2 | Align Java UX, formatting, diagnostics, DAP and LeetCode | Static checks, Lua parse checks and focused configuration searches | Workflow changes, then `main` push |
-| 3 | Centralize Java file creation and connect all entry points | 50–200 pure planner cases plus adapter smoke checks | Scaffold module and tests, then `main` push |
-| 4 | Provision IntelliJ, plugins and Matugen contract | Nix evaluation, XML/template checks and plugin ID/license review | `nix-conf` changes, then `main` push |
-| 5 | Integrate the published `vim-conf` revision into `nix-conf` | Lockfile diff, `nix flake check --no-build`, targeted eval and status checks | Lock/update commit, then `main` push |
+Spotify replaces cmus in the Livara Home Manager profile. Spicetify-Nix produces a reproducible Spotify package with a Livara custom color scheme, Matugen-aligned CSS and a pinned Adblockify extension. The extension is treated as ad/UI blocking only; it is not represented as an unlock for paid Spotify features.
 
-Full NixOS and editor builds are intentionally deferred to the host gate because the closure is large. Every stage uses small, high-signal checks first: parse all Nix modules, compile Lua modules, inspect generated references, validate package attributes and run a bounded matrix of planner cases. No helper script is introduced to hide a configuration problem.
+## Validation boundary
 
-## Acceptance criteria
-
-A Java file in a Maven or Gradle module attaches exactly one JDTLS-backed client. Completion resolves project and dependency symbols, diagnostics distinguish errors and warnings, organize-imports is available, and a project dependency change can refresh the workspace. Saving a Java file uses the selected formatter without reordering imports unexpectedly. Java tests, debug and runner commands work through the existing DAP/test UX. LeetCode opens Java solutions without attaching Spring tooling. Creating a class from a normal buffer, the dashboard, an explorer or `:JavaNew` produces the same package and class template, never overwrites an existing file and rejects unsafe or ambiguous paths.
-
-IntelliJ is installed through the current Nixpkgs package name, with free plugins identified by their official Marketplace IDs. Matugen generates an IntelliJ `.icls` color scheme from a versioned template; it does not pretend to control the full IDE chrome. IdeaVim and NixIDEA remain inside IntelliJ, while Neovim keeps consuming the shared Matugen palette independently.
+Low-cost checks are required first: `git diff --check`, shell syntax checks, Nix parsing, `nix flake check --no-build`, the headless Lua scaffold tests and isolated palette adapter tests. Full NixOS or NixVim builds remain host-gated because their closures are large. Visual compositor sizing, application UI rendering and cloud theme activation require a real user session and are not proven by sandbox evaluation.
 
 ## References
 
-[1]: https://nixos.org/manual/nixos/stable/ "NixOS Manual"
-[2]: https://nix-community.github.io/nixvim/user-guide/install.html "Nixvim Installation"
-[3]: https://github.com/eclipse-jdtls/eclipse.jdt.ls "Eclipse JDT Language Server"
+[1]: https://nixos.org/guides/nix-pills/ "Nix Pills"
+[2]: https://nixos-and-flakes.thiscute.world/ "NixOS and Flakes"
+[3]: https://github.com/nix-community/nixvim "NixVim"
 [4]: https://github.com/nvim-java/nvim-java "nvim-java"
-[5]: https://github.com/stevearc/conform.nvim "conform.nvim"
-[6]: https://github.com/kawre/leetcode.nvim "leetcode.nvim"
-[7]: https://github.com/gipo355/nvim-intellij-lsp "Legacy IntelliJ LSP client"
-[8]: https://plugins.jetbrains.com/plugin/28675-spring-explyt "Spring Explyt Marketplace"
-[9]: https://plugins.jetbrains.com/plugin/8607-nixidea "NixIDEA Marketplace"
-[10]: https://plugins.jetbrains.com/plugin/164-ideavim "IdeaVim Marketplace"
-[11]: https://github.com/InioX/matugen/wiki/Templates "Matugen Templates"
-[12]: https://www.reddit.com/r/NixOS/comments/108fwwh/tradeoffs_of_using_home_manager_for_neovim_plugins/ "Tradeoffs of using Home Manager for Neovim plugins"
-[13]: https://www.reddit.com/r/NixOS/comments/1fbyvwf/anyone_using_nixvim/ "Anyone using Nixvim"
-[14]: https://nixos.org/guides/nix-pills/ "Nix Pills"
-[15]: https://mhwombat.codeberg.page/nix-book/ "Wombat's Book of Nix"
+[5]: https://github.com/eclipse-jdtls/eclipse.jdt.ls "Eclipse JDTLS"
+[6]: https://github.com/stevearc/conform.nvim "Conform"
+[7]: https://wiki.nixos.org/wiki/Spicetify-Nix "Spicetify-Nix"
+[8]: https://www.jetbrains.com/help/idea/configuring-colors-and-fonts.html "JetBrains color schemes"
+[9]: https://core.telegram.org/themes "Telegram themes"
+[10]: https://github.com/hydralauncher/hydra-themes "Hydra themes"

@@ -92,6 +92,16 @@ in
             "Daily Notes" = { glyph = "󰃭"; hl = "MiniIconsYellow"; };
             "Thoughts" = { glyph = "󰗞"; hl = "MiniIconsPurple"; };
             "References" = { glyph = "󰈙"; hl = "MiniIconsAzure"; };
+            "Documents" = { glyph = "󰈙"; hl = "MiniIconsAzure"; };
+            "Downloads" = { glyph = "󰇚"; hl = "MiniIconsGreen"; };
+            "Pictures" = { glyph = "󰉏"; hl = "MiniIconsYellow"; };
+            "Wallpapers" = { glyph = "󰸉"; hl = "MiniIconsPurple"; };
+            "Books" = { glyph = "󰂺"; hl = "MiniIconsOrange"; };
+            "Games" = { glyph = "󰊗"; hl = "MiniIconsRed"; };
+            "Music" = { glyph = "󰝚"; hl = "MiniIconsPurple"; };
+            "Musics" = { glyph = "󰝚"; hl = "MiniIconsPurple"; };
+            "Fire" = { glyph = "󰈸"; hl = "MiniIconsRed"; };
+            "Vault" = { glyph = "󰌾"; hl = "MiniIconsBlue"; };
             "Config" = { glyph = "󰒓"; hl = "MiniIconsGrey"; };
           };
         };

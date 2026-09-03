@@ -5,7 +5,7 @@
     autoInstall.enable = false;
     settings = {
       formatters_by_ft = {
-        java = { lsp_format = "prefer"; };
+        java = { lsp_format = "never"; };
         c = [ "clang-format" ];
         cpp = [ "clang-format" ];
         javascript = {
