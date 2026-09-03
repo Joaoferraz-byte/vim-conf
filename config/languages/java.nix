@@ -85,12 +85,12 @@ in
             updateSnapshots = true;
           };
           references = { includeDecompiledSources = true; };
-          errors.incompleteClasspath.severity = "warning";
-          signatureHelp.enabled = true;
-          implementationsCodeLens.enabled = true;
-          referencesCodeLens.enabled = true;
-          format.enabled = true;
-          saveActions.organizeImports = false;
+      errors = { incompleteClasspath = { severity = "warning"; }; };
+      signatureHelp = { enabled = true; };
+      implementationsCodeLens = { enabled = true; };
+      referencesCodeLens = { enabled = true; };
+      format = { enabled = true; };
+      saveActions = { organizeImports = false; };
           completion = {
             importOnCompletion = true;
             favoriteStaticMembers = {
