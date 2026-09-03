@@ -11,7 +11,6 @@ local state = {
     "gradlew",
     "settings.gradle",
     "settings.gradle.kts",
-    ".git",
   },
 }
 
