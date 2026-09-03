@@ -71,6 +71,33 @@ local function find_root(start)
   return start
 end
 
+local valid_package
+
+local function project_package(root)
+  local pom = vim.fs.joinpath(root, "pom.xml")
+  if uv.fs_stat(pom) then
+    for _, line in ipairs(vim.fn.readfile(pom)) do
+      local package = line:match("<groupId>%s*([%w_%.%-]+)%s*</groupId>")
+      if package and valid_package(package) then
+        return package
+      end
+    end
+  end
+  local gradle = vim.fs.joinpath(root, "build.gradle")
+  local gradle_kts = vim.fs.joinpath(root, "build.gradle.kts")
+  for _, file in ipairs({ gradle, gradle_kts }) do
+    if uv.fs_stat(file) then
+      for _, line in ipairs(vim.fn.readfile(file)) do
+        local package = line:match("group%s*[=:]%s*['\"]([%w_%.%-]+)['\"]")
+        if package and valid_package(package) then
+          return package
+        end
+      end
+    end
+  end
+  return nil
+end
+
 local function source_context(base_dir, root)
   for _, relative in ipairs(state.source_roots) do
     local source_root = normalize(vim.fs.joinpath(root, relative))
@@ -89,7 +116,7 @@ local function source_context(base_dir, root)
   return base_dir, nil
 end
 
-local function valid_package(package)
+valid_package = function(package)
   if package == "" then
     return true
   end
@@ -174,14 +201,21 @@ function M.create(opts)
 
   local root = find_root(base_dir)
   local source_root, inferred_package = source_context(base_dir, root)
-  local default_package = inferred_package or "com.example"
-  local default_class = "Main"
+  local project_base = project_package(root)
+  local default_package = inferred_package or project_base or "com.example"
+  if project_base and inferred_package and not inferred_package:match("^" .. vim.pesc(project_base) .. "(%..*)?$") then
+    default_package = project_base .. "." .. inferred_package
+  end
+  local default_class = opts.class_name or "Main"
 
   vim.ui.input({ prompt = "Java package: ", default = default_package }, function(package)
     if package == nil then
       return
     end
-    vim.ui.input({ prompt = "Java class: ", default = default_class }, function(class_name)
+    local choose_class = opts.class_name and function(callback) callback(opts.class_name) end or function(callback)
+      vim.ui.input({ prompt = "Java class: ", default = default_class }, callback)
+    end
+    choose_class(function(class_name)
       if class_name == nil then
         return
       end
@@ -234,5 +268,6 @@ M._valid_package = valid_package
 M._valid_class_name = valid_class_name
 M._render = render
 M._contains = contains
+M._project_package = project_package
 
 return M

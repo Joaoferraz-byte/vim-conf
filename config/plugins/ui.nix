@@ -512,6 +512,11 @@ func main() {
       if vim.fn.isdirectory(dir) == 0 then vim.fn.mkdir(dir, "p") end
       local name = vim.fn.fnamemodify(path, ":t")
       local ext = name:match("%.([^.]+)$") or ""
+      if ext == "java" then
+        local class_name = name:gsub("%.java$", "")
+        require("java_scaffold").create({ base_dir = dir, class_name = class_name })
+        return
+      end
       vim.cmd("edit " .. vim.fn.fnameescape(path))
       local content = template_content(ext, name, path)
       if content then
