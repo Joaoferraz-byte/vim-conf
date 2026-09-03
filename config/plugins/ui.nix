@@ -469,6 +469,28 @@ func main() {
       return ok and content or nil
     end
 
+    vim.api.nvim_create_autocmd("BufNewFile", {
+      group = vim.api.nvim_create_augroup("livara_file_templates", { clear = true }),
+      callback = function(args)
+        local path = vim.api.nvim_buf_get_name(args.buf)
+        local name = vim.fn.fnamemodify(path, ":t")
+        local ext = name:match("%.([^.]+)$") or ""
+        if ext == "java" then
+          local class_name = name:gsub("%.java$", "")
+          require("java_scaffold").create({
+            base_dir = vim.fn.fnamemodify(path, ":h"),
+            class_name = class_name,
+            interactive = false,
+          })
+          return
+        end
+        local content = template_content(ext, name, path)
+        if not content or not vim.api.nvim_buf_is_valid(args.buf) then return end
+        vim.api.nvim_buf_set_lines(args.buf, 0, -1, false, vim.split(content, "\n", { plain = true }))
+        vim.bo[args.buf].modified = true
+      end,
+    })
+
     local function apply_current_template(choice)
       local name = vim.fn.expand("%:t")
       if name == "" then name = "Main" end

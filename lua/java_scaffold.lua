@@ -202,13 +202,16 @@ function M.create(opts)
   local root = find_root(base_dir)
   local source_root, inferred_package = source_context(base_dir, root)
   local project_base = project_package(root)
-  local default_package = inferred_package or project_base or "com.example"
+  local default_package = inferred_package or project_base or ""
   if project_base and inferred_package and not inferred_package:match("^" .. vim.pesc(project_base) .. "(%..*)?$") then
     default_package = project_base .. "." .. inferred_package
   end
   local default_class = opts.class_name or "Main"
 
-  vim.ui.input({ prompt = "Java package: ", default = default_package }, function(package)
+  local choose_package = opts.interactive == false and function(callback) callback(default_package) end or function(callback)
+    vim.ui.input({ prompt = "Java package: ", default = default_package }, callback)
+  end
+  choose_package(function(package)
     if package == nil then
       return
     end
