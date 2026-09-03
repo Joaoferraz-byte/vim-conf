@@ -122,6 +122,7 @@ in
     lombok
     maven
     gradle
+    unzip
     vscode-extensions.vscjava.vscode-java-test
     vscode-extensions.vscjava.vscode-java-debug
   ];
