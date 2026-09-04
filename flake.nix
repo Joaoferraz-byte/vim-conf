@@ -60,6 +60,8 @@
             config=${./config/languages/java.nix}
             grep -Fq 'capabilities = require("cmp_nvim_lsp").default_capabilities()' "$config"
             grep -Fq 'autocmd = false' "$config"
+            grep -Fq 'enable = false' "$config"
+            grep -Fq 'root_dir = function(bufnr, on_dir)' "$config"
             grep -Fq 'single_file_support = false' "$config"
             touch "$out"
           '';

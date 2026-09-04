@@ -66,7 +66,9 @@ in
   };
 
   plugins.spring-boot = {
-    enable = true;
+    # nvim-java owns the single Java LSP client. The standalone Spring Boot
+    # plugin otherwise starts a second client rooted at the home directory.
+    enable = false;
     settings = {
       java_cmd = "${javaRuntime}/bin/java";
       server.root_dir.__raw = ''vim.fs.root(0, { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle", "build.gradle.kts" })'';
@@ -82,6 +84,21 @@ in
   extraConfigLuaPost = ''
     vim.lsp.config("jdtls", {
       capabilities = require("cmp_nvim_lsp").default_capabilities(),
+      root_dir = function(bufnr, on_dir)
+        local root = vim.fs.root(bufnr, {
+          "settings.gradle",
+          "settings.gradle.kts",
+          "pom.xml",
+          "build.gradle",
+          "build.gradle.kts",
+          "mvnw",
+          "gradlew",
+        })
+        if root then
+          on_dir(root)
+        end
+      end,
+      workspace_required = true,
       settings = {
         java = {
           configuration = {
