@@ -63,6 +63,10 @@
             grep -Fq 'enable = false' "$config"
             grep -Fq 'root_dir = function(bufnr, on_dir)' "$config"
             grep -Fq 'single_file_support = false' "$config"
+            general=${./config/languages/general.nix}
+            completion=${./config/plugins/completion.nix}
+            grep -Fq 'vim.lsp.protocol.make_client_capabilities()' "$general"
+            grep -Fq 'completion.autocomplete = [ "TextChanged" "InsertCharPre" ];' "$completion"
             touch "$out"
           '';
         }
