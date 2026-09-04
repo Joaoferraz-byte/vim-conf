@@ -93,6 +93,7 @@ in
           "build.gradle.kts",
           "mvnw",
           "gradlew",
+          ".git",
         })
         if root then
           on_dir(root)
