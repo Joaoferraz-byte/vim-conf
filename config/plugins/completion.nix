@@ -13,6 +13,7 @@
     settings = {
       snippet.expand.__raw = "function(args) require('luasnip').lsp_expand(args.body) end";
       completion.completeopt = "menu,menuone,noselect";
+      completion.autocomplete = [ "TextChanged" "InsertCharPre" ];
       window = {
         completion = {
           border = "rounded";
@@ -25,10 +26,10 @@
         };
       };
       sources = [
-        { name = "nvim_lsp"; }
-        { name = "luasnip"; }
-        { name = "path"; }
-        { name = "buffer"; }
+        { name = "nvim_lsp"; group_index = 1; }
+        { name = "luasnip"; group_index = 1; }
+        { name = "path"; group_index = 2; }
+        { name = "buffer"; group_index = 2; }
       ];
       mapping = {
         "<C-Space>" = "cmp.mapping.complete()";

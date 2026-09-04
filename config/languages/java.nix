@@ -83,7 +83,11 @@ in
 
   extraConfigLuaPost = ''
     vim.lsp.config("jdtls", {
-      capabilities = require("cmp_nvim_lsp").default_capabilities(),
+      capabilities = vim.tbl_deep_extend(
+        "force",
+        vim.lsp.protocol.make_client_capabilities(),
+        require("cmp_nvim_lsp").default_capabilities()
+      ),
       root_dir = function(bufnr, on_dir)
         local root = vim.fs.root(bufnr, {
           "settings.gradle",
