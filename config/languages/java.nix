@@ -70,7 +70,7 @@ in
     settings = {
       java_cmd = "${javaRuntime}/bin/java";
       server.root_dir.__raw = ''vim.fs.root(0, { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle", "build.gradle.kts" })'';
-      autocmd = true;
+      autocmd = false;
     };
   };
 
@@ -81,6 +81,7 @@ in
 
   extraConfigLuaPost = ''
     vim.lsp.config("jdtls", {
+      capabilities = require("cmp_nvim_lsp").default_capabilities(),
       settings = {
         java = {
           configuration = {
@@ -126,7 +127,7 @@ in
         { "settings.gradle"; "settings.gradle.kts"; "pom.xml"; };
         { "build.gradle"; "build.gradle.kts"; "mvnw"; "gradlew"; };
       };
-      single_file_support = true;
+      single_file_support = false;
     });
     vim.lsp.enable("jdtls");
   '';

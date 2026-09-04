@@ -46,9 +46,25 @@
         }
       );
 
-      checks = forAllSystems (system: {
-        nixvim = self.packages.${system}.default;
-      });
+      checks = forAllSystems (
+        system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+          };
+        in
+        {
+          nixvim = self.packages.${system}.default;
+          java-completion-contract = pkgs.runCommand "livara-java-completion-contract" { } ''
+            config=${./config/languages/java.nix}
+            grep -Fq 'capabilities = require("cmp_nvim_lsp").default_capabilities()' "$config"
+            grep -Fq 'autocmd = false' "$config"
+            grep -Fq 'single_file_support = false' "$config"
+            touch "$out"
+          '';
+        }
+      );
 
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
     };
