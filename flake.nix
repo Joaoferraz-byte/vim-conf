@@ -74,7 +74,9 @@
             completion=${./config/plugins/completion.nix}
             ui=${./config/plugins/ui.nix}
             grep -Fq 'vim.lsp.protocol.make_client_capabilities()' "$general"
-            grep -Fq 'completion.autocomplete = [ "TextChanged" "InsertCharPre" ];' "$completion"
+            grep -Fq "require('cmp.types').cmp.TriggerEvent.TextChanged" "$completion"
+            grep -Fq "require('cmp.types').cmp.TriggerEvent.InsertCharPre" "$completion"
+            grep -Fq 'autoEnableSources = true;' "$completion"
             grep -Fq 'cmp.get_selected_entry()' "$completion"
             grep -Fq 'cmp.get_entries()' "$completion"
             grep -Fq 'item.menu = string.format' "$completion"

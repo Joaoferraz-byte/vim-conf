@@ -13,7 +13,10 @@
     settings = {
       snippet.expand.__raw = "function(args) require('luasnip').lsp_expand(args.body) end";
       completion.completeopt = "menu,menuone,noselect";
-      completion.autocomplete = [ "TextChanged" "InsertCharPre" ];
+      completion.autocomplete = [
+        "require('cmp.types').cmp.TriggerEvent.TextChanged"
+        "require('cmp.types').cmp.TriggerEvent.InsertCharPre"
+      ];
       window = {
         completion = {
           border = "rounded";
