@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 {
   plugins.luasnip.enable = true;
 
@@ -24,6 +24,19 @@
           border = "rounded";
           winhighlight = "Normal:CmpDocNormal,FloatBorder:CmpBorder,CursorLine:CmpDocSel,Search:None";
         };
+      };
+      formatting.format = lib.mkForce {
+        __raw = ''function(entry, item)
+          item = require("lspkind").cmp_format({ mode = "symbol_text" })(entry, item)
+          local total = 0
+          local ok, cmp = pcall(require, "cmp")
+          if ok and cmp.get_entries then
+            total = #cmp.get_entries()
+          end
+          local source = entry.source and entry.source.name or "?"
+          item.menu = string.format("[%s %d]", source, total)
+          return item
+        end'';
       };
       sources = [
         { name = "nvim_lsp"; group_index = 1; }

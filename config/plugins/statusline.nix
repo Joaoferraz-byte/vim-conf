@@ -152,7 +152,7 @@
         names[#names + 1] = client.name
       end
       table.sort(names)
-      return right_icon("󰒋") .. escape(names[1])
+      return right_icon("󰒋") .. escape(names[1]) .. " " .. #clients
     end
 
     local function line_count_component()
@@ -202,10 +202,8 @@
       local right = {}
       local diagnostics = diagnostics_component()
       if diagnostics ~= "" then right[#right + 1] = diagnostics end
-      if width >= 110 then
-        local lsp = lsp_component()
-        if lsp ~= "" then right[#right + 1] = lsp end
-      end
+      local lsp = lsp_component()
+      if lsp ~= "" then right[#right + 1] = lsp end
       if width >= 75 then right[#right + 1] = line_count_component() end
       right[#right + 1] = position_component()
 
