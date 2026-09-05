@@ -131,6 +131,7 @@ in
           format = { enabled = true; };
           saveActions = { organizeImports = true; };
           completion = {
+            importOnCompletion = true;
             favoriteStaticMembers = {
               "org.junit.Assert.*";
               "org.junit.Assume.*";

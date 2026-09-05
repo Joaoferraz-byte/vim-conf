@@ -1,9 +1,11 @@
 { ... }:
 {
   files."lua/java_scaffold.lua".extraConfigLua = builtins.readFile ../../lua/java_scaffold.lua;
+  files."lua/project_creator.lua".extraConfigLua = builtins.readFile ../../lua/project_creator.lua;
 
   extraConfigLuaPost = ''
     require("java_scaffold").setup()
+    require("project_creator").setup()
   '';
 
   plugins = {
@@ -56,10 +58,10 @@
                 action = ":lua Snacks.picker.grep()";
               }
               {
-                icon = " ";
-                key = "s";
-                desc = "Spring Boot";
-                action = ":lua _G.spring_boot_wizard()";
+                icon = "󰏗 ";
+                key = "n";
+                desc = "New Project";
+                action = ":lua _G.project_creator()";
               }
               {
                 icon = " ";
@@ -588,50 +590,6 @@ func main() {
       })
     end
 
-    _G.spring_boot_wizard = function()
-      vim.ui.select({ "17", "21" }, { prompt = "Java version:" }, function(java_version)
-        if not java_version then return end
-        vim.ui.select({ "3.2.0", "3.3.0" }, { prompt = "Spring Boot version:" }, function(boot_version)
-          if not boot_version then return end
-          vim.ui.input({ prompt = "Group ID: ", default = "com.example" }, function(group)
-            if not group then return end
-            vim.ui.input({ prompt = "Artifact ID: ", default = "demo" }, function(artifact)
-              if not artifact then return end
-              vim.ui.input({ prompt = "Destination directory: ", default = vim.fn.getcwd() }, function(root)
-                if not root or vim.fn.isdirectory(root) == 0 then
-                  notify("Destination directory does not exist", vim.log.levels.ERROR)
-                  return
-                end
-                local project = root .. "/" .. artifact
-                local command = table.concat({
-                  "curl -fsSL --fail https://start.spring.io/starter.tgz",
-                  "-d type=maven-project",
-                  "-d language=java",
-                  "-d bootVersion=" .. vim.fn.shellescape(boot_version),
-                  "-d baseDir=" .. vim.fn.shellescape(artifact),
-                  "-d groupId=" .. vim.fn.shellescape(group),
-                  "-d artifactId=" .. vim.fn.shellescape(artifact),
-                  "-d javaVersion=" .. vim.fn.shellescape(java_version),
-                  "| tar -xzf - -C " .. vim.fn.shellescape(root),
-                }, " ")
-                vim.fn.jobstart({ "sh", "-c", command }, {
-                  on_exit = function(_, code)
-                    vim.schedule(function()
-                      if code == 0 then
-                        vim.cmd("Oil " .. vim.fn.fnameescape(project))
-                        notify("Spring Boot project created at: " .. project)
-                      else
-                        notify("Spring Boot generator failed with exit code " .. code, vim.log.levels.ERROR)
-                      end
-                    end)
-                  end,
-                })
-              end)
-            end)
-          end)
-        end)
-      end)
-    end
   '';
 
   autoCmd = [

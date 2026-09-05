@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ ... }:
 {
   plugins.luasnip.enable = true;
 
@@ -13,10 +13,13 @@
     settings = {
       snippet.expand.__raw = "function(args) require('luasnip').lsp_expand(args.body) end";
       completion.completeopt = "menu,menuone,noselect";
-      completion.autocomplete = [
-        "require('cmp.types').cmp.TriggerEvent.TextChanged"
-        "require('cmp.types').cmp.TriggerEvent.InsertCharPre"
-      ];
+      completion.autocomplete = [ "require('cmp.types').cmp.TriggerEvent.TextChanged" ];
+      performance = {
+        debounce = 100;
+        throttle = 50;
+        fetching_timeout = 300;
+        max_view_entries = 50;
+      };
       window = {
         completion = {
           border = "rounded";
@@ -28,24 +31,11 @@
           winhighlight = "Normal:CmpDocNormal,FloatBorder:CmpBorder,CursorLine:CmpDocSel,Search:None";
         };
       };
-      formatting.format = lib.mkForce {
-        __raw = ''function(entry, item)
-          item = require("lspkind").cmp_format({ mode = "symbol_text" })(entry, item)
-          local total = 0
-          local ok, cmp = pcall(require, "cmp")
-          if ok and cmp.get_entries then
-            total = #cmp.get_entries()
-          end
-          local source = entry.source and entry.source.name or "?"
-          item.menu = string.format("[%s %d]", source, total)
-          return item
-        end'';
-      };
       sources = [
-        { name = "nvim_lsp"; group_index = 1; }
-        { name = "luasnip"; group_index = 1; }
-        { name = "path"; group_index = 2; }
-        { name = "buffer"; group_index = 2; }
+        { name = "nvim_lsp"; group_index = 1; priority = 1000; }
+        { name = "luasnip"; group_index = 1; priority = 750; }
+        { name = "path"; group_index = 1; priority = 500; keyword_length = 1; }
+        { name = "buffer"; group_index = 1; priority = 250; keyword_length = 1; }
       ];
       mapping = {
         "<C-Space>" = "cmp.mapping.complete()";
@@ -147,5 +137,30 @@
       end
       feed_tab()
     end, { desc = "Expand Emmet, snippets, or continue indentation" })
+
+    _G.livara_completion_report = function()
+      local clients = vim.lsp.get_clients({ bufnr = 0 })
+      local rows = {}
+      for _, client in ipairs(clients) do
+        local provider = client.server_capabilities and client.server_capabilities.completionProvider
+        rows[#rows + 1] = string.format("%s: completion=%s root=%s", client.name, provider and "yes" or "no", client.config and client.config.root_dir or "unknown")
+      end
+      local ok_cmp, cmp = pcall(require, "cmp")
+      if ok_cmp then
+        local source_names = {}
+        for _, source in ipairs(cmp.get_config().sources or {}) do
+          source_names[#source_names + 1] = source.name
+        end
+        rows[#rows + 1] = "cmp sources: " .. table.concat(source_names, ", ")
+        rows[#rows + 1] = "cmp visible: " .. (cmp.visible() and "yes" or "no")
+      else
+        rows[#rows + 1] = "cmp unavailable"
+      end
+      if #rows == 0 then
+        rows[1] = "No LSP client is attached to the current buffer"
+      end
+      vim.notify(table.concat(rows, "\n"), vim.log.levels.INFO, { title = "Livara completion report" })
+    end
+    vim.api.nvim_create_user_command("LivaraCompletionReport", _G.livara_completion_report, {})
   '';
 }
