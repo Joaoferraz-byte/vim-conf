@@ -130,10 +130,10 @@
       options = { silent = true; desc = "Load Template into Current Buffer"; };
     }
     {
-      key = "<leader>ns";
-      action = "<cmd>lua _G.spring_boot_wizard()<CR>";
+      key = "<leader>np";
+      action = "<cmd>lua _G.project_creator()<CR>";
       mode = [ "n" ];
-      options = { silent = true; desc = "New Spring Boot Project"; };
+      options = { silent = true; desc = "New Project"; };
     }
     {
       key = "<leader>vd";
@@ -198,9 +198,9 @@
       }
       {
         key = "<leader>jl";
-        action = "<cmd>LspInfo<CR>";
+        action = "<cmd>LivaraCompletionReport<CR>";
         mode = [ "n" ];
-        options = { silent = true; desc = "Show Java LSP"; };
+        options = { silent = true; desc = "Show Java Completion Report"; };
       }
     {
       key = "<leader>jh";

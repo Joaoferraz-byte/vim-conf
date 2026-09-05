@@ -74,12 +74,12 @@
             completion=${./config/plugins/completion.nix}
             ui=${./config/plugins/ui.nix}
             grep -Fq 'vim.lsp.protocol.make_client_capabilities()' "$general"
-            grep -Fq "require('cmp.types').cmp.TriggerEvent.TextChanged" "$completion"
-            grep -Fq "require('cmp.types').cmp.TriggerEvent.InsertCharPre" "$completion"
+            grep -Fq "completion.autocomplete = [ \"require('cmp.types').cmp.TriggerEvent.TextChanged\" ];" "$completion"
             grep -Fq 'autoEnableSources = true;' "$completion"
             grep -Fq 'cmp.get_selected_entry()' "$completion"
-            grep -Fq 'cmp.get_entries()' "$completion"
-            grep -Fq 'item.menu = string.format' "$completion"
+            if grep -Eq 'cmp\.get_entries|item\.menu = string\.format|InsertCharPre' "$completion"; then
+              exit 1
+            fi
             statusline=${./config/plugins/statusline.nix}
             grep -Fq 'local lsp = lsp_component()' "$statusline"
             grep -Fq '.. " " .. #clients' "$statusline"

@@ -139,6 +139,12 @@ in
     fd
     gnumake
     nodejs
+    pnpm
+    uv
+    go
+    cmake
+    php
+    phpPackages.composer
     jdk21
     maven
     gradle

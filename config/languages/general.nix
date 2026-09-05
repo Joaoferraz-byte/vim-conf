@@ -30,6 +30,12 @@
       };
       dockerls.enable = true;
       clangd.enable = true;
+      gopls.enable = true;
+      rust_analyzer = {
+        enable = true;
+        installCargo = false;
+        installRustc = false;
+      };
       pyright = {
         enable = true;
         settings.python.analysis = {
@@ -46,5 +52,9 @@
   # environment instead of being silently expected from the host.
   extraPackages = with pkgs; [
     shellcheck
+    gopls
+    cargo
+    rustc
+    rust-analyzer
   ];
 }
