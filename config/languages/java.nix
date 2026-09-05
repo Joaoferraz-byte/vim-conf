@@ -2,8 +2,9 @@
 let
   extensionRoot = package: name: "${package}/share/vscode/extensions/${name}";
   jdtlsRoot = "${pkgs.jdt-language-server}/share/java/jdtls";
-  javaRuntime = "${pkgs.jdk25}";
+  jdtlsRuntime = "${pkgs.jdk21}";
   projectRuntime = "${pkgs.jdk21}";
+  latestRuntime = "${pkgs.jdk25}";
   legacyRuntime = "${pkgs.jdk8}";
   lombokJar = "${pkgs.lombok}/share/java/lombok.jar";
   javaTestExtension = extensionRoot pkgs.vscode-extensions.vscjava.vscode-java-test "vscjava.vscode-java-test";
@@ -32,7 +33,7 @@ in
         auto_install = false;
       };
       jdk = {
-        path = javaRuntime;
+        path = jdtlsRuntime;
         auto_install = false;
       };
       lombok = {
@@ -70,7 +71,7 @@ in
     # plugin otherwise starts a second client rooted at the home directory.
     enable = false;
     settings = {
-      java_cmd = "${javaRuntime}/bin/java";
+      java_cmd = "${jdtlsRuntime}/bin/java";
       server.root_dir.__raw = ''vim.fs.root(0, { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle", "build.gradle.kts" })'';
       autocmd = false;
     };
@@ -108,11 +109,10 @@ in
         java = {
           configuration = {
             updateBuildConfiguration = "interactive";
-            importOnFirstTimeStartup = "automatic";
             runtimes = {
               { name = "JavaSE-8"; path = "${legacyRuntime}"; };
               { name = "JavaSE-21"; path = "${projectRuntime}"; default = true; };
-              { name = "JavaSE-25"; path = "${javaRuntime}"; };
+              { name = "JavaSE-25"; path = "${latestRuntime}"; };
             };
           };
           eclipse = {
@@ -131,7 +131,6 @@ in
           format = { enabled = true; };
           saveActions = { organizeImports = true; };
           completion = {
-            importOnCompletion = true;
             favoriteStaticMembers = {
               "org.junit.Assert.*";
               "org.junit.Assume.*";

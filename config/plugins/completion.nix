@@ -117,7 +117,11 @@
       end
       local ok_cmp, cmp = pcall(require, "cmp")
       if ok_cmp and cmp.visible() then
-        cmp.confirm({ select = true })
+        if cmp.get_selected_entry() then
+          cmp.confirm({ select = false })
+        else
+          feed_tab()
+        end
         return
       end
       local ok_snip, luasnip = pcall(require, "luasnip")
