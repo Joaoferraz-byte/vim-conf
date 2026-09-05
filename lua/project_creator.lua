@@ -170,6 +170,15 @@ local function tree_lines(spec, values)
   local package_dir = package_path(package)
   local root = { label = name .. "/", directory = true, children = {} }
   local stack = { [0] = root }
+  local function child_node(parent, segment, directory)
+    local label = segment .. (directory and "/" or "")
+    for _, child in ipairs(parent.children) do
+      if child.label == label then return child end
+    end
+    local node = { label = label, directory = directory, children = {} }
+    parent.children[#parent.children + 1] = node
+    return node
+  end
   for _, entry in ipairs(spec.tree or {}) do
     local raw = entry:gsub("{name}", name):gsub("{package}", package):gsub("{package_dir}", package_dir)
     local spaces, path = raw:match("^(%s*)(.*)$")
@@ -179,13 +188,20 @@ local function tree_lines(spec, values)
     local parent = stack[level] or root
     for index, segment in ipairs(segments) do
       local directory = index < #segments or path:sub(-1) == "/"
-      local node = { label = segment .. (directory and "/" or ""), directory = directory, children = {} }
-      parent.children[#parent.children + 1] = node
-      parent = node
+      parent = child_node(parent, segment, directory)
     end
     stack[level + 1] = parent
     for index = level + 2, 32 do stack[index] = nil end
   end
+  local function compact(node)
+    for _, child in ipairs(node.children) do compact(child) end
+    while node.directory and #node.children == 1 and node.children[1].directory do
+      local child = node.children[1]
+      node.label = node.label .. child.label
+      node.children = child.children
+    end
+  end
+  compact(root)
   local lines = { path_icon(root.label, true) .. " " .. root.label }
   local function render(node, prefix, last)
     local branch = last and "└── " or "├── "
@@ -238,7 +254,8 @@ end
 local function structure_icon(spec)
   local icons = {
     ["Maven"] = "󰏗",
-    ["Gradle Kotlin DSL"] = "󰏗",
+    ["Gradle Kotlin"] = "󰏗",
+    ["Gradle Groovy"] = "󰏗",
     ["Vite vanilla"] = "󰜈",
     ["React via Vite"] = "",
     ["Vue via Vite"] = "󰡄",
@@ -405,7 +422,7 @@ local function create_javafx(spec, values, path)
   end
   if not executable("gradle") then notify("Gradle is not available", vim.log.levels.ERROR) return end
   vim.fn.mkdir(destination, "p")
-  run({ "gradle", "init", "--type", "java-application", "--dsl", "kotlin", "--test-framework", "junit-jupiter", "--package", values.package, "--project-name", values.name, "--java-version", values.java_version, "--no-split-project" }, { cwd = destination, text = true }, function(result) finish(result, spec.name, destination) end)
+  run({ "gradle", "init", "--type", "java-application", "--dsl", spec.dsl, "--test-framework", "junit-jupiter", "--package", values.package, "--project-name", values.name, "--java-version", values.java_version, "--no-split-project" }, { cwd = destination, text = true }, function(result) finish(result, spec.name, destination) end)
 end
 
 local function create_uv(spec, values, path)
@@ -540,8 +557,8 @@ local function configure_empty(callback)
   callback({})
 end
 
-local function java_spec(id, name, family, build_system, tree, create)
-  return { id = id, name = name, family = family, language = "Java", icon = "󰬷", build_system = build_system, tree = tree, configure = java_values, create = create }
+local function java_spec(id, name, family, build_system, tree, create, dsl)
+  return { id = id, name = name, family = family, language = "Java", icon = "󰬷", build_system = build_system, dsl = dsl or "kotlin", tree = tree, configure = java_values, create = create }
 end
 
 local function vite_spec(id, name, language, template)
@@ -550,11 +567,14 @@ end
 
 local specs = {
   java_spec("java-maven", "Maven", "Plain application", "maven", { "pom.xml", "src/", "  main/", "    java/", "      {package_dir}/", "        App.java", "  test/", "    java/", "      {package_dir}/", "        AppTest.java" }, create_maven),
-  java_spec("java-gradle", "Gradle Kotlin DSL", "Plain application", "gradle", { "settings.gradle.kts", "build.gradle.kts", "src/", "  main/", "    java/", "      {package_dir}/", "        App.java", "  test/", "    java/", "      {package_dir}/", "        AppTest.java" }, create_gradle),
+  java_spec("java-gradle", "Gradle Kotlin", "Plain application", "gradle", { "settings.gradle.kts", "build.gradle.kts", "src/", "  main/", "    java/", "      {package_dir}/", "        App.java", "  test/", "    java/", "      {package_dir}/", "        AppTest.java" }, create_gradle),
+  java_spec("java-gradle-groovy", "Gradle Groovy", "Plain application", "gradle", { "settings.gradle", "build.gradle", "src/", "  main/", "    java/", "      {package_dir}/", "        App.java", "  test/", "    java/", "      {package_dir}/", "        AppTest.java" }, create_gradle, "groovy"),
   { id = "spring-maven", name = "Maven", family = "Spring Boot", language = "Java", icon = "󰬷", initializr_type = "maven-project", tree = { "pom.xml", "src/", "  main/", "    java/", "      {package_dir}/", "        {name}Application.java", "    resources/", "      application.properties", "  test/", "    java/", "      {package_dir}/", "        {name}ApplicationTests.java" }, configure = java_values, create = create_spring },
-  { id = "spring-gradle", name = "Gradle Kotlin DSL", family = "Spring Boot", language = "Java", icon = "󰬷", initializr_type = "gradle-project-kotlin", tree = { "settings.gradle.kts", "build.gradle.kts", "src/", "  main/", "    java/", "      {package_dir}/", "        {name}Application.java", "    resources/", "      application.properties", "  test/", "    java/", "      {package_dir}/", "        {name}ApplicationTests.java" }, configure = java_values, create = create_spring },
+  { id = "spring-gradle", name = "Gradle Kotlin", family = "Spring Boot", language = "Java", icon = "󰬷", initializr_type = "gradle-project-kotlin", tree = { "settings.gradle.kts", "build.gradle.kts", "src/", "  main/", "    java/", "      {package_dir}/", "        {name}Application.java", "    resources/", "      application.properties", "  test/", "    java/", "      {package_dir}/", "        {name}ApplicationTests.java" }, configure = java_values, create = create_spring },
+  { id = "spring-gradle-groovy", name = "Gradle Groovy", family = "Spring Boot", language = "Java", icon = "󰬷", initializr_type = "gradle-project", tree = { "settings.gradle", "build.gradle", "src/", "  main/", "    java/", "      {package_dir}/", "        {name}Application.java", "    resources/", "      application.properties", "  test/", "    java/", "      {package_dir}/", "        {name}ApplicationTests.java" }, configure = java_values, create = create_spring },
   { id = "javafx-maven", name = "Maven", family = "JavaFX desktop", language = "Java", icon = "󰬷", build_system = "maven", tree = { "pom.xml", "src/", "  main/", "    java/", "      {package_dir}/", "        App.java" }, configure = java_values, create = create_javafx },
-  { id = "javafx-gradle", name = "Gradle Kotlin DSL", family = "JavaFX desktop", language = "Java", icon = "󰬷", build_system = "gradle", tree = { "settings.gradle.kts", "build.gradle.kts", "src/", "  main/", "    java/", "      {package_dir}/", "        App.java" }, configure = java_values, create = create_javafx },
+  { id = "javafx-gradle", name = "Gradle Kotlin", family = "JavaFX desktop", language = "Java", icon = "󰬷", build_system = "gradle", tree = { "settings.gradle.kts", "build.gradle.kts", "src/", "  main/", "    java/", "      {package_dir}/", "        App.java" }, configure = java_values, create = create_javafx },
+  { id = "javafx-gradle-groovy", name = "Gradle Groovy", family = "JavaFX desktop", language = "Java", icon = "󰬷", build_system = "gradle", dsl = "groovy", tree = { "settings.gradle", "build.gradle", "src/", "  main/", "    java/", "      {package_dir}/", "        App.java" }, configure = java_values, create = create_javafx },
   { id = "javascript-vite", name = "Vite vanilla", family = "Vanilla web", language = "JavaScript", icon = "󰌞", template = "vanilla", tree = { "package.json", "index.html", "src/", "  main.js", "  style.css" }, configure = configure_empty, create = create_vite },
   { id = "javascript-react", name = "React via Vite", family = "React", language = "JavaScript", icon = "󰌞", template = "react", tree = { "package.json", "index.html", "src/", "  main.jsx", "  App.jsx" }, configure = configure_empty, create = create_vite },
   { id = "javascript-vue", name = "Vue via Vite", family = "Vue", language = "JavaScript", icon = "󰌞", template = "vue", tree = { "package.json", "index.html", "src/", "  main.js", "  App.vue" }, configure = configure_empty, create = create_vite },

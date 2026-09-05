@@ -25,6 +25,13 @@ for _, language in ipairs(languages) do
         assert(tree:find("App.java", 1, true))
         assert(tree:find("", 1, true))
       end
+      if spec.language == "Java" and spec.family == "Plain application" and spec.name == "Gradle Groovy" then
+        assert(spec.dsl == "groovy")
+        assert(tree:find("settings.gradle", 1, true))
+        assert(tree:find("build.gradle", 1, true))
+        assert(tree:find("main/java/com/example/demo/", 1, true))
+        assert(not tree:find("main/\n", 1, true))
+      end
       assert(not spec.name:find("tabler:", 1, true))
     end
   end
