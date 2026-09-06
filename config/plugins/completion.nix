@@ -120,6 +120,26 @@
       end,
     })
 
+    vim.api.nvim_create_autocmd("TextChangedI", {
+      group = cmp_lsp_refresh_group,
+      pattern = "*",
+      callback = function(args)
+        if vim.bo[args.buf].filetype ~= "java" then
+          return
+        end
+        local line = vim.api.nvim_get_current_line()
+        local col = vim.api.nvim_win_get_cursor(0)[2]
+        local before_cursor = line:sub(1, col)
+        if not before_cursor:match("[%w_%.]$") then
+          return
+        end
+        local ok_cmp, cmp = pcall(require, "cmp")
+        if ok_cmp and not cmp.visible() then
+          cmp.complete({ reason = cmp.ContextReason.Auto })
+        end
+      end,
+    })
+
     local function feed_tab()
       local key = vim.api.nvim_replace_termcodes("<Tab>", true, false, true)
       vim.api.nvim_feedkeys(key, "n", false)
