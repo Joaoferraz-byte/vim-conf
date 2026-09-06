@@ -156,7 +156,16 @@
       local rows = {}
       for _, client in ipairs(clients) do
         local provider = client.server_capabilities and client.server_capabilities.completionProvider
-        rows[#rows + 1] = string.format("%s: completion=%s root=%s", client.name, provider and "yes" or "no", client.config and client.config.root_dir or "unknown")
+        local initialized = client.initialized and "yes" or "no"
+        local supports_completion = client.supports_method and client:supports_method("textDocument/completion") or false
+        rows[#rows + 1] = string.format(
+          "%s: completionProvider=%s supports_completion=%s initialized=%s root=%s",
+          client.name,
+          provider and "yes" or "no",
+          supports_completion and "yes" or "no",
+          initialized,
+          client.config and client.config.root_dir or "unknown"
+        )
       end
       local ok_cmp, cmp = pcall(require, "cmp")
       if ok_cmp then

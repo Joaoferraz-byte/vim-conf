@@ -109,12 +109,14 @@ in
         java = {
           configuration = {
             updateBuildConfiguration = "automatic";
-            importOnFirstTimeStartup = "automatic";
             runtimes = {
               { name = "JavaSE-1.8"; path = "${legacyRuntime}"; };
               { name = "JavaSE-21"; path = "${projectRuntime}"; default = true; };
               { name = "JavaSE-25"; path = "${latestRuntime}"; };
             };
+          };
+          project = {
+            importOnFirstTimeStartup = "automatic";
           };
           eclipse = {
             downloadSources = false;
