@@ -191,6 +191,23 @@
         rows[1] = "No LSP client is attached to the current buffer"
       end
       vim.notify(table.concat(rows, "\n"), vim.log.levels.INFO, { title = "Livara completion report" })
+      for _, client in ipairs(clients) do
+        if client.name == "jdtls" and client.supports_method and client:supports_method("textDocument/completion") then
+          local params = vim.lsp.util.make_position_params(0, client.offset_encoding)
+          client:request("textDocument/completion", params, function(err, result)
+            local items = result and (result.items or result) or {}
+            local labels = {}
+            for index = 1, math.min(#items, 8) do
+              labels[#labels + 1] = items[index].label or "<unlabeled>"
+            end
+            vim.schedule(function()
+              local status = err and ("error=" .. vim.inspect(err)) or ("items=" .. #items)
+              local sample = #labels > 0 and (" labels=" .. table.concat(labels, ", ")) or ""
+              vim.notify(status .. sample, err and vim.log.levels.ERROR or vim.log.levels.INFO, { title = "JDTLS completion probe" })
+            end)
+          end, 0)
+        end
+      end
     end
     vim.api.nvim_create_user_command("LivaraCompletionReport", _G.livara_completion_report, {})
   '';
