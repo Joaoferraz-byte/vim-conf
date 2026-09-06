@@ -90,29 +90,6 @@ in
         vim.lsp.protocol.make_client_capabilities(),
         require("cmp_nvim_lsp").default_capabilities()
       ),
-      root_dir = function(bufnr, on_dir)
-        local filename = vim.api.nvim_buf_get_name(bufnr)
-        local start = filename ~= "" and vim.fs.dirname(filename) or vim.fn.getcwd()
-        local multi_module = vim.fs.find({
-          "mvnw",
-          "gradlew",
-          "settings.gradle",
-          "settings.gradle.kts",
-        }, { path = start, upward = true })
-        local single_module = vim.fs.find({
-          "build.xml",
-          "pom.xml",
-          "build.gradle",
-          "build.gradle.kts",
-        }, { path = start, upward = true })
-        local fallback = vim.fs.find(".git", { path = start, upward = true })
-        local marker = multi_module[1] or single_module[1] or fallback[1]
-        local root = marker and vim.fs.dirname(marker)
-        if root then
-          on_dir(root)
-        end
-      end,
-      workspace_required = true,
       settings = {
         java = {
           configuration = {
@@ -155,12 +132,6 @@ in
           };
         };
       };
-      filetypes = { "java"; };
-      root_markers = {
-        { "settings.gradle"; "settings.gradle.kts"; "pom.xml"; };
-        { "build.xml"; "build.gradle"; "build.gradle.kts"; "mvnw"; "gradlew"; };
-      };
-      single_file_support = false;
     });
     vim.lsp.enable("jdtls");
   '';
