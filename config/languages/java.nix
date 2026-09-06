@@ -110,17 +110,17 @@ in
           configuration = {
             updateBuildConfiguration = "interactive";
             runtimes = {
-              { name = "JavaSE-8"; path = "${legacyRuntime}"; };
+              { name = "JavaSE-1.8"; path = "${legacyRuntime}"; };
               { name = "JavaSE-21"; path = "${projectRuntime}"; default = true; };
               { name = "JavaSE-25"; path = "${latestRuntime}"; };
             };
           };
           eclipse = {
-            downloadSources = true;
-            downloadJavadocs = true;
+            downloadSources = false;
+            downloadJavadocs = false;
           };
           maven = {
-            downloadSources = true;
+            downloadSources = false;
             updateSnapshots = false;
           };
           references = { includeDecompiledSources = true; };

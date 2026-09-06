@@ -317,6 +317,85 @@
     }
 
     {
+      key = "<leader>at";
+      action = "<cmd>lua _G.livara_copilot_toggle()<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Toggle Copilot Inline"; };
+    }
+    {
+      key = "<leader>ae";
+      action = "<cmd>lua _G.livara_copilot_enable()<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Enable Copilot Inline"; };
+    }
+    {
+      key = "<leader>ad";
+      action = "<cmd>lua _G.livara_copilot_disable()<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Disable Copilot Inline"; };
+    }
+    {
+      key = "<leader>ac";
+      action = "<cmd>CopilotChatToggle<CR>";
+      mode = [ "n" "v" ];
+      options = { silent = true; desc = "Toggle Copilot Chat"; };
+    }
+    {
+      key = "<leader>ax";
+      action = "<cmd>CopilotChatExplain<CR>";
+      mode = [ "n" "v" ];
+      options = { silent = true; desc = "Explain Selection with Copilot"; };
+    }
+    {
+      key = "<leader>ar";
+      action = "<cmd>CopilotChatReview<CR>";
+      mode = [ "n" "v" ];
+      options = { silent = true; desc = "Review Selection with Copilot"; };
+    }
+    {
+      key = "<leader>af";
+      action = "<cmd>CopilotChatFix<CR>";
+      mode = [ "n" "v" ];
+      options = { silent = true; desc = "Fix Selection with Copilot"; };
+    }
+    {
+      key = "<leader>ao";
+      action = "<cmd>CopilotChatOptimize<CR>";
+      mode = [ "n" "v" ];
+      options = { silent = true; desc = "Optimize Selection with Copilot"; };
+    }
+    {
+      key = "<leader>as";
+      action = "<cmd>CopilotChatTests<CR>";
+      mode = [ "n" "v" ];
+      options = { silent = true; desc = "Generate Tests with Copilot"; };
+    }
+    {
+      key = "<leader>ap";
+      action = "<cmd>CopilotChatPrompts<CR>";
+      mode = [ "n" "v" ];
+      options = { silent = true; desc = "Select Copilot Prompt"; };
+    }
+    {
+      key = "<leader>am";
+      action = "<cmd>CopilotChatModels<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Select Copilot Model"; };
+    }
+    {
+      key = "<leader>ai";
+      action = "<cmd>Copilot auth info<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Show Copilot Auth Status"; };
+    }
+    {
+      key = "<leader>au";
+      action = "<cmd>Copilot auth signin<CR>";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Authenticate Copilot"; };
+    }
+
+    {
       key = "<leader>ha";
       action.__raw = "function() require('harpoon'):list():add() end";
       mode = [ "n" ];

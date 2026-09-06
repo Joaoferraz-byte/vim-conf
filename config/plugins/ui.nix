@@ -143,6 +143,9 @@
               desc = "Create Java Class Here";
             };
           };
+          sources.select = {
+            layout.preset = "select";
+          };
           previewers.file.max_size = 1024 * 1024;
         };
         quickfile.enabled = true;
@@ -230,6 +233,7 @@
           { __unkeyed-1 = "<leader>z"; desc = "Toggle Zen Mode"; icon = "󰒲 "; }
           { __unkeyed-1 = "<leader>?"; desc = "Browse All Keymaps"; icon = "󰋤 "; }
           { __unkeyed-1 = "<leader>t"; group = "Test"; icon = " "; }
+          { __unkeyed-1 = "<leader>a"; group = "AI"; icon = "󰚩 "; }
         ];
       };
     };
@@ -611,6 +615,27 @@ func main() {
           vim.opt_local.scrolloff = 0
           vim.cmd("nohlsearch")
           pcall(function() require("illuminate").pause() end)
+      '';
+    }
+    {
+      event = [ "BufEnter" "BufWinEnter" "WinEnter" "FileType" "BufModifiedSet" ];
+      pattern = "*";
+      command = ''
+        lua
+          local special_filetypes = {
+            snacks_dashboard = true,
+            snacks_picker_input = true,
+            snacks_picker_list = true,
+            snacks_picker_preview = true,
+            oil = true,
+            qf = true,
+            help = true,
+          }
+          local unnamed = vim.api.nvim_buf_get_name(0) == "" and not vim.bo.modified
+          local special = vim.bo.buftype == "nofile" or special_filetypes[vim.bo.filetype] == true or unnamed
+          vim.o.showtabline = special and 0 or 2
+          vim.opt_local.statusline = special and "" or "%!v:lua.LivaraBar.statusline()"
+          vim.opt_local.winbar = special and "" or "%!v:lua.LivaraBar.winbar()"
       '';
     }
     {

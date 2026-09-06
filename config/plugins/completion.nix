@@ -34,8 +34,21 @@
       sources = [
         { name = "nvim_lsp"; group_index = 1; priority = 1000; }
         { name = "luasnip"; group_index = 1; priority = 750; }
-        { name = "path"; group_index = 1; priority = 500; keyword_length = 1; }
-        { name = "buffer"; group_index = 1; priority = 250; keyword_length = 1; }
+        {
+          name = "path";
+          group_index = 1;
+          priority = 500;
+          option = { keyword_length = 1; };
+        }
+        {
+          name = "buffer";
+          group_index = 1;
+          priority = 250;
+          option = {
+            keyword_length = 1;
+            keyword_pattern = "\\k\\+";
+          };
+        }
       ];
       mapping = {
         "<C-Space>" = "cmp.mapping.complete()";
@@ -150,6 +163,14 @@
         local source_names = {}
         for _, source in ipairs(cmp.get_config().sources or {}) do
           source_names[#source_names + 1] = source.name
+          if source.name == "buffer" then
+            local option = source.option or {}
+            rows[#rows + 1] = string.format(
+              "buffer source: keyword_length=%s pattern=%s",
+              tostring(option.keyword_length or "default"),
+              tostring(option.keyword_pattern or "default")
+            )
+          end
         end
         rows[#rows + 1] = "cmp sources: " .. table.concat(source_names, ", ")
         rows[#rows + 1] = "cmp visible: " .. (cmp.visible() and "yes" or "no")

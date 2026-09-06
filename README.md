@@ -45,7 +45,7 @@ The configuration uses a hybrid **layered and workflow** architecture rather tha
 | UI | `config/plugins/ui.nix`: Snacks, Oil, Which-Key, Noice, statusline and interface surfaces. |
 | Core | `config/plugins/core.nix`: Git, Treesitter, movement, text objects and specialized tools. |
 | Languages | `config/languages/*.nix`: LSP, toolchains and ecosystem tests. |
-| Workflows | `config/keymaps.nix` and Lua helpers: Java/Spring, projects, file creation, Git, DAP and testing. |
+| Workflows | `config/keymaps.nix` and Lua helpers: Java/Spring, projects, file creation, Git, DAP, testing and AI. |
 
 Each plugin has one primary owner. The layout does not artificially fragment every option into its own file: plugins that form a workflow stay together, while distinct domains remain isolated.
 
@@ -59,9 +59,15 @@ Matugen is the owner of the dynamic palette. NixVim only consumes the generated 
 
 ## Interface and workflows
 
-Snacks is the foundation for picker, explorer, dashboard, input, notifier, quickfile, terminal, image, scope, indent and zen. Oil owns filesystem editing as a buffer. Neo-tree, NvimTree, Telescope, Mini Files and project.nvim are not active.
+Snacks is the foundation for picker, explorer, dashboard, input, notifier, quickfile, terminal, image, scope, indent and zen. `vim.ui.select` uses Snacks' compact `select` preset, while the project creator keeps its custom structure preview. Oil owns filesystem editing as a buffer. Dashboard, picker input/list/preview, Oil and quickfix surfaces hide the file bufferline, winbar and statusline. Neo-tree, NvimTree, Telescope, Mini Files and project.nvim are not active.
 
 Specialized plugins remain when no real parity exists: Aerial for outlines, Neogit/Diffview/Gitsigns for Git, nvim-dap for debugging, Conform for formatting, Neotest for testing and nvim-java/JDTLS for Java. Modernization does not remove a feature merely because another area has a newer plugin.
+
+### AI workflow
+
+The AI layer uses `copilot.lua` for inline completion and `CopilotChat.nvim` for contextual actions. Both are installed declaratively through NixVim; the inline panel and automatic suggestions are disabled at startup, and the client attaches only after explicit activation. The configuration limits attachment to common source and configuration filetypes, hides suggestions while `nvim-cmp` is open and keeps chat tool execution under its default manual-approval policy. No API token is stored in the repository: authentication uses the official `:Copilot auth signin` device flow and persists in the Copilot language-server credential store. An active GitHub Copilot entitlement, including an eligible Copilot Free account, is still required by the service.
+
+The `<leader>a` group exposes `<leader>at` for toggle, `<leader>ae` and `<leader>ad` for enable/disable, `<leader>ac` for chat, `<leader>ax` for explanation, `<leader>ar` for review, `<leader>af` for fixes, `<leader>ao` for optimization, `<leader>as` for tests, `<leader>ap` for prompts, `<leader>am` for models, `<leader>ai` for authentication status and `<leader>au` for sign-in. The initial state is deliberately offline from the editor workflow; opening chat or enabling inline suggestions is an explicit user action.
 
 ### Rich Markdown
 
@@ -117,7 +123,7 @@ The supported coverage is organized as follows:
 
 Java is a dedicated local workflow backed by JDTLS and orchestrated by nvim-java. JDTLS, the JDK, Lombok, Java Test and Java Debug Adapter are provided by Nix and referenced by fixed store paths; no nvim-java tool downloads occur at startup. Spring Tools and the standalone Spring Boot plugin are disabled so they cannot create a competing client rooted at the home directory.
 
-Completion uses the shared `nvim-cmp` sources and explicit `cmp_nvim_lsp.default_capabilities()` on the nvim-java JDTLS client. LSP, snippet, path and buffer sources share one group with explicit priorities so repeated text remains available while semantic candidates appear first; path and buffer use a one-character threshold. JDTLS provides diagnostics, completion, references, code actions and formatting; `java.configuration.completion.importOnCompletion` and `saveActions.organizeImports` manage imports, while Conform does not issue a competing Java LSP format request. Project-root detection is restricted to Java build markers and rootless single-file clients are disabled. `<leader>jl` opens a runtime completion report, `<leader>jh` checks LSP health, `<leader>jo` runs an explicit organize-import fallback, `<leader>jr` runs the current main class, `<leader>jR` builds the workspace, and `<leader>jt`/`<leader>jT` run or debug the nearest test.
+Completion uses the shared `nvim-cmp` sources and explicit `cmp_nvim_lsp.default_capabilities()` on the nvim-java JDTLS client. LSP, snippet, path and buffer sources share one group with explicit priorities so repeated text remains available while semantic candidates appear first; path and buffer use a one-character threshold. JDTLS provides diagnostics, completion, references, code actions and formatting; `java.configuration.completion.importOnCompletion` and `saveActions.organizeImports` manage imports, while Conform does not issue a competing Java LSP format request. Maven/Gradle source and Javadoc attachment stays available through explicit project actions instead of blocking the first JDTLS import. The per-project JDTLS workspace remains cached under Neovim's state directory, project-root detection is restricted to Java build markers and rootless single-file clients are disabled. `<leader>jl` opens a runtime completion report, `<leader>jh` checks LSP health, `<leader>jo` runs an explicit organize-import fallback, `<leader>jr` runs the current main class, `<leader>jR` builds the workspace, and `<leader>jt`/`<leader>jT` run or debug the nearest test.
 
 Every Java file creation path converges on `lua/java_scaffold.lua`. The module infers the project root, Maven/Gradle group package and source root, validates package/class names, creates the requested class atomically and opens it with Java filetype. Names ending in `Exception` or `Error` receive a `RuntimeException` base by default; interfaces, enums and records are supported through the same renderer API. Snacks Explorer, Oil, `BufNewFile` and the generic new-file workflow do not maintain separate Java templates. The dashboard now exposes the universal project creator instead of an unsolicited Spring Boot shortcut.
 
@@ -166,6 +172,9 @@ The standalone package `nix build` is a later validation step and should run on 
 - [NixVim](https://github.com/nix-community/nixvim)
 - [Snacks.nvim](https://github.com/folke/snacks.nvim)
 - [Oil.nvim](https://github.com/stevearc/oil.nvim)
+- [copilot.lua](https://github.com/zbirenbaum/copilot.lua)
+- [CopilotChat.nvim](https://github.com/CopilotC-Nvim/CopilotChat.nvim)
+- [GitHub Copilot for Vim and Neovim](https://github.com/github/copilot.vim)
 
 ## Repository structure
 

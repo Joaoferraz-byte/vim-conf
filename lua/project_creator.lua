@@ -109,6 +109,7 @@ local function create_files(path, files, callback)
   for relative, content in pairs(files) do
     if not write_file(join_path(path, relative), content) then
       notify("Unable to write the generated project", vim.log.levels.ERROR)
+      callback({ code = 1, stdout = "", stderr = "Unable to write generated project file" })
       return
     end
   end
@@ -218,13 +219,25 @@ local function tree_lines(spec, values)
 end
 
 local function preview(spec, values)
-  return { text = tree_lines(spec, values), ft = "text", loc = false }
+  local header = table.concat({
+    "╭─ " .. spec.name .. " ─────────────────────────────",
+    "│ " .. spec.language .. " · " .. spec.family,
+    "╰──────────────────────────────────────────────",
+    "",
+  }, "\n")
+  return { text = header .. tree_lines(spec, values), ft = "text", loc = false }
 end
 
 local function list_preview(title, entries)
-  local lines = { title, "" }
-  for _, entry in ipairs(entries) do
-    lines[#lines + 1] = "• " .. entry
+  local lines = {
+    "  " .. title,
+    "  " .. string.rep("─", math.max(18, #title + 4)),
+    "",
+  }
+  for index, entry in ipairs(entries) do
+    local icon = type(entry) == "table" and (entry.display_icon or entry.icon) or "•"
+    local label = type(entry) == "table" and entry.name or entry
+    lines[#lines + 1] = string.format("%2d  %s  %s", index, icon, label)
   end
   return { text = table.concat(lines, "\n"), ft = "text", loc = false }
 end
@@ -538,10 +551,16 @@ end
 local function create_cmake(spec, values, path)
   local destination = join_path(path, values.name)
   local source = spec.language == "C" and "main.c" or "main.cpp"
-  local body = spec.language == "C" and "#include <stdio.h>\n\nint main(void) {\n  puts(\"Hello, world\");\n  return 0;\n}\n" or "#include <iostream>\n\nint main() {\n  std::cout << \"Hello, world\\n\";\n}\n"
+  local header = spec.language == "C" and "app.h" or "app.hpp"
+  local include = spec.language == "C" and "#include <stdio.h>\n#include \"app.h\"\n\nint main(void) {\n  puts(APP_MESSAGE);\n  return 0;\n}\n" or "#include <iostream>\n#include \"app.hpp\"\n\nint main() {\n  std::cout << APP_MESSAGE << std::endl;\n}\n"
+  local header_body = spec.language == "C" and "#pragma once\n#define APP_MESSAGE \"Hello, world\"\n" or "#pragma once\n#define APP_MESSAGE \"Hello, world\"\n"
   local cmake_language = spec.language == "C" and "C" or "CXX"
-  local project = "cmake_minimum_required(VERSION 3.20)\nproject(" .. values.name .. " LANGUAGES " .. cmake_language .. ")\nadd_executable(" .. values.name .. " " .. source .. ")\n"
-  create_files(destination, { ["CMakeLists.txt"] = project, [source] = body }, function(result)
+  local project = "cmake_minimum_required(VERSION 3.20)\nproject(" .. values.name .. " LANGUAGES " .. cmake_language .. ")\nadd_executable(" .. values.name .. " src/" .. source .. ")\ntarget_include_directories(" .. values.name .. " PRIVATE include)\n"
+  create_files(destination, {
+    ["CMakeLists.txt"] = project,
+    ["src/" .. source] = include,
+    ["include/" .. header] = header_body,
+  }, function(result)
     if executable("cmake") then
       run({ "cmake", "-S", destination, "-B", join_path(destination, "build") }, { text = true }, function(check_result)
         if check_result.code ~= 0 then notify(spec.name .. " generated, but CMake validation failed", vim.log.levels.WARN) end
@@ -673,11 +692,11 @@ end
 
 function M.select()
   pick("Create project · language", language_entries(), function(language)
-    return list_preview(language.name, vim.tbl_map(function(entry) return entry.family end, family_entries(language.id)))
+    return list_preview(language.name, family_entries(language.id))
   end, function(language)
     pick("Create project · " .. language.name .. " · framework or type", family_entries(language.id), function(family)
       local structures = structure_entries(language.id, family.name)
-      return list_preview(family.name, vim.tbl_map(function(entry) return entry.name end, structures))
+      return list_preview(family.name, structures)
     end, function(family)
       pick("Create project · " .. language.name .. " · " .. family.name .. " · structure", structure_entries(language.id, family.name), function(spec)
         return preview(spec, { name = "project-name", package = "com.example.app" })

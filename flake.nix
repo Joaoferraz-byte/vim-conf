@@ -84,6 +84,20 @@
             grep -Fq 'local lsp = lsp_component()' "$statusline"
             grep -Fq '.. " " .. #clients' "$statusline"
             grep -Fq 'ui_select = true;' "$ui"
+            ai=${./config/plugins/ai.nix}
+            keymaps=${./config/keymaps.nix}
+            project_creator=${./lua/project_creator.lua}
+            grep -Fq 'plugins.copilot-lua' "$ai"
+            grep -Fq 'auto_trigger = false;' "$ai"
+            grep -Fq 'livara_copilot_enabled = false' "$ai"
+            grep -Fq 'plugins.copilot-chat' "$ai"
+            grep -Fq 'should_attach.__raw' "$ai"
+            grep -Fq 'key = "<leader>at";' "$keymaps"
+            grep -Fq 'key = "<leader>ac";' "$keymaps"
+            grep -Fq 'key = "<leader>ar";' "$keymaps"
+            grep -Fq 'group = "AI"' "$ui"
+            grep -Fq 'Choose an option to continue' "$project_creator"
+            grep -Fq 'Create project · ' "$project_creator"
             touch "$out"
           '';
         }
