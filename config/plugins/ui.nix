@@ -245,6 +245,7 @@
           "vim.lsp.util.convert_input_to_markdown_lines" = true;
           "vim.lsp.util.set_formatting_params" = true;
         };
+        lsp.progress.enabled = false;
         presets = {
           bottom_search = true;
           command_palette = true;
@@ -271,6 +272,9 @@
         progress = {
           poll_rate = false;
           suppress_on_insert = true;
+          ignore = [
+            { __raw = "function(msg) return msg.title and (msg.title:lower():find('validate documents', 1, true) or msg.title:lower():find('published diagnostics', 1, true)) ~= nil end"; }
+          ];
         };
         notification = {
           override_vim_notify = false;

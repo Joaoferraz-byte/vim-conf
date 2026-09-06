@@ -66,6 +66,8 @@
             grep -Fq 'autocmd = false' "$config"
             grep -Fq 'enable = false' "$config"
             grep -Fq 'root_dir = function(bufnr, on_dir)' "$config"
+            grep -Fq 'local multi_module = vim.fs.find' "$config"
+            grep -Fq '"build.xml"' "$config"
             grep -Fq 'single_file_support = false' "$config"
             grep -Fq 'updateBuildConfiguration = "automatic";' "$config"
             grep -Fq 'project = {' "$config"

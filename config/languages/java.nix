@@ -24,6 +24,7 @@ in
         "pom.xml"
         "build.gradle"
         "build.gradle.kts"
+        "build.xml"
         "mvnw"
         "gradlew"
         ".git"
@@ -90,16 +91,23 @@ in
         require("cmp_nvim_lsp").default_capabilities()
       ),
       root_dir = function(bufnr, on_dir)
-        local root = vim.fs.root(bufnr, {
+        local filename = vim.api.nvim_buf_get_name(bufnr)
+        local start = filename ~= "" and vim.fs.dirname(filename) or vim.fn.getcwd()
+        local multi_module = vim.fs.find({
+          "mvnw",
+          "gradlew",
           "settings.gradle",
           "settings.gradle.kts",
+        }, { path = start, upward = true })
+        local single_module = vim.fs.find({
+          "build.xml",
           "pom.xml",
           "build.gradle",
           "build.gradle.kts",
-          "mvnw",
-          "gradlew",
-          ".git",
-        })
+        }, { path = start, upward = true })
+        local fallback = vim.fs.find(".git", { path = start, upward = true })
+        local marker = multi_module[1] or single_module[1] or fallback[1]
+        local root = marker and vim.fs.dirname(marker)
         if root then
           on_dir(root)
         end
@@ -150,7 +158,7 @@ in
       filetypes = { "java"; };
       root_markers = {
         { "settings.gradle"; "settings.gradle.kts"; "pom.xml"; };
-        { "build.gradle"; "build.gradle.kts"; "mvnw"; "gradlew"; };
+        { "build.xml"; "build.gradle"; "build.gradle.kts"; "mvnw"; "gradlew"; };
       };
       single_file_support = false;
     });
