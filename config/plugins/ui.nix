@@ -273,7 +273,7 @@
           poll_rate = false;
           suppress_on_insert = true;
           ignore = [
-            { __raw = "function(msg) return msg.title and (msg.title:lower():find('validate documents', 1, true) or msg.title:lower():find('published diagnostics', 1, true)) ~= nil end"; }
+            { __raw = "function(msg) local title = msg.title and msg.title:lower() or ''; return title:find('validate documents', 1, true) ~= nil or title:find('publish diagnostics', 1, true) ~= nil or title:find('published diagnostics', 1, true) ~= nil end"; }
           ];
         };
         notification = {

@@ -78,6 +78,8 @@
             general=${./config/languages/general.nix}
             completion=${./config/plugins/completion.nix}
             ui=${./config/plugins/ui.nix}
+            grep -Fq 'publish diagnostics' "$ui"
+            grep -Fq 'validate documents' "$ui"
             grep -Fq 'vim.lsp.protocol.make_client_capabilities()' "$general"
             grep -Fq "completion.autocomplete = [ \"require('cmp.types').cmp.TriggerEvent.TextChanged\" ];" "$completion"
             grep -Fq 'autoEnableSources = true;' "$completion"
