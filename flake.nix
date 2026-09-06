@@ -79,7 +79,7 @@
             grep -Fq 'publish diagnostics' "$ui"
             grep -Fq 'validate documents' "$ui"
             grep -Fq 'vim.lsp.protocol.make_client_capabilities()' "$general"
-            grep -Fq "completion.autocomplete = [ \"require('cmp.types').cmp.TriggerEvent.TextChanged\" ];" "$completion"
+            grep -Fq 'completion.autocomplete = [ "InsertEnter" "TextChanged" ];' "$completion"
             grep -Fq 'autoEnableSources = true;' "$completion"
             grep -Fq 'cmp.get_selected_entry()' "$completion"
             if grep -Eq 'cmp\.get_entries|item\.menu = string\.format|InsertCharPre' "$completion"; then

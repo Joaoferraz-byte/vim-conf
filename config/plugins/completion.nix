@@ -14,7 +14,7 @@
     settings = {
       snippet.expand.__raw = "function(args) require('luasnip').lsp_expand(args.body) end";
       completion.completeopt = "menu,menuone,noselect";
-      completion.autocomplete = [ "require('cmp.types').cmp.TriggerEvent.TextChanged" ];
+      completion.autocomplete = [ "InsertEnter" "TextChanged" ];
       performance = {
         debounce = 100;
         throttle = 50;
