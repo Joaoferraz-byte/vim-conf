@@ -67,6 +67,8 @@
             grep -Fq 'enable = false' "$config"
             grep -Fq 'root_dir = function(bufnr, on_dir)' "$config"
             grep -Fq 'single_file_support = false' "$config"
+            grep -Fq 'updateBuildConfiguration = "automatic";' "$config"
+            grep -Fq 'importOnFirstTimeStartup = "automatic";' "$config"
             grep -Fq 'saveActions = { organizeImports = true; };' "$config"
             keymaps=${./config/keymaps.nix}
             grep -Fq 'source.organizeImports' "$keymaps"

@@ -108,7 +108,8 @@ in
       settings = {
         java = {
           configuration = {
-            updateBuildConfiguration = "interactive";
+            updateBuildConfiguration = "automatic";
+            importOnFirstTimeStartup = "automatic";
             runtimes = {
               { name = "JavaSE-1.8"; path = "${legacyRuntime}"; };
               { name = "JavaSE-21"; path = "${projectRuntime}"; default = true; };
