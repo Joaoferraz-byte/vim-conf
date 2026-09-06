@@ -184,6 +184,19 @@
         end
         rows[#rows + 1] = "cmp sources: " .. table.concat(source_names, ", ")
         rows[#rows + 1] = "cmp visible: " .. (cmp.visible() and "yes" or "no")
+        for _, source in ipairs(cmp.get_registered_sources()) do
+          if source.name == "nvim_lsp" then
+            local ok_available, available = pcall(function()
+              return source:is_available()
+            end)
+            rows[#rows + 1] = string.format(
+              "nvim_lsp registered=%s available=%s debug=%s",
+              "yes",
+              ok_available and (available and "yes" or "no") or "error",
+              source:get_debug_name()
+            )
+          end
+        end
       else
         rows[#rows + 1] = "cmp unavailable"
       end
@@ -210,5 +223,13 @@
       end
     end
     vim.api.nvim_create_user_command("LivaraCompletionReport", _G.livara_completion_report, {})
+    vim.api.nvim_create_user_command("LivaraCmpStatus", function()
+      local ok_cmp, cmp = pcall(require, "cmp")
+      if ok_cmp then
+        cmp.status()
+      else
+        vim.notify("cmp unavailable", vim.log.levels.ERROR, { title = "Livara cmp status" })
+      end
+    end, {})
   '';
 }
