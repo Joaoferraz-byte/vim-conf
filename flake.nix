@@ -78,6 +78,7 @@
             general=${./config/languages/general.nix}
             completion=${./config/plugins/completion.nix}
             ui=${./config/plugins/ui.nix}
+            grep -Fq 'plugins.cmp-nvim-lsp.enable = true;' "$completion"
             grep -Fq 'publish diagnostics' "$ui"
             grep -Fq 'validate documents' "$ui"
             grep -Fq 'vim.lsp.protocol.make_client_capabilities()' "$general"

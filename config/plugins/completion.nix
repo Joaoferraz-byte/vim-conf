@@ -1,6 +1,7 @@
 { ... }:
 {
   plugins.luasnip.enable = true;
+  plugins.cmp-nvim-lsp.enable = true;
 
   plugins.lspkind = {
     enable = true;
