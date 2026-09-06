@@ -229,9 +229,10 @@ local function preview(spec, values)
 end
 
 local function list_preview(title, entries)
+  local title_width = vim.fn.strdisplaywidth(title)
   local lines = {
     "  " .. title,
-    "  " .. string.rep("─", math.max(18, #title + 4)),
+    "  " .. string.rep("─", title_width),
     "",
   }
   for index, entry in ipairs(entries) do

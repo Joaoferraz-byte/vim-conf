@@ -119,7 +119,10 @@ in
           format = { enabled = true; };
           saveActions = { organizeImports = true; };
           completion = {
-            importOnCompletion = true;
+            enabled = true;
+            lazyResolveTextEdit = {
+              enabled = false;
+            };
             favoriteStaticMembers = {
               "org.junit.Assert.*";
               "org.junit.Assume.*";

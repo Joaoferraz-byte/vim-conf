@@ -14,7 +14,10 @@
     settings = {
       snippet.expand.__raw = "function(args) require('luasnip').lsp_expand(args.body) end";
       completion.completeopt = "menu,menuone,noselect";
-      completion.autocomplete = [ "InsertEnter" "TextChanged" ];
+      completion.autocomplete = [
+        { __raw = "require('cmp.types').cmp.TriggerEvent.InsertEnter"; }
+        { __raw = "require('cmp.types').cmp.TriggerEvent.TextChanged"; }
+      ];
       performance = {
         debounce = 100;
         throttle = 50;
@@ -56,22 +59,6 @@
         "<C-e>" = "cmp.mapping.abort()";
         "<C-n>" = "cmp.mapping.select_next_item()";
         "<C-p>" = "cmp.mapping.select_prev_item()";
-        # Keep completion selection explicit: Shift+Arrow changes the highlighted
-        # item, while Enter confirms only an item the user selected.
-        "<S-Right>" = ''cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
-          else
-            fallback()
-          end
-        end, { "i", "s" })'';
-        "<S-Left>" = ''cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
-          else
-            fallback()
-          end
-        end, { "i", "s" })'';
         "<CR>" = "cmp.mapping.confirm({ select = false })";
       };
     };
@@ -94,49 +81,80 @@
   };
 
   extraConfigLua = ''
-    local function refresh_jdtls_cmp_source()
-      local ok_cmp, cmp = pcall(require, "cmp")
-      local ok_lsp_cmp, lsp_cmp = pcall(require, "cmp_nvim_lsp")
-      if not ok_cmp or not ok_lsp_cmp or type(lsp_cmp.client_source_map) ~= "table" then
+    local luasnip = require("luasnip")
+    local snippet = luasnip.snippet
+    local insert = luasnip.insert_node
+    local fmt = require("luasnip.extras.fmt").fmt
+
+    luasnip.add_snippets("java", {
+      snippet("psvm", fmt("public static void main(String[] args) {{\n\t{}\n}}", {
+        insert(0),
+      })),
+      snippet("sout", fmt("System.out.println({});", {
+        insert(1),
+      })),
+      snippet("sysout", fmt("System.out.println({});", {
+        insert(1),
+      })),
+    })
+
+    local cmp_auto_group = vim.api.nvim_create_augroup("livara_cmp_auto_completion", { clear = true })
+    local cmp_auto_timer
+    local cmp_auto_delay_ms = 250
+
+    local function schedule_cmp_completion()
+      if cmp_auto_timer then
+        cmp_auto_timer:stop()
+        cmp_auto_timer:close()
+        cmp_auto_timer = nil
+      end
+
+      cmp_auto_timer = vim.defer_fn(function()
+        cmp_auto_timer = nil
+        local ok_cmp, cmp = pcall(require, "cmp")
+        if not ok_cmp then
+          return
+        end
+        local ok_types, cmp_types = pcall(require, "cmp.types")
+        if ok_types then
+          cmp.complete({ reason = cmp_types.cmp.ContextReason.Auto })
+        else
+          cmp.complete()
+        end
+      end, cmp_auto_delay_ms)
+    end
+
+    vim.api.nvim_create_autocmd({ "InsertEnter", "TextChangedI", "TextChangedP" }, {
+      group = cmp_auto_group,
+      callback = schedule_cmp_completion,
+    })
+
+    local function synchronize_cmp_lsp_sources(buf)
+      if not vim.api.nvim_buf_is_valid(buf) then
         return
       end
-      for client_id, source_id in pairs(lsp_cmp.client_source_map) do
-        local client = vim.lsp.get_client_by_id(client_id)
-        if not client or client.name == "jdtls" then
-          cmp.unregister_source(source_id)
-          lsp_cmp.client_source_map[client_id] = nil
-        end
-      end
-      lsp_cmp._on_insert_enter()
+      vim.api.nvim_buf_call(buf, function()
+        vim.api.nvim_exec_autocmds("InsertEnter", {
+          group = "cmp_nvim_lsp",
+          buf = buf,
+          modeline = false,
+        })
+      end)
     end
 
     local cmp_lsp_refresh_group = vim.api.nvim_create_augroup("livara_cmp_lsp_refresh", { clear = true })
-    vim.api.nvim_create_autocmd({ "LspAttach", "BufEnter" }, {
+    vim.api.nvim_create_autocmd({ "LspAttach", "LspDetach" }, {
       group = cmp_lsp_refresh_group,
       callback = function(args)
-        if args.event == "BufEnter" or vim.lsp.get_client_by_id(args.data and args.data.client_id or -1) then
-          vim.schedule(refresh_jdtls_cmp_source)
+        if args.event == "LspAttach" then
+          local client = vim.lsp.get_client_by_id(args.data and args.data.client_id or -1)
+          if not client or not client:supports_method("textDocument/completion") then
+            return
+          end
         end
-      end,
-    })
-
-    vim.api.nvim_create_autocmd("TextChangedI", {
-      group = cmp_lsp_refresh_group,
-      pattern = "*",
-      callback = function(args)
-        if vim.bo[args.buf].filetype ~= "java" then
-          return
-        end
-        local line = vim.api.nvim_get_current_line()
-        local col = vim.api.nvim_win_get_cursor(0)[2]
-        local before_cursor = line:sub(1, col)
-        if not before_cursor:match("[%w_%.]$") then
-          return
-        end
-        local ok_cmp, cmp = pcall(require, "cmp")
-        if ok_cmp and not cmp.visible() then
-          cmp.complete({ reason = cmp.ContextReason.Auto })
-        end
+        vim.schedule(function()
+          synchronize_cmp_lsp_sources(args.buf)
+        end)
       end,
     })
 
@@ -176,18 +194,12 @@
     end
 
     vim.keymap.set("i", "<Tab>", function()
-      -- Keep the most useful VS Code behavior: a standalone `!` expands
-      -- immediately, while any other visible Emmet/LSP item is accepted.
       if expand_html_bang() then
         return
       end
       local ok_cmp, cmp = pcall(require, "cmp")
       if ok_cmp and cmp.visible() then
-        if cmp.get_selected_entry() then
-          cmp.confirm({ select = false })
-        else
-          feed_tab()
-        end
+        cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
         return
       end
       local ok_snip, luasnip = pcall(require, "luasnip")
@@ -256,11 +268,27 @@
           client:request("textDocument/completion", params, function(err, result)
             local items = result and (result.items or result) or {}
             local labels = {}
-            for index = 1, math.min(#items, 8) do
-              labels[#labels + 1] = items[index].label or "<unlabeled>"
+            local text_edits = 0
+            local additional_text_edits = 0
+            for index = 1, #items do
+              local item = items[index]
+              if index <= 8 then
+                labels[#labels + 1] = item.label or "<unlabeled>"
+              end
+              if item.textEdit then
+                text_edits = text_edits + 1
+              end
+              if item.additionalTextEdits then
+                additional_text_edits = additional_text_edits + #item.additionalTextEdits
+              end
             end
             vim.schedule(function()
-              local status = err and ("error=" .. vim.inspect(err)) or ("items=" .. #items)
+              local status = err and ("error=" .. vim.inspect(err)) or string.format(
+                "items=%d text_edits=%d additional_text_edits=%d",
+                #items,
+                text_edits,
+                additional_text_edits
+              )
               local sample = #labels > 0 and (" labels=" .. table.concat(labels, ", ")) or ""
               vim.notify(status .. sample, err and vim.log.levels.ERROR or vim.log.levels.INFO, { title = "JDTLS completion probe" })
             end)

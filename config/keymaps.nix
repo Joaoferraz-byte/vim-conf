@@ -61,6 +61,33 @@
         apply = true,
       })
     end
+    local function java_source_action(action)
+      if vim.bo.filetype ~= "java" then
+        vim.notify("Java workflow requires a Java buffer", vim.log.levels.WARN)
+        return
+      end
+      local clients = vim.lsp.get_clients({ bufnr = 0, name = "jdtls" })
+      if #clients == 0 then
+        vim.notify("JDTLS is not attached to this buffer", vim.log.levels.WARN)
+        return
+      end
+      vim.lsp.buf.code_action({
+        context = { only = { action }, diagnostics = {} },
+        apply = true,
+      })
+    end
+    _G.livara_java_generate_accessors = function()
+      java_source_action("source.generate.accessors")
+    end
+    _G.livara_java_generate_constructors = function()
+      java_source_action("source.generate.constructors")
+    end
+    _G.livara_java_generate_to_string = function()
+      java_source_action("source.generate.toString")
+    end
+    _G.livara_java_generate_hash_equals = function()
+      java_source_action("source.generate.hashCodeEquals")
+    end
     _G.livara_java_summary = function()
       local ok, neotest = pcall(require, "neotest")
       if not ok then
@@ -183,6 +210,30 @@
       action.__raw = "function() _G.livara_java_organize_imports() end";
       mode = [ "n" ];
       options = { silent = true; desc = "Organize Java Imports"; };
+    }
+    {
+      key = "<leader>jga";
+      action.__raw = "function() _G.livara_java_generate_accessors() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Generate Java Getters and Setters"; };
+    }
+    {
+      key = "<leader>jgc";
+      action.__raw = "function() _G.livara_java_generate_constructors() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Generate Java Constructors"; };
+    }
+    {
+      key = "<leader>jgt";
+      action.__raw = "function() _G.livara_java_generate_to_string() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Generate Java toString"; };
+    }
+    {
+      key = "<leader>jgh";
+      action.__raw = "function() _G.livara_java_generate_hash_equals() end";
+      mode = [ "n" ];
+      options = { silent = true; desc = "Generate Java hashCode and equals"; };
     }
       {
         key = "<leader>jR";
