@@ -94,6 +94,32 @@
   };
 
   extraConfigLua = ''
+    local function refresh_jdtls_cmp_source()
+      local ok_cmp, cmp = pcall(require, "cmp")
+      local ok_lsp_cmp, lsp_cmp = pcall(require, "cmp_nvim_lsp")
+      if not ok_cmp or not ok_lsp_cmp or type(lsp_cmp.client_source_map) ~= "table" then
+        return
+      end
+      for client_id, source_id in pairs(lsp_cmp.client_source_map) do
+        local client = vim.lsp.get_client_by_id(client_id)
+        if not client or client.name == "jdtls" then
+          cmp.unregister_source(source_id)
+          lsp_cmp.client_source_map[client_id] = nil
+        end
+      end
+      lsp_cmp._on_insert_enter()
+    end
+
+    local cmp_lsp_refresh_group = vim.api.nvim_create_augroup("livara_cmp_lsp_refresh", { clear = true })
+    vim.api.nvim_create_autocmd({ "LspAttach", "BufEnter" }, {
+      group = cmp_lsp_refresh_group,
+      callback = function(args)
+        if args.event == "BufEnter" or vim.lsp.get_client_by_id(args.data and args.data.client_id or -1) then
+          vim.schedule(refresh_jdtls_cmp_source)
+        end
+      end,
+    })
+
     local function feed_tab()
       local key = vim.api.nvim_replace_termcodes("<Tab>", true, false, true)
       vim.api.nvim_feedkeys(key, "n", false)
