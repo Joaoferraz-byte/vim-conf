@@ -92,12 +92,11 @@
             completion=${./config/plugins/completion.nix}
             ui=${./config/plugins/ui.nix}
             grep -Fq 'plugins.cmp-nvim-lsp.enable = true;' "$completion"
-            grep -Fq 'TextChangedI' "$completion"
-            grep -Fq 'TextChangedP' "$completion"
-            grep -Fq 'vim.defer_fn' "$completion"
-            grep -Fq 'cmp_auto_delay_ms = 250' "$completion"
-            grep -Fq 'cmp_auto_timer:stop()' "$completion"
-            grep -Fq 'cmp.complete()' "$completion"
+            grep -Fq 'completion.autocomplete' "$completion"
+            grep -Fq "require('cmp.types').cmp.TriggerEvent.TextChanged" "$completion"
+            if grep -Eq 'livara_cmp_auto_completion|vim.defer_fn|cmp_auto_delay_ms|cmp.complete\(' "$completion"; then
+              exit 1
+            fi
             grep -Fq 'luasnip.add_snippets("java"' "$completion"
             grep -Fq 'snippet("psvm"' "$completion"
             grep -Fq 'main(String[] args) {{\n\t{}\n}}' "$completion"
@@ -112,7 +111,6 @@
             grep -Fq 'publish diagnostics' "$ui"
             grep -Fq 'validate documents' "$ui"
             grep -Fq 'vim.lsp.protocol.make_client_capabilities()' "$general"
-            grep -Fq "require('cmp.types').cmp.TriggerEvent.TextChanged" "$completion"
             grep -Fq 'autoEnableSources = true;' "$completion"
             grep -Fq 'cmp.select_next_item' "$completion"
             grep -Fq 'vim.api.nvim_buf_call(buf' "$completion"

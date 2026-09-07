@@ -19,8 +19,8 @@
         { __raw = "require('cmp.types').cmp.TriggerEvent.TextChanged"; }
       ];
       performance = {
-        debounce = 100;
-        throttle = 50;
+        debounce = 60;
+        throttle = 30;
         fetching_timeout = 300;
         max_view_entries = 50;
       };
@@ -96,37 +96,6 @@
       snippet("sysout", fmt("System.out.println({});", {
         insert(1),
       })),
-    })
-
-    local cmp_auto_group = vim.api.nvim_create_augroup("livara_cmp_auto_completion", { clear = true })
-    local cmp_auto_timer
-    local cmp_auto_delay_ms = 250
-
-    local function schedule_cmp_completion()
-      if cmp_auto_timer then
-        cmp_auto_timer:stop()
-        cmp_auto_timer:close()
-        cmp_auto_timer = nil
-      end
-
-      cmp_auto_timer = vim.defer_fn(function()
-        cmp_auto_timer = nil
-        local ok_cmp, cmp = pcall(require, "cmp")
-        if not ok_cmp then
-          return
-        end
-        local ok_types, cmp_types = pcall(require, "cmp.types")
-        if ok_types then
-          cmp.complete({ reason = cmp_types.cmp.ContextReason.Auto })
-        else
-          cmp.complete()
-        end
-      end, cmp_auto_delay_ms)
-    end
-
-    vim.api.nvim_create_autocmd({ "InsertEnter", "TextChangedI", "TextChangedP" }, {
-      group = cmp_auto_group,
-      callback = schedule_cmp_completion,
     })
 
     local function synchronize_cmp_lsp_sources(buf)
