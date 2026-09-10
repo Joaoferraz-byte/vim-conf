@@ -218,14 +218,22 @@ local function tree_lines(spec, values)
   return table.concat(lines, "\n")
 end
 
+local function title_box(title)
+  local width = vim.fn.strdisplaywidth(title)
+  local horizontal = string.rep("─", width)
+  return {
+    "╭" .. horizontal .. "╮",
+    "│" .. title .. "│",
+    "╰" .. horizontal .. "╯",
+  }
+end
+
 local function preview(spec, values)
-  local header = table.concat({
-    "╭─ " .. spec.name .. " ─────────────────────────────",
-    "│ " .. spec.language .. " · " .. spec.family,
-    "╰──────────────────────────────────────────────",
-    "",
-  }, "\n")
-  return { text = header .. tree_lines(spec, values), ft = "text", loc = false }
+  local title = spec.language .. " · " .. spec.family
+  local header = title_box(title)
+  header[#header + 1] = "  " .. spec.name
+  header[#header + 1] = ""
+  return { text = table.concat(header, "\n") .. "\n" .. tree_lines(spec, values), ft = "text", loc = false }
 end
 
 local function list_preview(title, entries)
@@ -718,6 +726,7 @@ M._languages = language_entries
 M._families = family_entries
 M._structures = structure_entries
 M._tree_lines = tree_lines
+M._title_box = title_box
 M._valid_package = valid_package
 M._join_path = join_path
 
