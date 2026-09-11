@@ -229,9 +229,10 @@ local function title_box(title)
 end
 
 local function preview(spec, values)
-  local title = spec.language .. " · " .. spec.family
+  local language_icon = spec.display_icon or spec.icon or "󰘧"
+  local title = string.format(" %s %s · %s · %s %s ", language_icon, spec.language,
+    spec.family, structure_icon(spec), spec.name)
   local header = title_box(title)
-  header[#header + 1] = "  " .. spec.name
   header[#header + 1] = ""
   return { text = table.concat(header, "\n") .. "\n" .. tree_lines(spec, values), ft = "text", loc = false }
 end
@@ -728,6 +729,7 @@ M._families = family_entries
 M._structures = structure_entries
 M._tree_lines = tree_lines
 M._title_box = title_box
+M._preview = preview
 M._valid_package = valid_package
 M._join_path = join_path
 

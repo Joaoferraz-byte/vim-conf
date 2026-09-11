@@ -79,4 +79,16 @@ assert(title_box[1]:sub(1, 3) == "╭")
 assert(title_box[1]:sub(-3) == "╮")
 assert(title_box[3]:sub(1, 3) == "╰")
 assert(title_box[3]:sub(-3) == "╯")
+local java_maven
+for _, spec in ipairs(creator._structures("Java", "Plain application")) do
+  if spec.name == "Maven" then java_maven = spec end
+end
+assert(java_maven)
+local language_icon = java_maven.display_icon or java_maven.icon
+local preview = creator._preview(java_maven, { name = "demo", package = "com.example.demo" })
+local expected_title = string.format(" %s %s · %s · %s %s ", language_icon, java_maven.language,
+  java_maven.family, "󰏗", java_maven.name)
+assert(preview.text:find(expected_title, 1, true))
+local preview_title = preview.text:match("([^\n]+)\n")
+assert(vim.fn.strdisplaywidth(preview_title) == vim.fn.strdisplaywidth(expected_title) + 2)
 print("project creator hierarchy contract passed")
