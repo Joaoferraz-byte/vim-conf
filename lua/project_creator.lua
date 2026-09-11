@@ -313,7 +313,8 @@ local function pick(title, entries, preview_fn, callback)
     items = items,
     format = "text",
     preview = "preview",
-    layout = { preset = "default", width = 0.82, height = 0.78 },
+    layout = { preset = "default", width = 0.94, height = 0.90, backdrop = false },
+    win = { preview = { border = "rounded" } },
     confirm = function(picker, item)
       picker:close()
       if item and item.entry then callback(item.entry) end

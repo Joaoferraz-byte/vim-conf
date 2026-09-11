@@ -109,8 +109,19 @@
             "tiff"
             "avif"
             "pdf"
+            "svg"
           ];
           convert.magick.default = [ "{src}[0]" "-scale" "1920x1080>" ];
+          convert.magick.vector = [ "-background" "none" "-density" "192" "{src}[{page}]" ];
+        };
+        styles.snacks_image = {
+          width = 0.92;
+          height = 0.86;
+          border = "rounded";
+          backdrop = false;
+          row = 0;
+          col = 0;
+          wo.winhighlight = "Normal:SnacksPickerPreview,NormalFloat:SnacksPickerPreview";
         };
         indent.enabled = true;
         input.enabled = true;
