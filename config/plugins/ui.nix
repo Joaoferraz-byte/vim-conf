@@ -121,8 +121,6 @@
           height = 0.86;
           border = "rounded";
           backdrop = false;
-          row = 0;
-          col = 0;
           wo.winhighlight = "Normal:SnacksPickerPreview,NormalFloat:SnacksPickerPreview";
         };
         indent.enabled = true;
