@@ -97,30 +97,7 @@
           replace_netrw = true;
           trash = true;
         };
-        image = {
-          enabled = true;
-          formats = [
-            "png"
-            "jpg"
-            "jpeg"
-            "gif"
-            "bmp"
-            "webp"
-            "tiff"
-            "avif"
-            "pdf"
-            "svg"
-          ];
-          convert.magick.default = [ "{src}[0]" "-scale" "1920x1080>" ];
-          convert.magick.vector = [ "-density" "192" "{src}[{page}]" ];
-        };
-        styles.snacks_image = {
-          relative = "editor";
-          border = "rounded";
-          focusable = false;
-          backdrop = false;
-          wo.winhighlight = "Normal:SnacksPickerPreview,NormalFloat:SnacksPickerPreview";
-        };
+        image.enabled = false;
         indent.enabled = true;
         input.enabled = true;
         notifier.enabled = true;
