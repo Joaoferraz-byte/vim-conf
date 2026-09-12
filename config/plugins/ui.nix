@@ -112,14 +112,12 @@
             "svg"
           ];
           convert.magick.default = [ "{src}[0]" "-scale" "1920x1080>" ];
-          convert.magick.vector = [ "-background" "none" "-density" "192" "{src}[{page}]" ];
+          convert.magick.vector = [ "-density" "192" "{src}[{page}]" ];
         };
         styles.snacks_image = {
-          position = "float";
           relative = "editor";
-          width = 0.92;
-          height = 0.86;
           border = "rounded";
+          focusable = false;
           backdrop = false;
           wo.winhighlight = "Normal:SnacksPickerPreview,NormalFloat:SnacksPickerPreview";
         };
