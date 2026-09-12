@@ -115,6 +115,8 @@
           convert.magick.vector = [ "-background" "none" "-density" "192" "{src}[{page}]" ];
         };
         styles.snacks_image = {
+          position = "float";
+          relative = "editor";
           width = 0.92;
           height = 0.86;
           border = "rounded";
