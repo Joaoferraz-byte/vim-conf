@@ -330,7 +330,8 @@
           enabled = true;
           inline = true;
           block = true;
-          converter = [ "utftex" "latex2text" ];
+          converter = [ "latex2text" ];
+          highlight = "RenderMarkdownMath";
         };
         heading = {
           enabled = true;

@@ -246,6 +246,16 @@
       set_livara_highlight("DiagnosticWarn", colors.yellow)
       set_livara_highlight("DiagnosticInfo", colors.blue)
       set_livara_highlight("DiagnosticHint", colors.teal)
+      -- LeetCode's description renderer uses semantic groups from its theme;
+      -- keep prose readable instead of inheriting a low-contrast Comment/Conceal.
+      set_livara_highlight("leetcode_normal", colors.text, "NONE")
+      set_livara_highlight("leetcode_alt", theme_color(colors, "subtext1", "subtext0"), "NONE")
+      set_livara_highlight("leetcode_code", colors.blue, "NONE")
+      set_livara_highlight("leetcode_header", colors.primary, "NONE", { bold = true })
+      set_livara_highlight("leetcode_link", colors.secondary, "NONE", { underline = true })
+      set_livara_highlight("RenderMarkdownMath", colors.text, "NONE")
+      set_livara_highlight("RenderMarkdownUnchecked", colors.yellow, "NONE")
+      set_livara_highlight("RenderMarkdownChecked", colors.green, "NONE")
       set_livara_highlight("Pmenu", colors.text, colors.surface1, { blend = 22 })
       set_livara_highlight("PmenuSel", colors.on_primary, colors.primary, { bold = true })
       set_livara_highlight("StatusLine", colors.text, "NONE")
@@ -403,6 +413,7 @@
 
     if not _G.livara_theme_watcher_started then
       _G.livara_theme_watcher_started = true
+      local livara_theme_path = find_livara_theme_path()
       local theme_dir = vim.fn.fnamemodify(livara_theme_path, ":h")
       local watcher = vim.uv.new_fs_event()
       if watcher and vim.fn.isdirectory(theme_dir) == 1 then
