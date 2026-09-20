@@ -67,7 +67,19 @@ in
       };
     };
 
-    image.enable = false;
+    image = {
+      enable = true;
+      settings = {
+        backend = "kitty";
+        processor = "magick_cli";
+        integrations.markdown = {
+          enabled = true;
+          clear_in_insert_mode = true;
+          download_remote_images = true;
+          only_render_image_at_cursor = false;
+        };
+      };
+    };
 
     lazydev = {
       enable = true;
@@ -152,6 +164,7 @@ in
     imagemagick
     python3Packages.pylatexenc
     ffmpeg
+    curl
     wl-clipboard
   ];
 }

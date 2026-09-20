@@ -33,8 +33,9 @@ in
 
   extraConfigLua = ''
     require("leetcode").setup({
-      lang = "java",
+      lang = "cpp",
       logging = false,
+      image_support = true,
       plugins = {
         non_standalone = true,
       },

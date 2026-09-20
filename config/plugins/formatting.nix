@@ -8,7 +8,7 @@
         vim.bo[args.buf].smartindent = false
         vim.bo[args.buf].cindent = true
         vim.bo[args.buf].indentexpr = ""
-        vim.bo[args.buf].cinoptions = ":s,=s"
+        vim.bo[args.buf].cinoptions = ":1,=s"
       end,
     })
   '';
@@ -51,6 +51,9 @@
         nix = [ "nixfmt" ];
         lua = [ "stylua" ];
         sh = [ "shfmt" ];
+      };
+      formatters.clang_format = {
+        append_args = [ "--style={BasedOnStyle: LLVM, IndentCaseLabels: true}" ];
       };
       format_on_save = {
         timeout_ms = 2500;

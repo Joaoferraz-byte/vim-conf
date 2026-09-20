@@ -105,7 +105,56 @@
       neotest.run.stop()
     end
 
+    local function paste_markdown_image()
+      if vim.bo.filetype ~= "markdown" then return false end
+      if vim.fn.executable("wl-paste") ~= 1 then return false end
+      if vim.fn.expand("%:p") == "" then
+        vim.notify("Save the Markdown buffer before pasting an image", vim.log.levels.WARN)
+        return true
+      end
+      local mime = vim.fn.systemlist({ "wl-paste", "--list-types" })
+      local imageType
+      for _, value in ipairs(mime) do
+        if value:match("^image/") then
+          imageType = value
+          break
+        end
+      end
+      if not imageType then return false end
+
+      local extensions = {
+        ["image/gif"] = "gif",
+        ["image/jpeg"] = "jpg",
+        ["image/png"] = "png",
+        ["image/svg+xml"] = "svg",
+        ["image/webp"] = "webp",
+      }
+      local extension = extensions[imageType] or "png"
+      local dir = vim.fn.expand("%:p:h") .. "/images"
+      vim.fn.mkdir(dir, "p")
+      local stem = os.date("%Y%m%d-%H%M%S")
+      local index = 1
+      local filename = string.format("%s.%s", stem, extension)
+      while vim.fn.filereadable(dir .. "/" .. filename) == 1 do
+        filename = string.format("%s-%d.%s", stem, index, extension)
+        index = index + 1
+      end
+      local path = dir .. "/" .. filename
+      local data = vim.fn.system({ "wl-paste", "--type", imageType, "--no-newline" })
+      if vim.v.shell_error ~= 0 or data == "" then
+        vim.notify("Could not read an image from the system clipboard", vim.log.levels.ERROR)
+        return true
+      end
+      local file = assert(io.open(path, "wb"))
+      file:write(data)
+      file:close()
+      local relative = "images/" .. filename
+      vim.api.nvim_put({ "![" .. filename .. "](" .. relative .. ")" }, "c", true, true)
+      return true
+    end
+
     _G.livara_paste_system_clipboard = function()
+      if paste_markdown_image() then return end
       local start_line = vim.fn.line(".")
       local text = vim.fn.getreg("+")
       if text == "" then return end
