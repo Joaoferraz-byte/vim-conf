@@ -1,5 +1,18 @@
 { pkgs, ... }:
 {
+  extraConfigLua = ''
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = { "c", "cpp" },
+      callback = function(args)
+        vim.bo[args.buf].autoindent = true
+        vim.bo[args.buf].smartindent = false
+        vim.bo[args.buf].cindent = true
+        vim.bo[args.buf].indentexpr = ""
+        vim.bo[args.buf].cinoptions = ":s,=s"
+      end,
+    })
+  '';
+
   plugins.conform-nvim = {
     enable = true;
     autoInstall.enable = false;

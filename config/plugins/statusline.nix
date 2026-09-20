@@ -9,6 +9,7 @@
       oil = true,
       help = true,
       qf = true,
+      ["leetcode.nvim"] = true,
     }
 
     -- The mode is the only colored surface. This is intentionally fixed rather

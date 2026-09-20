@@ -620,6 +620,7 @@ func main() {
             oil = true,
             qf = true,
             help = true,
+            ["leetcode.nvim"] = true,
           }
           local unnamed = vim.api.nvim_buf_get_name(0) == "" and not vim.bo.modified
           local special = vim.bo.buftype == "nofile" or special_filetypes[vim.bo.filetype] == true or unnamed

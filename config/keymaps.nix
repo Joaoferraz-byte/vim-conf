@@ -104,6 +104,17 @@
       end
       neotest.run.stop()
     end
+
+    _G.livara_paste_system_clipboard = function()
+      local start_line = vim.fn.line(".")
+      local text = vim.fn.getreg("+")
+      if text == "" then return end
+      vim.api.nvim_paste(text, false, -1)
+      local end_line = vim.fn.line(".")
+      if vim.bo.filetype == "c" or vim.bo.filetype == "cpp" then
+        vim.cmd(string.format("silent! %d,%dnormal! ==", start_line, end_line))
+      end
+    end
   '';
 
   keymaps = [
@@ -645,15 +656,21 @@
     }
     {
       key = "<C-S-v>";
-      action.__raw = "function() vim.cmd('normal! \"+p') end";
+      action.__raw = "function() _G.livara_paste_system_clipboard() end";
       mode = [ "n" ];
       options = { silent = true; desc = "Paste from System Clipboard"; };
     }
     {
       key = "<C-S-v>";
-      action.__raw = "function() vim.cmd('normal! \"+p') end";
+      action.__raw = "function() _G.livara_paste_system_clipboard() end";
       mode = [ "v" ];
       options = { silent = true; desc = "Replace Selection with System Clipboard"; };
+    }
+    {
+      key = "<C-S-v>";
+      action.__raw = "function() _G.livara_paste_system_clipboard() end";
+      mode = [ "i" ];
+      options = { silent = true; desc = "Paste from System Clipboard"; };
     }
     {
       key = "<S-h>";
