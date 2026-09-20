@@ -9,6 +9,7 @@ let
       rev = "74b06c6c75e4eeb3108ec01852001636d85a932b";
       hash = "sha256-nkfETDkPiE+Kd2BWYZijgUp9bP8RgFwRmvqJz2BMuq4=";
     };
+    nvimSkipModules = [ "plenary.neorocks.init" ];
   };
   nui-nvim = pkgs.vimUtils.buildVimPlugin {
     pname = "nui-nvim";
