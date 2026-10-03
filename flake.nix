@@ -97,14 +97,14 @@
             if grep -Eq 'livara_cmp_auto_completion|vim.defer_fn|cmp_auto_delay_ms|cmp.complete\(' "$completion"; then
               exit 1
             fi
-            grep -Fq 'luasnip.add_snippets("java"' "$completion"
-            grep -Fq 'snippet("psvm"' "$completion"
-            grep -Fq 'main(String[] args) {{\n\t{}\n}}' "$completion"
-            if grep -Fq 'main(String[] args) {\n\t{}\n}' "$completion"; then
+            java_config=${./config/languages/java.nix}
+            grep -Fq 'luasnip.add_snippets("java"' "$java_config"
+            grep -Fq 'snippet("psvm"' "$java_config"
+            grep -Fq 'snippet("sout"' "$java_config"
+            grep -Fq 'snippet("sysout"' "$java_config"
+            if grep -Eq 'luasnip.add_snippets\("java"|expand_html_bang|client.name == "jdtls"' "$completion"; then
               exit 1
             fi
-            grep -Fq 'snippet("sout"' "$completion"
-            grep -Fq 'snippet("sysout"' "$completion"
             if grep -Eq 'S-Right|S-Left' "$completion"; then
               exit 1
             fi
@@ -122,6 +122,21 @@
             if grep -Eq 'client_source_map|_on_insert_enter|cmp\.unregister_source|cmp\.get_entries|item\.menu = string\.format|InsertCharPre|BufEnter' "$completion"; then
               exit 1
             fi
+            test -s ${./config/languages/c-cpp.nix}
+            test -s ${./config/languages/python.nix}
+            test -s ${./config/languages/javascript.nix}
+            test -s ${./config/languages/php.nix}
+            test -s ${./config/languages/assembly.nix}
+            test -s ${./config/languages/kotlin.nix}
+            test -s ${./config/languages/rust.nix}
+            test -s ${./config/languages/tooling.nix}
+            grep -Fq 'compile_commands.json' ${./config/languages/c-cpp.nix}
+            grep -Fq 'uv.lock' ${./config/languages/python.nix}
+            grep -Fq 'package.json' ${./config/languages/javascript.nix}
+            grep -Fq 'composer.json' ${./config/languages/php.nix}
+            grep -Fq 'asm-lsp' ${./config/languages/assembly.nix}
+            grep -Fq 'kotlin-lsp' ${./config/languages/kotlin.nix}
+            grep -Fq 'rust-analyzer' ${./config/languages/rust.nix}
             statusline=${./config/plugins/statusline.nix}
             grep -Fq 'local lsp = lsp_component()' "$statusline"
             grep -Fq '.. " " .. #clients' "$statusline"

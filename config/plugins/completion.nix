@@ -2,6 +2,10 @@
 {
   plugins.luasnip.enable = true;
   plugins.cmp-nvim-lsp.enable = true;
+  plugins.cmp-buffer.enable = true;
+  plugins.cmp-path.enable = true;
+  plugins.cmp-cmdline.enable = true;
+  plugins.cmp_luasnip.enable = true;
 
   plugins.lspkind = {
     enable = true;
@@ -81,23 +85,6 @@
   };
 
   extraConfigLua = ''
-    local luasnip = require("luasnip")
-    local snippet = luasnip.snippet
-    local insert = luasnip.insert_node
-    local fmt = require("luasnip.extras.fmt").fmt
-
-    luasnip.add_snippets("java", {
-      snippet("psvm", fmt("public static void main(String[] args) {{\n\t{}\n}}", {
-        insert(0),
-      })),
-      snippet("sout", fmt("System.out.println({});", {
-        insert(1),
-      })),
-      snippet("sysout", fmt("System.out.println({});", {
-        insert(1),
-      })),
-    })
-
     local function synchronize_cmp_lsp_sources(buf)
       if not vim.api.nvim_buf_is_valid(buf) then
         return
@@ -132,40 +119,7 @@
       vim.api.nvim_feedkeys(key, "n", false)
     end
 
-    local function expand_html_bang()
-      local filetype = vim.bo.filetype
-      if filetype ~= "php" and filetype ~= "html" then
-        return false
-      end
-      local row, col = unpack(vim.api.nvim_win_get_cursor(0))
-      local line = vim.api.nvim_get_current_line()
-      local before_cursor = line:sub(1, col)
-      if not before_cursor:match("^%s*!$") then
-        return false
-      end
-
-      local indent = before_cursor:match("^%s*") or ""
-      local template = {
-        indent .. "<!DOCTYPE html>",
-        indent .. "<html lang=\"en\">",
-        indent .. "<head>",
-        indent .. "  <meta charset=\"UTF-8\">",
-        indent .. "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
-        indent .. "  <title>Document</title>",
-        indent .. "</head>",
-        indent .. "<body>",
-        indent .. "</body>",
-        indent .. "</html>",
-      }
-      vim.api.nvim_buf_set_lines(0, row - 1, row, false, template)
-      vim.api.nvim_win_set_cursor(0, { row + 7, #indent + 6 })
-      return true
-    end
-
     vim.keymap.set("i", "<Tab>", function()
-      if expand_html_bang() then
-        return
-      end
       local ok_cmp, cmp = pcall(require, "cmp")
       if ok_cmp and cmp.visible() then
         cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
@@ -177,7 +131,7 @@
         return
       end
       feed_tab()
-    end, { desc = "Expand Emmet, snippets, or continue indentation" })
+    end, { desc = "Expand snippet or continue indentation" })
 
     _G.livara_completion_report = function()
       local clients = vim.lsp.get_clients({ bufnr = 0 })
@@ -231,39 +185,6 @@
         rows[1] = "No LSP client is attached to the current buffer"
       end
       vim.notify(table.concat(rows, "\n"), vim.log.levels.INFO, { title = "Livara completion report" })
-      for _, client in ipairs(clients) do
-        if client.name == "jdtls" and client.supports_method and client:supports_method("textDocument/completion") then
-          local params = vim.lsp.util.make_position_params(0, client.offset_encoding)
-          client:request("textDocument/completion", params, function(err, result)
-            local items = result and (result.items or result) or {}
-            local labels = {}
-            local text_edits = 0
-            local additional_text_edits = 0
-            for index = 1, #items do
-              local item = items[index]
-              if index <= 8 then
-                labels[#labels + 1] = item.label or "<unlabeled>"
-              end
-              if item.textEdit then
-                text_edits = text_edits + 1
-              end
-              if item.additionalTextEdits then
-                additional_text_edits = additional_text_edits + #item.additionalTextEdits
-              end
-            end
-            vim.schedule(function()
-              local status = err and ("error=" .. vim.inspect(err)) or string.format(
-                "items=%d text_edits=%d additional_text_edits=%d",
-                #items,
-                text_edits,
-                additional_text_edits
-              )
-              local sample = #labels > 0 and (" labels=" .. table.concat(labels, ", ")) or ""
-              vim.notify(status .. sample, err and vim.log.levels.ERROR or vim.log.levels.INFO, { title = "JDTLS completion probe" })
-            end)
-          end, 0)
-        end
-      end
     end
     vim.api.nvim_create_user_command("LivaraCompletionReport", _G.livara_completion_report, {})
     vim.api.nvim_create_user_command("LivaraCmpStatus", function()

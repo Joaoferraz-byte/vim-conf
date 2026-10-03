@@ -139,6 +139,18 @@ in
     vim.lsp.enable("jdtls");
   '';
 
+  extraConfigLua = ''
+    local luasnip = require("luasnip")
+    local snippet = luasnip.snippet
+    local insert = luasnip.insert_node
+    local fmt = require("luasnip.extras.fmt").fmt
+    luasnip.add_snippets("java", {
+      snippet("psvm", fmt("public static void main(String[] args) {{\n\t{}\n}}", { insert(0) })),
+      snippet("sout", fmt("System.out.println({});", { insert(1) })),
+      snippet("sysout", fmt("System.out.println({});", { insert(1) })),
+    })
+  '';
+
   extraPackages = with pkgs; [
     jdk8
     jdk21
