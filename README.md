@@ -51,11 +51,11 @@ Each plugin has one primary owner. The layout does not artificially fragment eve
 
 ## Matugen/Livara theme
 
-The editor keeps `habamax` as its first-start fallback and forces `background = "dark"`. When `~/.config/nvim/lua/matugen_colors.lua` exists, `config/theme.nix` loads the Lua table produced by the Livara adapter and applies the wallpaper-derived palette.
+The editor keeps `habamax` as its first-start fallback and forces `background = "dark"`. When `~/.config/nvim/lua/matugen_colors.lua` exists, `config/theme.nix` loads the Lua table produced by the Ambxst/Livara adapter and applies the wallpaper-derived palette.
 
 The loader uses one `_G.reload_livara_theme` contract and a `vim.uv.new_fs_event` watcher. `LivaraStatusline` is the sole owner of `vim.o.statusline`: the global footer uses a linear composition with file, Git, diagnostic, LSP client, filetype, position and scrollbar information. `vim.o.winbar` intentionally remains empty, preventing a breadcrumb plugin from inheriting or redrawing the bar. The canvas and statusline groups are transparent; menus, floats and completion retain contrasting surfaces.
 
-Matugen is the owner of the dynamic palette. NixVim only consumes the generated file and does not start a compositor, visual shell, QuickShell, Hyprland or Serpantinum.
+Ambxst owns the dynamic palette. NixVim only consumes the generated file and does not start the compositor or desktop shell.
 
 ## Interface and workflows
 

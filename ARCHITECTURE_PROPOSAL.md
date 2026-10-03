@@ -12,8 +12,8 @@ NixVim remains viable because the repository already provides a stable module bo
 | --- | --- | --- |
 | `vim-conf` | NixVim modules, Java UX, diagnostics, completion, format routing, tests, debug and file creation | Installing mutable Java tools or managing IDE profile state |
 | `nix-conf` | JDKs, JDTLS, Java CLI tools, IntelliJ/Android Studio packages, desktop entries and Matugen entrypoints | Java buffer callbacks or a second LSP client |
-| `shell-conf` | Runtime application adapters for generated palettes and documented external formats | Noctalia ownership or arbitrary application state resets |
-| `noctalia-conf` | Noctalia runtime, stable settings, wallpaper policy, templates and plugin lifecycle | Application-specific imperative configuration |
+| `shell-conf` | Runtime application adapters for the canonical Ambxst palette and documented external formats | Shell runtime ownership or arbitrary application state resets |
+| `ambxst-conf` | Ambxst runtime, wallpaper selection and canonical palette production | Editor-specific adapters or Java LSP configuration |
 | NixVim | Declarative plugin composition and stable setup order | Runtime context that requires Lua callbacks |
 | Lua | JDTLS callbacks, Java scaffolding, explorer adapters and editor commands | Downloading mutable tools or duplicating package management |
 | JDTLS/nvim-java | Java project model, classpath, completion, diagnostics, imports, formatting, runner, tests, debug and refactoring | Desktop IDE UI |
@@ -31,7 +31,7 @@ Java formatting is owned by JDTLS. Conform does not issue a competing Java LSP f
 
 ## Application theme contract
 
-Noctalia produces the wallpaper-derived palette. `shell-conf` converts it only into documented target formats: `.icls` for IntelliJ IDEA and Android Studio, a local UI-theme plugin for both products, and `theme.css` source for Hydra Launcher. Hydra publication remains a review and pull-request action through the official `hydra-themes` repository; local Appearance activation remains Hydra's supported Create/Edit workflow because its list is stored in a private LevelDB database.
+Ambxst produces the wallpaper-derived dark palette. `shell-conf` converts the canonical bridge output only into documented target formats: `.icls` for IntelliJ IDEA and Android Studio, a local UI-theme plugin for both products, and `theme.css` source for Hydra Launcher. Hydra publication remains a review and pull-request action through the official `hydra-themes` repository; local Appearance activation remains Hydra's supported Create/Edit workflow because its list is stored in a private LevelDB database.
 
 Snacks uses the compact `select` preset for `vim.ui.select` while the project creator keeps its custom preview layout. Dashboard, picker input/list/preview, Oil and quickfix buffers are non-file surfaces: their bufferline entry, winbar and statusline are hidden without changing the global file workflow.
 
