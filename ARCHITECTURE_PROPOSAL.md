@@ -2,7 +2,7 @@
 
 ## Decision
 
-The Java backend is Eclipse JDT Language Server (JDTLS), orchestrated by `nvim-java`. IntelliJ IDEA remains an optional desktop IDE and is not a Neovim language-server dependency. The editor uses one Java LSP owner and does not start `nvim-jdtls` or an IntelliJ bridge beside it. Source and Javadoc attachment remains available on demand, but it is not requested during the first project import.
+The Java backend is Eclipse JDT Language Server (JDTLS), orchestrated by `nvim-java`. Optional desktop IDEs are outside the Neovim language-server and theme contracts. The editor uses one Java LSP owner and does not start `nvim-jdtls` or an IntelliJ bridge beside it. Source and Javadoc attachment remains available on demand, but it is not requested during the first project import.
 
 NixVim remains viable because the repository already provides a stable module boundary, while runtime-sensitive behavior lives in one Lua module. Package management remains declarative: JDTLS, JDKs, Lombok, Java Test and Java Debug Adapter are referenced through Nix store paths, and nvim-java auto-install is disabled.
 
@@ -11,7 +11,7 @@ NixVim remains viable because the repository already provides a stable module bo
 | Owner | Responsibility | Non-responsibility |
 | --- | --- | --- |
 | `vim-conf` | NixVim modules, Java UX, diagnostics, completion, format routing, tests, debug and file creation | Installing mutable Java tools or managing IDE profile state |
-| `nix-conf` | JDKs, JDTLS, Java CLI tools, IntelliJ/Android Studio packages, desktop entries and Matugen entrypoints | Java buffer callbacks or a second LSP client |
+| `nix-conf` | JDKs, JDTLS, Java CLI tools, desktop entries and palette entrypoints | Java buffer callbacks or a second LSP client |
 | `shell-conf` | Runtime application adapters for the canonical Ambxst palette and documented external formats | Shell runtime ownership or arbitrary application state resets |
 | `ambxst-conf` | Ambxst runtime, wallpaper selection and canonical palette production | Editor-specific adapters or Java LSP configuration |
 | NixVim | Declarative plugin composition and stable setup order | Runtime context that requires Lua callbacks |
@@ -31,7 +31,7 @@ Java formatting is owned by JDTLS. Conform does not issue a competing Java LSP f
 
 ## Application theme contract
 
-Ambxst produces the wallpaper-derived dark palette. `shell-conf` converts the canonical bridge output only into documented target formats: `.icls` for IntelliJ IDEA and Android Studio, a local UI-theme plugin for both products, and `theme.css` source for Hydra Launcher. Hydra publication remains a review and pull-request action through the official `hydra-themes` repository; local Appearance activation remains Hydra's supported Create/Edit workflow because its list is stored in a private LevelDB database.
+Ambxst produces the wallpaper-derived dark palette. `shell-conf` owns the active application adapters; IDE theme generation is intentionally out of scope. Hydra publication remains a review and pull-request action through the official `hydra-themes` repository; local Appearance activation remains Hydra's supported Create/Edit workflow because its list is stored in a private LevelDB database.
 
 Snacks uses the compact `select` preset for `vim.ui.select` while the project creator keeps its custom preview layout. Dashboard, picker input/list/preview, Oil and quickfix buffers are non-file surfaces: their bufferline entry, winbar and statusline are hidden without changing the global file workflow.
 
