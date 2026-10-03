@@ -4,6 +4,8 @@
   # rustaceanvim must not be enabled alongside this client.
   plugins.lsp.servers.rust_analyzer = {
     enable = true;
+    installCargo = false;
+    installRustc = false;
     rootMarkers = [ "Cargo.toml" "rust-project.json" ".git" ];
     settings = {
       "rust-analyzer" = {

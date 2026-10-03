@@ -7,6 +7,11 @@
       command = "${pkgs.lldb}/bin/lldb-dap";
     };
 
+    adapters.executables.python = {
+      command = "${pkgs.python3Packages.debugpy}/bin/python";
+      args = [ "-m" "debugpy.adapter" ];
+    };
+
     configurations = {
       c = [
         {
@@ -43,6 +48,17 @@
           name = "Attach Spring Boot (porta 5005)";
           hostName = "127.0.0.1";
           port = 5005;
+        }
+      ];
+      python = [
+        {
+          name = "Launch current Python file";
+          type = "python";
+          request = "launch";
+          program.__raw = ''vim.fn.expand("%:p")'';
+          pythonPath.__raw = ''function() return vim.fn.exepath("python") end'';
+          console = "integratedTerminal";
+          cwd = "\${workspaceFolder}";
         }
       ];
     };

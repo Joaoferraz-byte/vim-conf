@@ -3,6 +3,12 @@
   plugins.lsp.servers.pyright = {
     enable = true;
     rootMarkers = [ "pyproject.toml" "uv.lock" "pyrightconfig.json" ".git" ];
+    settings.python.analysis = {
+      autoSearchPaths = true;
+      diagnosticMode = "workspace";
+      typeCheckingMode = "basic";
+      useLibraryCodeForTypes = true;
+    };
   };
   plugins.lsp.servers.ruff = {
     enable = true;
@@ -17,5 +23,5 @@
     end, {})
   '';
 
-  extraPackages = with pkgs; [ python3 uv ruff pyright ];
+  extraPackages = with pkgs; [ python3 uv ruff pyright python3Packages.debugpy ];
 }

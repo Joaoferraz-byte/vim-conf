@@ -29,22 +29,7 @@
         settings.bashIde.shellcheckPath = "shellcheck";
       };
       dockerls.enable = true;
-      clangd.enable = true;
       gopls.enable = true;
-      rust_analyzer = {
-        enable = true;
-        installCargo = false;
-        installRustc = false;
-      };
-      pyright = {
-        enable = true;
-        settings.python.analysis = {
-          autoSearchPaths = true;
-          diagnosticMode = "workspace";
-          typeCheckingMode = "basic";
-          useLibraryCodeForTypes = true;
-        };
-      };
       marksman.enable = true;
     };
   };
@@ -53,8 +38,5 @@
   extraPackages = with pkgs; [
     shellcheck
     gopls
-    cargo
-    rustc
-    rust-analyzer
   ];
 }
