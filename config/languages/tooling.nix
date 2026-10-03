@@ -40,6 +40,20 @@
     };
   };
 
+  # Project .clang-format files remain authoritative. When a project has no
+  # style file, use the same policy as the editor: two spaces, spaces only,
+  # and case labels indented inside switch blocks.
+  extraConfigLua = ''
+    local ok, conform = pcall(require, "conform")
+    if ok then
+      conform.formatters["clang-format"] = {
+        prepend_args = {
+          "--fallback-style={BasedOnStyle: LLVM, IndentWidth: 2, TabWidth: 2, UseTab: Never, IndentCaseLabels: true}",
+        },
+      }
+    end
+  '';
+
   plugins.neotest.enable = true;
 
   extraPackages = with pkgs; [

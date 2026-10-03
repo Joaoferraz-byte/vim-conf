@@ -1,16 +1,19 @@
 { ... }:
 {
-  # Indentation policy is editor behavior; formatter ownership lives in
-  # languages/tooling.nix and delegates style to each project's config.
+  # Keep insertion indentation aligned with the clang-format fallback policy.
+  # Formatting itself remains owned by conform.nvim and project .clang-format.
   extraConfigLua = ''
     vim.api.nvim_create_autocmd("FileType", {
       pattern = { "c", "cpp" },
       callback = function(args)
-        vim.bo[args.buf].autoindent = true
-        vim.bo[args.buf].smartindent = false
-        vim.bo[args.buf].cindent = true
-        vim.bo[args.buf].indentexpr = ""
-        vim.bo[args.buf].cinoptions = ":1,=s"
+        local buffer = vim.bo[args.buf]
+        buffer.expandtab = true
+        buffer.shiftwidth = 2
+        buffer.tabstop = 2
+        buffer.softtabstop = 2
+        buffer.autoindent = true
+        buffer.smartindent = false
+        buffer.cindent = false
       end,
     })
   '';
