@@ -7,5 +7,5 @@
     extraOptions.workspace_required = true;
   };
 
-  extraPackages = with pkgs; [ php phpPackages.composer ];
+  extraPackages = with pkgs; [ php phpPackages.composer phpPackages.php-cs-fixer ];
 }
